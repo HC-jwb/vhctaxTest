@@ -17,4 +17,8 @@ public class ReportDesc {
 	private String created;
 	@JsonProperty("time_filter")
 	private TimeFilter timeFilter;
+	//private String title;
+	private List<Sheet> sheets;
+	private String from;
+	private String to;
 }
