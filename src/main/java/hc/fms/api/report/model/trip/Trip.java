@@ -1,5 +1,8 @@
 package hc.fms.api.report.model.trip;
 
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -13,10 +16,12 @@ import lombok.ToString;
 @ToString
 public class Trip {
 	private Long id;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss", timezone="Asia/Seoul")
 	@JsonProperty("start_date")
-	private String startDate;
+	private Date startDate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss", timezone="Asia/Seoul")
 	@JsonProperty("end_date")
-	private String endDate;
+	private Date endDate;
 	
 	@JsonProperty("avg_speed")
 	private Integer avgSpeed;

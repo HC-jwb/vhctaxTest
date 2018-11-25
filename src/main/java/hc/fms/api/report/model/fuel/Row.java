@@ -10,4 +10,5 @@ public class Row {
 	private ColMinMaxAvg avg;
 	private ColMinMaxAvg time;
 	private ColMinMaxAvg value;
+	private Address address;
 }

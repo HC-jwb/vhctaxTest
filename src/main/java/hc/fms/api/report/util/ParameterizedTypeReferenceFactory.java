@@ -8,6 +8,7 @@ import hc.fms.api.report.model.FuelConsumptionReportResponse;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenResponse;
 import hc.fms.api.report.model.SensorResponse;
+import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.TripResponse;
 import hc.fms.api.report.model.auth.AuthResponse;
 @Configuration
@@ -35,5 +36,9 @@ public class ParameterizedTypeReferenceFactory {
 	@Bean
 	ParameterizedTypeReference<FuelConsumptionReportResponse> reportConsumptionResponseTypeRef() {
 		return new ParameterizedTypeReference<FuelConsumptionReportResponse>() {};
+	}
+	@Bean
+	ParameterizedTypeReference<TrackerResponse> trackerResponseTypeRef() {
+		return new ParameterizedTypeReference<TrackerResponse>() {};
 	}
 }

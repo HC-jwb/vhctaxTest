@@ -13,9 +13,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class Sheet {
-	//private String type;//"table"
 	private String header;//"Statistics data",  "Data breakdown"
-	//private String timezone;
-
 	private List<Section> sections;
 }

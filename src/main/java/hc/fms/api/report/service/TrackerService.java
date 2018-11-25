@@ -16,6 +16,7 @@ import hc.fms.api.report.model.FuelConsumptionReportResponse;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenResponse;
 import hc.fms.api.report.model.SensorResponse;
+import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.TripResponse;
 import hc.fms.api.report.model.tracker.request.GenerateRequest;
 import hc.fms.api.report.model.tracker.request.SensorRequest;
@@ -40,7 +41,20 @@ public class TrackerService {
 	private ParameterizedTypeReference<ReportGenResponse> reportGenResponseTypeRef;
 	@Autowired
 	private ParameterizedTypeReference<FuelConsumptionReportResponse> reportConsumptionResponseTypeRef;
-	
+	@Autowired
+	private ParameterizedTypeReference<TrackerResponse> trackerResponseTypeRef;
+	public TrackerResponse getTrackerList(String hash) {
+		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+		map.add("hash", hash);
+		TrackerResponse response = null;
+		try {
+			ResponseEntity<TrackerResponse> responseEntity = restTemplate.exchange(String.format("%s%s", fmsProps.getBaseUrl(), fmsProps.getApi().getTracker()), HttpMethod.POST, new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), trackerResponseTypeRef);
+			response= responseEntity.getBody();
+		} catch(HttpStatusCodeException  e) {
+			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), TrackerResponse.class);} catch(Exception ex) {	ex.printStackTrace();}
+		}
+		return response;
+	}
 	public TripResponse getTrip(TripRequest req) {
 		return getTrip(req.getHash(), req.getTrackerId(), req.getFrom(), req.getTo());
 	}
@@ -114,7 +128,6 @@ public class TrackerService {
 		try {
 			ResponseEntity<FuelConsumptionReportResponse> responseEntity = restTemplate.exchange(String.format("%s%s", fmsProps.getBaseUrl(), fmsProps.getApi().getReportRetrieve()), HttpMethod.POST, new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), reportConsumptionResponseTypeRef);
 			response= responseEntity.getBody();
-			//restTemplate.postForObject(url, request, responseType)
 		} catch(HttpStatusCodeException e) {
 			e.printStackTrace();
 			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), FuelConsumptionReportResponse.class);} catch(Exception ex) {	ex.printStackTrace();}
