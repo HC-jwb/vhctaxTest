@@ -1,5 +1,9 @@
 package hc.fms.api.report.service;
 
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -12,16 +16,21 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.FuelConsumptionReportResponse;
 import hc.fms.api.report.model.GroupResponse;
+import hc.fms.api.report.model.ReportGenFlatRequest;
 import hc.fms.api.report.model.ReportGenResponse;
 import hc.fms.api.report.model.SensorResponse;
 import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.TripResponse;
+import hc.fms.api.report.model.fuel.Plugin;
 import hc.fms.api.report.model.tracker.request.GenerateRequest;
 import hc.fms.api.report.model.tracker.request.SensorRequest;
+import hc.fms.api.report.model.tracker.request.TrackerInfo;
 import hc.fms.api.report.model.tracker.request.TripRequest;
 import hc.fms.api.report.properties.FmsProperties;
+import hc.fms.api.report.repository.ReportGenRepository;
 import hc.fms.api.report.util.HttpUtil;
 
 @Service
@@ -43,6 +52,9 @@ public class TrackerService {
 	private ParameterizedTypeReference<FuelConsumptionReportResponse> reportConsumptionResponseTypeRef;
 	@Autowired
 	private ParameterizedTypeReference<TrackerResponse> trackerResponseTypeRef;
+	
+	@Autowired
+	private ReportGenRepository reportGenRepository;
 	public TrackerResponse getTrackerList(String hash) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", hash);
@@ -120,7 +132,7 @@ public class TrackerService {
 		}
 		return response;
 	}
-	public FuelConsumptionReportResponse retrieveReport(String hash, int reportId) {
+	public FuelConsumptionReportResponse retrieveReport(String hash, long reportId) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", hash);
 		map.add("report_id", String.valueOf(reportId));
@@ -130,8 +142,89 @@ public class TrackerService {
 			response= responseEntity.getBody();
 		} catch(HttpStatusCodeException e) {
 			e.printStackTrace();
-			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), FuelConsumptionReportResponse.class);} catch(Exception ex) {	ex.printStackTrace();}
+			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), FuelConsumptionReportResponse.class);} catch(Exception ex) {ex.printStackTrace();}
 		}
 		return response;
+	}
+	
+	public ReportGenResponse generateReport(ReportGenFlatRequest req) {
+		/*
+		- trackers => [{trackerId:73, mileageSensorId: 222, fuleSensorId: 111} ,{trackerId:69, mileageSensorId: 224, fuelSensorId: 124}], from=> 2018-11-23 00:00:00, to=> 2018-11-23 23:59:59, detailsIntervalMinutes => 360 
+		genReq.setTrackers(Arrays.asList(73, 69));
+		genReq.setFrom("2018-11-23 00:00:00");
+		genReq.setTo("2018-11-23 23:59:59");
+		genReq.setTimeFilter(new TimeFilter());//default
+		Plugin plugin = new Plugin();
+		plugin.setDetailsIntervalMinutes(60 * 6);//default
+		plugin.setShowAddress(true);//default
+		plugin.setFilter(true);//default
+		List<Plugin.Sensor> sensors = new ArrayList<>();
+		Plugin.Sensor sensor = new Plugin.Sensor();
+		sensor.setTrackerId(71);
+		sensor.setSensorId(647);
+		sensors.add(sensor);
+		
+		sensor = new Plugin.Sensor();
+		sensor.setTrackerId(69);
+		sensor.setSensorId(645);
+		sensors.add(sensor);
+		plugin.setSensors(sensors);
+		 */
+		List<TrackerInfo> infoList = req.getTrackers();
+		List<Integer> trackerIdList = infoList.stream().map(info -> info.getTrackerId()).collect(Collectors.toList());
+		String from = req.getFrom();
+		String to = req.getTo();
+		String hash = req.getHash();
+		int detailsIntervalMinutes = req.getIntervalInMin();
+		
+		GenerateRequest fuelGenReq = new GenerateRequest();
+		fuelGenReq.setHash(hash);
+
+		fuelGenReq.setTrackers(trackerIdList);
+		fuelGenReq.setFrom(from);
+		fuelGenReq.setTo(to);
+		
+		Plugin plugin = new Plugin();
+		plugin.setDetailsIntervalMinutes(detailsIntervalMinutes);
+		System.out.println(infoList.stream().map(info -> new Plugin.Sensor(info.getTrackerId(), info.getFuelConsumptionSensorId())).collect(Collectors.toList()));
+		plugin.setSensors(infoList.stream().map(info -> new Plugin.Sensor(info.getTrackerId(), info.getFuelConsumptionSensorId())).collect(Collectors.toList()));
+		fuelGenReq.setPlugin(plugin);
+				
+		
+		GenerateRequest mileageGenReq = new GenerateRequest();
+		mileageGenReq.setHash(hash);
+
+		mileageGenReq.setTrackers(trackerIdList);
+		mileageGenReq.setFrom(from);
+		mileageGenReq.setTo(to);
+		
+		plugin = new Plugin();
+		plugin.setDetailsIntervalMinutes(detailsIntervalMinutes);
+		plugin.setSensors(infoList.stream().map(info -> new Plugin.Sensor(info.getTrackerId(), info.getHardwareMileageSensorId())).collect(Collectors.toList()));
+		mileageGenReq.setPlugin(plugin);
+		
+		
+		ReportGenResponse response = new ReportGenResponse();
+		ReportGenResponse fuelGenResponse = requestReportGen(fuelGenReq);
+		if(fuelGenResponse.isSuccess()) {
+			ReportGenResponse mileageGenResponse = requestReportGen(mileageGenReq);
+			if(mileageGenResponse.isSuccess()) {
+				ReportGen reportGen = new ReportGen();
+				reportGen.setFuelReportId(fuelGenResponse.getId());
+				reportGen.setMileageReportId(mileageGenResponse.getId());
+				reportGen.setLabel(req.getLabel());
+				reportGen.setCreatedDate(new Date());
+				reportGen.setFrom(from);
+				reportGen.setTo(to);
+				reportGen = reportGenRepository.save(reportGen);
+				response.setSuccess(true);
+				response.setId(reportGen.getId());
+			} else {
+				return mileageGenResponse;//fuel generation successful but faile to generate mileageReport 
+			}
+		} else {
+			return fuelGenResponse;//fuel generation failed
+		}
+		return response;//all successful and created a single report reponse which includes both of the sub reports
 	}
 }

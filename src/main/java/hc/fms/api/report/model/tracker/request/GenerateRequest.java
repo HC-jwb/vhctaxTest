@@ -25,7 +25,7 @@ public class GenerateRequest {
 	private String to;
 	private String geocoder = "google";
 	@JsonProperty("time_filter")
-	private TimeFilter timeFilter;
+	private TimeFilter timeFilter = new TimeFilter();
 	private Plugin plugin;
 	
 	public String getTimeFilter() {

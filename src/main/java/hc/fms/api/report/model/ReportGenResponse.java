@@ -12,8 +12,8 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class ReportGenResponse {
-	private Boolean success;
-	private int id;
+	private boolean success;
+	private long id;
 	private ResponseStatus status;
 	private List<ResponseError> errors;
 }
