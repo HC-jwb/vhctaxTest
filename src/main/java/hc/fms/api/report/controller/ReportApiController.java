@@ -55,8 +55,9 @@ public class ReportApiController {
 	@PostMapping("/generate")
 	public ReportGenResponse requestReportGen(@RequestBody ReportGenFlatRequest req, HttpSession session) {
 		/*
-		 * 
+		 * session Key: d222e37acb3d15cd0da78c229a7b9d70
 		{
+			
 			"trackers": [{"trackerId": 78, "mileageSensorId": 656, "fuelSensorId": 640}, {"trackerId": 72, "mileageSensorId": 655, "fuelSensorId": 644}],
 			"from":"2018-11-01 00:00:00",
 			"to":"2018-11-26 23:59:59",
