@@ -25,6 +25,8 @@ public class FuelStatistics {
 	private Long trackerId;
 	@Column(name="stat_dt")
 	private String statDate;
+	@Column(name="raw_dt")
+	private Long rawDate;
 	
 	private Double min;
 	private Double max;

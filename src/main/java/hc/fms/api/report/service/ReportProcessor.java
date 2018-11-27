@@ -60,10 +60,16 @@ public class ReportProcessor {
 			fuelStat.setTrackerId(trackerId);
 			fuelStat.setType(type);
 			fuelStat.setStatDate(row.getDate().getV());
-			fuelStat.setMin(row.getMin().getRaw().doubleValue());
-			fuelStat.setMax(row.getMax().getRaw().doubleValue());
-			fuelStat.setAvg(row.getAvg().getRaw().doubleValue());
-			fuelStat.setStatDate(row.getDate().getV());
+			fuelStat.setRawDate(row.getDate().getRaw());
+			try {
+				if(row.getMin().getRaw() != null) fuelStat.setMin(row.getMin().getRaw().doubleValue());
+				if(row.getMax().getRaw() != null) fuelStat.setMax(row.getMax().getRaw().doubleValue());
+				if(row.getAvg().getRaw() != null) fuelStat.setAvg(row.getAvg().getRaw().doubleValue());
+				fuelStat.setStatDate(row.getDate().getV());
+			} catch(Exception e) {
+				e.printStackTrace();
+				throw e;
+			}
 			return fuelStat;
 		}).collect(Collectors.toList());
 		Section statDetailSection = sectionList.get(1);
@@ -87,6 +93,7 @@ public class ReportProcessor {
 				}
 				fuelDetail.setValue(row.getValue().getRaw());
 				return fuelDetail;
+				
 			}).collect(Collectors.toList());
 			statDetailList.addAll(detailList);
 		});
