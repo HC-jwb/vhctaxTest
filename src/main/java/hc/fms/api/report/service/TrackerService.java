@@ -64,10 +64,15 @@ public class TrackerService {
 		map.add("hash", hash);
 		TrackerResponse response = null;
 		try {
-			ResponseEntity<TrackerResponse> responseEntity = restTemplate.exchange(String.format("%s%s", fmsProps.getBaseUrl(), fmsProps.getApi().getTracker()), HttpMethod.POST, new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), trackerResponseTypeRef);
+			ResponseEntity<TrackerResponse> responseEntity = restTemplate.exchange(
+					String.format("%s%s", fmsProps.getBaseUrl(), fmsProps.getApi().getTracker()), 
+					HttpMethod.POST, 
+					new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), 
+					trackerResponseTypeRef
+			);
 			response= responseEntity.getBody();
 		} catch(HttpStatusCodeException  e) {
-			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), TrackerResponse.class);} catch(Exception ex) {	ex.printStackTrace();}
+			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), TrackerResponse.class);} catch(Exception ex) { ex.printStackTrace();}
 		}
 		return response;
 	}
