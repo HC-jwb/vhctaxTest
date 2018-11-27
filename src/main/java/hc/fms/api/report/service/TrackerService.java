@@ -1,9 +1,12 @@
 package hc.fms.api.report.service;
 
-import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -17,7 +20,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import hc.fms.api.report.entity.ReportGen;
-import hc.fms.api.report.model.FuelConsumptionReportResponse;
+import hc.fms.api.report.model.ReportResponse;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
 import hc.fms.api.report.model.ReportGenResponse;
@@ -25,17 +28,20 @@ import hc.fms.api.report.model.SensorResponse;
 import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.TripResponse;
 import hc.fms.api.report.model.fuel.Plugin;
+import hc.fms.api.report.model.fuel.ReportDesc;
 import hc.fms.api.report.model.tracker.request.GenerateRequest;
 import hc.fms.api.report.model.tracker.request.SensorRequest;
 import hc.fms.api.report.model.tracker.request.TrackerInfo;
 import hc.fms.api.report.model.tracker.request.TripRequest;
 import hc.fms.api.report.properties.FmsProperties;
-import hc.fms.api.report.repository.ReportGenRepository;
 import hc.fms.api.report.util.HttpUtil;
 
 @Service
 public class TrackerService {
 	private RestTemplate restTemplate = new RestTemplate();
+	private Logger logger = LoggerFactory.getLogger(TrackerService.class);
+	@Autowired
+	private ReportProcessor reportProcessor;
 	@Autowired
 	private HttpHeaders basicUrlEncodedContentTypeHeaders;
 	@Autowired
@@ -49,12 +55,10 @@ public class TrackerService {
 	@Autowired
 	private ParameterizedTypeReference<ReportGenResponse> reportGenResponseTypeRef;
 	@Autowired
-	private ParameterizedTypeReference<FuelConsumptionReportResponse> reportConsumptionResponseTypeRef;
+	private ParameterizedTypeReference<ReportResponse> reportConsumptionResponseTypeRef;
 	@Autowired
 	private ParameterizedTypeReference<TrackerResponse> trackerResponseTypeRef;
 	
-	@Autowired
-	private ReportGenRepository reportGenRepository;
 	public TrackerResponse getTrackerList(String hash) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", hash);
@@ -132,17 +136,17 @@ public class TrackerService {
 		}
 		return response;
 	}
-	public FuelConsumptionReportResponse retrieveReport(String hash, long reportId) {
+	public ReportResponse retrieveReport(String hash, long reportId) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", hash);
 		map.add("report_id", String.valueOf(reportId));
-		FuelConsumptionReportResponse response = null;
+		ReportResponse response = null;
 		try {
-			ResponseEntity<FuelConsumptionReportResponse> responseEntity = restTemplate.exchange(String.format("%s%s", fmsProps.getBaseUrl(), fmsProps.getApi().getReportRetrieve()), HttpMethod.POST, new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), reportConsumptionResponseTypeRef);
+			ResponseEntity<ReportResponse> responseEntity = restTemplate.exchange(String.format("%s%s", fmsProps.getBaseUrl(), fmsProps.getApi().getReportRetrieve()), HttpMethod.POST, new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), reportConsumptionResponseTypeRef);
 			response= responseEntity.getBody();
 		} catch(HttpStatusCodeException e) {
 			e.printStackTrace();
-			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), FuelConsumptionReportResponse.class);} catch(Exception ex) {ex.printStackTrace();}
+			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), ReportResponse.class);} catch(Exception ex) {ex.printStackTrace();}
 		}
 		return response;
 	}
@@ -186,7 +190,7 @@ public class TrackerService {
 		
 		Plugin plugin = new Plugin();
 		plugin.setDetailsIntervalMinutes(detailsIntervalMinutes);
-		System.out.println(infoList.stream().map(info -> new Plugin.Sensor(info.getTrackerId(), info.getFuelConsumptionSensorId())).collect(Collectors.toList()));
+		//logger.info(infoList.stream().map(info -> new Plugin.Sensor(info.getTrackerId(), info.getFuelConsumptionSensorId())).collect(Collectors.toList()) + "");
 		plugin.setSensors(infoList.stream().map(info -> new Plugin.Sensor(info.getTrackerId(), info.getFuelConsumptionSensorId())).collect(Collectors.toList()));
 		fuelGenReq.setPlugin(plugin);
 				
@@ -213,12 +217,72 @@ public class TrackerService {
 				reportGen.setFuelReportId(fuelGenResponse.getId());
 				reportGen.setMileageReportId(mileageGenResponse.getId());
 				reportGen.setLabel(req.getLabel());
-				reportGen.setCreatedDate(new Date());
 				reportGen.setFrom(from);
 				reportGen.setTo(to);
-				reportGen = reportGenRepository.save(reportGen);
+				final ReportGen reportGenSaved = reportProcessor.logReportGen(reportGen);
 				response.setSuccess(true);
-				response.setId(reportGen.getId());
+				response.setId(reportGenSaved.getId());
+				ExecutorService execService = Executors.newSingleThreadExecutor();
+				
+				execService.submit(() -> {
+					long elapsed = 0L, start = System.currentTimeMillis();
+					long fuelReportId = reportGenSaved.getFuelReportId();
+					long mileageReportId = reportGenSaved.getMileageReportId();
+					ReportDesc fuelReport = null, mileageReport = null;
+					while(true) {
+						try {
+							Thread.sleep(5 * 1000);
+						} catch(Exception e) {
+							e.printStackTrace();
+						}
+						if(fuelReport == null) {
+							try {
+								ReportResponse fuelReportResponse = retrieveReport(req.getHash(), fuelReportId);
+								if(fuelReportResponse.isSuccess()) {
+									fuelReport = fuelReportResponse.getReport();
+								} else if(fuelReportResponse.getStatus().getCode() == 229) {
+									logger.info("Fuel consumption report generation still in progress ..");
+								} else if(fuelReportResponse.getStatus().getCode() == 204) {
+									logger.info("Fuel consumption report not found");
+									break;
+								} else {
+									logger.info("Fuel consumption report unknown error status " + fuelReportResponse);
+								}
+							} catch(Exception e) {
+								e.printStackTrace();
+							}
+						}
+						if(mileageReport == null) {
+							try {
+								ReportResponse mileageReportResponse = retrieveReport(req.getHash(), mileageReportId);
+								if(mileageReportResponse.isSuccess()) {
+									mileageReport = mileageReportResponse.getReport();
+								} else if(mileageReportResponse.getStatus().getCode() == 229) {
+									logger.info("Mileage report generation still in progress ..");
+								} else if(mileageReportResponse.getStatus().getCode() == 204) {
+									logger.info("Mileage report not found");
+									break;
+								} else {
+									logger.info("Mileage report unknown error status " + mileageReportResponse);
+								}
+							} catch(Exception e) {
+								//e.printStackTrace();
+							}
+						}
+						if(fuelReport != null && mileageReport != null) {
+							logger.info("retrieved both reports " + reportGenSaved);
+							reportProcessor.process(reportGenSaved, fuelReport, mileageReport);
+							break;
+						}
+						elapsed = System.currentTimeMillis() - start;
+						if(elapsed > 60 * 1000 * 60) {
+							break;
+						}
+					}
+					logger.info("Report generation Thread exited");
+				});
+				execService.shutdown();
+				
 			} else {
 				return mileageGenResponse;//fuel generation successful but faile to generate mileageReport 
 			}

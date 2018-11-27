@@ -14,11 +14,13 @@ import javax.persistence.TemporalType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name="report_gen")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class ReportGen {
 	@Id
@@ -34,6 +36,8 @@ public class ReportGen {
 	private String to;
 	private String label;
 	
+	@Column(name="report_proc", columnDefinition="TINYINT(1)")
+	private boolean fuelReportProcessed;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="created_dt", updatable=false)
 	private Date createdDate;

@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import hc.fms.api.report.model.FuelConsumptionReportResponse;
+import hc.fms.api.report.model.ReportResponse;
 import hc.fms.api.report.model.ReportGenResponse;
 import hc.fms.api.report.model.Section;
 import hc.fms.api.report.model.SensorResponse;
@@ -106,7 +106,7 @@ public class HandycarFmsApiReportApplicationTests {
 		return genResponse.getId();
 	}
 	private void retrieveFuelReportSample() {
-		FuelConsumptionReportResponse reportConsumptionResponse = trackerService.retrieveReport("abe373f67db97cfdab502e26195b1735", 538);
+		ReportResponse reportConsumptionResponse = trackerService.retrieveReport("abe373f67db97cfdab502e26195b1735", 538);
 		System.out.println(reportConsumptionResponse.getStatus());
 		if(reportConsumptionResponse.isSuccess()) {
 			ReportDesc report = reportConsumptionResponse.getReport();
@@ -124,7 +124,7 @@ public class HandycarFmsApiReportApplicationTests {
 		}
 	}
 	private void retrieveMileageReportSample() {
-		FuelConsumptionReportResponse reportConsumptionResponse = trackerService.retrieveReport("abe373f67db97cfdab502e26195b1735", 540);
+		ReportResponse reportConsumptionResponse = trackerService.retrieveReport("abe373f67db97cfdab502e26195b1735", 540);
 		System.out.println(reportConsumptionResponse.getStatus());
 		if(reportConsumptionResponse.isSuccess()) {
 			ReportDesc report = reportConsumptionResponse.getReport();

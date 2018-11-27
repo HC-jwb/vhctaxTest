@@ -12,7 +12,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class FuelConsumptionReportResponse {
+public class ReportResponse {
 	private boolean success;
 	private ResponseStatus status;
 	private List<ResponseError> errors;
