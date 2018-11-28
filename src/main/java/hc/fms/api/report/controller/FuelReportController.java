@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class FuelReportController {
 	@RequestMapping("/fuel")
 	public String fuelConsumptionReport(Model model, @RequestParam(value="hash", required=false) String hashKey) {
-		return "flcnsmp";
+		return "fuelreport";
 	}
 }
