@@ -1,5 +1,6 @@
 package hc.fms.api.report.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import hc.fms.api.report.entity.FuelStatResult;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
 import hc.fms.api.report.model.ReportGenResponse;
@@ -70,16 +72,11 @@ public class ReportApiController {
 		ReportGenResponse response = trackerService.generateReport(req);
 		return response;
 	}
-/*	
-	@RequestMapping("/normalize/{reportId}")
-	public ReportResponse analyzeReport(@PathVariable("reportId") long reportId, HttpSession session) {
-		ReportResponse response = trackerService.retrieveReport(hashKey(session), reportId);
-		if(response.isSuccess()) {
-			reportGenService.analyzeReport(response.getReport());
-		}
-		return response;
+
+	@RequestMapping("/stat/list/{reportId}")
+	public List<FuelStatResult> getStatisticsByReport(@PathVariable("reportId") Long reportId) {
+		return trackerService.getFuelStatisticsResultListByReportId(reportId);
 	}
-*/	
 	private String hashKey (HttpSession session) {
 		String hash = null;
 		Object attrHash = session.getAttribute("hash");

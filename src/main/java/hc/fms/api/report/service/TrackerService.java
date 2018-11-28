@@ -19,6 +19,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import hc.fms.api.report.entity.FuelStatResult;
 import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.ReportResponse;
 import hc.fms.api.report.model.GroupResponse;
@@ -34,6 +35,7 @@ import hc.fms.api.report.model.tracker.request.SensorRequest;
 import hc.fms.api.report.model.tracker.request.TrackerInfo;
 import hc.fms.api.report.model.tracker.request.TripRequest;
 import hc.fms.api.report.properties.FmsProperties;
+import hc.fms.api.report.repository.FuelStatisticsRepository;
 import hc.fms.api.report.util.HttpUtil;
 
 @Service
@@ -59,6 +61,8 @@ public class TrackerService {
 	@Autowired
 	private ParameterizedTypeReference<TrackerResponse> trackerResponseTypeRef;
 	
+	@Autowired
+	private FuelStatisticsRepository fuelStatRepository;
 	public TrackerResponse getTrackerList(String hash) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", hash);
@@ -150,7 +154,7 @@ public class TrackerService {
 			ResponseEntity<ReportResponse> responseEntity = restTemplate.exchange(String.format("%s%s", fmsProps.getBaseUrl(), fmsProps.getApi().getReportRetrieve()), HttpMethod.POST, new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), reportConsumptionResponseTypeRef);
 			response= responseEntity.getBody();
 		} catch(HttpStatusCodeException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), ReportResponse.class);} catch(Exception ex) {ex.printStackTrace();}
 		}
 		return response;
@@ -295,5 +299,8 @@ public class TrackerService {
 			return fuelGenResponse;//fuel generation failed
 		}
 		return response;//all successful and created a single report reponse which includes both of the sub reports
+	}
+	public List<FuelStatResult> getFuelStatisticsResultListByReportId(Long reportId) {
+		return fuelStatRepository.getFuelStatResultList(reportId);
 	}
 }

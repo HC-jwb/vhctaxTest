@@ -30,6 +30,5 @@ public class FuelStatistics {
 	
 	private Double min;
 	private Double max;
-	private Double avg;
 	private String type;
 }

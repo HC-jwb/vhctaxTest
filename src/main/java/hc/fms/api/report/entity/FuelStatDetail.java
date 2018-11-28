@@ -20,13 +20,10 @@ public class FuelStatDetail {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
-	@Column(name="stat_id")
-	private Long statId;
 	private String time;
 	private Double min;
 	private Double max;
 	private Double value;
-	private Double avg;
 	private String address;
 	private String type;//'F' or 'M'
 	private Long rawTime;

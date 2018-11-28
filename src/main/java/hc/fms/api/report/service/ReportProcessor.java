@@ -55,16 +55,16 @@ public class ReportProcessor {
 		Section statSection = sectionList.get(0);
 		List<FuelStatistics> statList = statSection.getData().get(0).getRows().stream().map(row -> {
 			FuelStatistics fuelStat = new FuelStatistics();
+			try {
 			fuelStat.setReportId(reportId);
 			fuelStat.setGenerationId(generationId);
 			fuelStat.setTrackerId(trackerId);
 			fuelStat.setType(type);
 			fuelStat.setStatDate(row.getDate().getV());
 			fuelStat.setRawDate(row.getDate().getRaw());
-			try {
+
 				if(row.getMin().getRaw() != null) fuelStat.setMin(row.getMin().getRaw().doubleValue());
 				if(row.getMax().getRaw() != null) fuelStat.setMax(row.getMax().getRaw().doubleValue());
-				if(row.getAvg().getRaw() != null) fuelStat.setAvg(row.getAvg().getRaw().doubleValue());
 				fuelStat.setStatDate(row.getDate().getV());
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -72,10 +72,12 @@ public class ReportProcessor {
 			}
 			return fuelStat;
 		}).collect(Collectors.toList());
+		
 		Section statDetailSection = sectionList.get(1);
 		final List<FuelStatDetail> statDetailList = new ArrayList<>();
 		statDetailSection.getData().forEach(datum -> {
 			List<FuelStatDetail> detailList = datum.getRows().stream().map(row -> {
+				try {
 				if(row.getValue().getRaw() == null) return null;
 				FuelStatDetail fuelDetail = new FuelStatDetail();
 				fuelDetail.setReportId(reportId);
@@ -86,24 +88,35 @@ public class ReportProcessor {
 				fuelDetail.setTrackerId(trackerId);
 				fuelDetail.setMin(row.getMin().getRaw());
 				fuelDetail.setMax(row.getMax().getRaw());
-				fuelDetail.setAvg(row.getAvg().getRaw());
 				fuelDetail.setTime(row.getTime().getV());
 				if(row.getTime().getRaw() != null) {
 					fuelDetail.setRawTime(row.getTime().getRaw().longValue());
 				}
 				fuelDetail.setValue(row.getValue().getRaw());
 				return fuelDetail;
+				}catch(Exception e) {
+					e.printStackTrace();
+					throw e;
+				}
 				
 			}).collect(Collectors.toList());
 			statDetailList.addAll(detailList);
 		});
+		
 		statList = fuelRepository.saveAll(statList);
 		//filter only non-null data and save'em all
-		fuelDetailRepository.saveAll(
-			statDetailList.stream().filter(fuelDetail -> {
-				return (fuelDetail != null);
-			}).collect(Collectors.toList())
-		);
+/*		
+		List<FuelStatDetail> filteredStatDetailList = statDetailList.stream().filter(fuelDetail -> {
+			return (fuelDetail != null);
+		}).collect(Collectors.toList());
+		for(FuelStatDetail detail: filteredStatDetailList) {
+			System.out.println(detail);
+			fuelDetailRepository.save(detail);
+		}
+*/
+		fuelDetailRepository.saveAll(statDetailList.stream().filter(fuelDetail -> {
+			return (fuelDetail != null);
+		}).collect(Collectors.toList()));
 		
 	}
 	
