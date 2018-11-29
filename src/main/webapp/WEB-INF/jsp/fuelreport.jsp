@@ -54,14 +54,28 @@
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/jquery.tablesort.min.js"></script>
 <script src="/js/modules.min.js"></script>
+<script src="/js/api.js"></script>
 <script>
 function getGroupList() {
-	
+	ReportApi.getGroupList(function(response) {
+		if(response.success) {
+			console.log(response);
+		} else {
+			alert(response.status.description);
+		}
+	});
 }
 $(function() {
 	$(".ui.accordion").accordion();
 	$(".ui.dropdown").dropdown();
-	
+/*	
+	ReportApi.authenticate({login: 'test@cesco.co.kr', password:'123456'}, function(response) {
+		if(!response.success) {
+			alert(response.status.description);
+		}
+	});
+*/
+getGroupList();
 });
 	
 </script>

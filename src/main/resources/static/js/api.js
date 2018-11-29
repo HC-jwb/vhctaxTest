@@ -1,12 +1,17 @@
-function authenticate(callback) {
-	Api.sendGet(ApiURL.rsvnBase + '/tracking/auth', function(data) {
-		if(data.success) {
-			callback(data.payload);
-		} else {
-			alert("추적 관리 시스템 접속에 실패하였습니다.\n잠시후 다시 시도해 주십시요.");
+var ReportApi = {
+		apiBase: '/report/api',
+		authUri: '/authenticate',
+		groupListUri:'/tracker/group/list',
+		authenticate: function (authJson, callback) {
+			Api.postJson(this.apiBase + this.authUri, authJson, callback, function(data) {
+				alert("시스템 접속에 실패하였습니다.\n잠시후 다시 시도해 주십시요.");
+			});
+		},
+		getGroupList: function(callback) {
+			Api.sendGet(this.apiBase + this.groupListUri, callback);
 		}
-	});
-}
+};
+
 Date.prototype.yyyyMMdd = function() {
 	var yyyy = this.getFullYear();
 	var MM = this.getMonth() + 1;
@@ -52,15 +57,6 @@ function dateAdd(date, interval, units) {
 		default       :  ret = undefined;  break;
 	}
 	return ret;
-}
-/*http://rsvn.myhandycar.com*/
-var ApiURL = {
-		auth: '/login',
-		apiBase: '/api',
-		compBase: '/api/company',
-		userBase: '/api/user',
-		vhcBase: '/api/vehicle',
-		rsvnBase: '/api/rsvn'
 }
 var Api = {
 	init: function() {
