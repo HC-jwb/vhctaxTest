@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +31,7 @@ public class ReportApiController {
 	private AuthService authService;
 	@Autowired
 	private TrackerService trackerService;
-
+	private Logger logger = LoggerFactory.getLogger(ReportApiController.class);
 	@PostMapping("/authenticate")
 	public AuthResponse initAuth(@RequestBody Map<String, String> authInfo, HttpSession session) {
 		AuthResponse response = authService.sendAuth(authInfo.get("login"), authInfo.get("password"));
@@ -68,7 +70,7 @@ public class ReportApiController {
 		}
 		*/
 		req.setHash(hashKey(session));
-		System.out.println("session Key " + req.getHash());
+		logger.info("session Key " + req.getHash());
 		ReportGenResponse response = trackerService.generateReport(req);
 		return response;
 	}
