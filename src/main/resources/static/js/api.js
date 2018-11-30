@@ -2,6 +2,10 @@ var ReportApi = {
 		apiBase: '/report/api',
 		authUri: '/authenticate',
 		groupListUri:'/tracker/group/list',
+		trackerListUri: '/tracker/list',
+		genRequestUri:'/generate',
+		genListUri: '/genlist',
+		genListInProgressUri: '/genlist/inprogress',
 		authenticate: function (authJson, callback) {
 			Api.postJson(this.apiBase + this.authUri, authJson, callback, function(data) {
 				alert("시스템 접속에 실패하였습니다.\n잠시후 다시 시도해 주십시요.");
@@ -9,9 +13,36 @@ var ReportApi = {
 		},
 		getGroupList: function(callback) {
 			Api.sendGet(this.apiBase + this.groupListUri, callback);
+		},
+		getTrackerList: function(groupJson, callback) {
+			Api.postJson(this.apiBase + this.trackerListUri, groupJson, callback, function(resonse) {
+				console.log(response);
+			});
+		},
+		sendGenRequest: function(genRequestJson, callback) {
+			Api.postJson(this.apiBase + this.genRequestUri, genRequestJson, callback, function(response) {
+				console.log(response);
+			});
+		},
+		getReportGenList: function(callback) {
+			Api.sendGet(this.apiBase + this.genListUri, callback);
+		},
+		getReportGenListInProgress: function(callback) {
+			Api.sendGet(this.apiBase + this.genListInProgressUri, callback);
 		}
 };
-
+$.datepicker.setDefaults({
+	dateFormat: 'yy-mm-dd',
+	prevText: '이전 달',
+	nextText: '다음 달',
+	monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+	monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+	dayNames: ['일', '월', '화', '수', '목', '금', '토'],
+	dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+	dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+	showMonthAfterYear: true,
+	yearSuffix: '년'
+});
 Date.prototype.yyyyMMdd = function() {
 	var yyyy = this.getFullYear();
 	var MM = this.getMonth() + 1;

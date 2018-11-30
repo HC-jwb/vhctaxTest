@@ -36,6 +36,7 @@ import hc.fms.api.report.model.tracker.request.TrackerInfo;
 import hc.fms.api.report.model.tracker.request.TripRequest;
 import hc.fms.api.report.properties.FmsProperties;
 import hc.fms.api.report.repository.FuelStatisticsRepository;
+import hc.fms.api.report.repository.ReportGenRepository;
 import hc.fms.api.report.util.HttpUtil;
 
 @Service
@@ -63,6 +64,8 @@ public class TrackerService {
 	
 	@Autowired
 	private FuelStatisticsRepository fuelStatRepository;
+	@Autowired
+	private ReportGenRepository reportGenRepository;
 	public TrackerResponse getTrackerList(String hash) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", hash);
@@ -185,6 +188,7 @@ public class TrackerService {
 		 */
 		List<TrackerInfo> infoList = req.getTrackers();
 		List<Integer> trackerIdList = infoList.stream().map(info -> info.getTrackerId()).collect(Collectors.toList());
+		
 		String from = req.getFrom();
 		String to = req.getTo();
 		String hash = req.getHash();
@@ -302,5 +306,13 @@ public class TrackerService {
 	}
 	public List<FuelStatResult> getFuelStatisticsResultListByReportId(Long reportId) {
 		return fuelStatRepository.getFuelStatResultList(reportId);
+	}
+	public List<ReportGen> getReportGenList() {
+		return reportGenRepository.findAllByOrderByCreatedDateDesc();
+		
+	}
+	public List<Long> getReportGenListInProgress() {
+		List<ReportGen> genList = reportGenRepository.findAllByFuelReportProcessed(false);
+		return genList.stream().map(reportGen -> reportGen.getId()).collect(Collectors.toList());
 	}
 }

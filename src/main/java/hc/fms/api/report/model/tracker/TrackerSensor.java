@@ -12,7 +12,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class TrackerSensor {
-	private Long id;
+	private int id;
 	private String type;
 	private String name;
 	@JsonProperty("input_number")

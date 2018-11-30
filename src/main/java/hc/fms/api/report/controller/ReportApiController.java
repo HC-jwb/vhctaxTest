@@ -2,6 +2,7 @@ package hc.fms.api.report.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
@@ -15,12 +16,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import hc.fms.api.report.entity.FuelStatResult;
+import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
 import hc.fms.api.report.model.ReportGenResponse;
+import hc.fms.api.report.model.ResponseContainer;
+import hc.fms.api.report.model.ResponseStatus;
 import hc.fms.api.report.model.SensorResponse;
 import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.auth.AuthResponse;
+import hc.fms.api.report.model.tracker.Tracker;
+import hc.fms.api.report.model.tracker.TrackerSensor;
 import hc.fms.api.report.service.AuthService;
 import hc.fms.api.report.service.TrackerService;
 
@@ -41,10 +47,14 @@ public class ReportApiController {
 		return response;
 	}
 	@RequestMapping("/tracker/list")
-	public TrackerResponse getTrackers(HttpSession session) {
-		TrackerResponse trackerListReponse = trackerService.getTrackerList(hashKey(session));
-		trackerListReponse.getList().stream().forEach(System.out::println);
-		return trackerListReponse;
+	public TrackerResponse getTrackers(@RequestBody Long groupId,HttpSession session) {
+		TrackerResponse response = trackerService.getTrackerList(hashKey(session));
+		if(response.getSuccess()) {
+			List<Tracker> filteredList = response.getList().stream().filter(tracker -> tracker.getGroupId().equals(groupId)).collect(Collectors.toList());
+			response.setList(filteredList);
+		}
+		//trackerListReponse.getList().stream().forEach(System.out::println);
+		return response;
 	}
 	@RequestMapping("/tracker/group/list")
 	public GroupResponse getGroupList(HttpSession session) {
@@ -71,6 +81,26 @@ public class ReportApiController {
 		*/
 		req.setHash(hashKey(session));
 		logger.info("session Key " + req.getHash());
+		req.normalize();//add HH:mm:ss to from and to, modify end Date by changing to previous date and to 59:59:59
+		req.getTrackers().forEach(info -> {
+			SensorResponse sensorResponse = trackerService.getSensorList(req.getHash(), info.getTrackerId());
+			if(sensorResponse.getSuccess()) {
+				List<TrackerSensor> sensorList = sensorResponse.getList();
+				String sensorName;
+				for(TrackerSensor sensor : sensorList) {
+					sensorName = sensor.getName().replaceAll(" ", "");
+					if(sensorName.equals("누적연료소모량")) {
+						info.setFuelConsumptionSensorId(sensor.getId());
+					} else if(sensorName.equals("누적운행거리")) {
+						info.setHardwareMileageSensorId(sensor.getId());
+					}
+				}
+			} else {
+				logger.info(String.format("Failed to load Sensor List for trackerId: %d %s", info.getTrackerId(),sensorResponse));
+				throw new RuntimeException(sensorResponse.getStatus().getDescription());
+			}
+		});
+		logger.info(req.toString());
 		ReportGenResponse response = trackerService.generateReport(req);
 		return response;
 	}
@@ -88,5 +118,34 @@ public class ReportApiController {
 			throw new RuntimeException("no session hash");
 		}
 		return hash;
+	}
+	@RequestMapping("/genlist")
+	public ResponseContainer<List<ReportGen>> getGeneratedReportList() {
+		ResponseContainer <List<ReportGen>> response = new ResponseContainer<>();
+		try {
+			response.setPayload(trackerService.getReportGenList());
+			response.setSuccess(true);
+		} catch(Exception e) {
+			e.printStackTrace();
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription(e.getMessage());
+			response.setStatus(status);
+		}
+		return response;
+	}
+	@RequestMapping("/genlist/inprogress")
+	public  ResponseContainer<List<Long>> getGenListInProgress() {
+		ResponseContainer<List<Long>> response = new ResponseContainer<>();
+		try {
+			response.setPayload(trackerService.getReportGenListInProgress());
+			response.setSuccess(true);
+		} catch(Exception e) {
+			e.printStackTrace();
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription(e.getMessage());
+			response.setStatus(status);
+		}
+		
+		return response;
 	}
 }
