@@ -164,28 +164,6 @@ public class TrackerService {
 	}
 	
 	public ReportGenResponse generateReport(ReportGenFlatRequest req) {
-		/*
-		- trackers => [{trackerId:73, mileageSensorId: 222, fuleSensorId: 111} ,{trackerId:69, mileageSensorId: 224, fuelSensorId: 124}], from=> 2018-11-23 00:00:00, to=> 2018-11-23 23:59:59, detailsIntervalMinutes => 360 
-		genReq.setTrackers(Arrays.asList(73, 69));
-		genReq.setFrom("2018-11-23 00:00:00");
-		genReq.setTo("2018-11-23 23:59:59");
-		genReq.setTimeFilter(new TimeFilter());//default
-		Plugin plugin = new Plugin();
-		plugin.setDetailsIntervalMinutes(60 * 6);//default
-		plugin.setShowAddress(true);//default
-		plugin.setFilter(true);//default
-		List<Plugin.Sensor> sensors = new ArrayList<>();
-		Plugin.Sensor sensor = new Plugin.Sensor();
-		sensor.setTrackerId(71);
-		sensor.setSensorId(647);
-		sensors.add(sensor);
-		
-		sensor = new Plugin.Sensor();
-		sensor.setTrackerId(69);
-		sensor.setSensorId(645);
-		sensors.add(sensor);
-		plugin.setSensors(sensors);
-		 */
 		List<TrackerInfo> infoList = req.getTrackers();
 		List<Integer> trackerIdList = infoList.stream().map(info -> info.getTrackerId()).collect(Collectors.toList());
 		
@@ -314,5 +292,8 @@ public class TrackerService {
 	public List<Long> getReportGenListInProgress() {
 		List<ReportGen> genList = reportGenRepository.findAllByFuelReportProcessed(false);
 		return genList.stream().map(reportGen -> reportGen.getId()).collect(Collectors.toList());
+	}
+	public ReportGen getReportGen(Long genId) {
+		return reportGenRepository.findById(genId).get();
 	}
 }

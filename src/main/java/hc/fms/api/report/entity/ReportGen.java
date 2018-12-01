@@ -1,5 +1,6 @@
 package hc.fms.api.report.entity;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -10,6 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +26,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @NoArgsConstructor
+@JsonIgnoreProperties(value={"formattedCreatedDate"}, allowGetters=true)
 public class ReportGen {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -41,5 +46,10 @@ public class ReportGen {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="created_dt", updatable=false)
 	private Date createdDate;
-
+	
+	@Transient
+	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	public String getFormattedCreatedDate() {
+		return formatter.format(createdDate);
+	}
 }

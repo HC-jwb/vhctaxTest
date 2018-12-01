@@ -15,7 +15,7 @@ var ReportApi = {
 			Api.sendGet(this.apiBase + this.groupListUri, callback);
 		},
 		getTrackerList: function(groupJson, callback) {
-			Api.postJson(this.apiBase + this.trackerListUri, groupJson, callback, function(resonse) {
+			Api.postJson(this.apiBase + this.trackerListUri, groupJson, callback, function(response) {
 				console.log(response);
 			});
 		},

@@ -67,7 +67,7 @@ public class ReportApiController {
 		return response;
 	}
 	@PostMapping("/generate")
-	public ReportGenResponse requestReportGen(@RequestBody ReportGenFlatRequest req, HttpSession session) {
+	public ResponseContainer<ReportGen> requestReportGen(@RequestBody ReportGenFlatRequest req, HttpSession session) {
 		/*
 		 * session Key: d222e37acb3d15cd0da78c229a7b9d70
 		{
@@ -101,7 +101,21 @@ public class ReportApiController {
 			}
 		});
 		logger.info(req.toString());
-		ReportGenResponse response = trackerService.generateReport(req);
+		ReportGenResponse genResponse = trackerService.generateReport(req);
+		
+		ResponseContainer<ReportGen> response = new ResponseContainer<>();
+		try {
+			if(genResponse.isSuccess()) {
+				response.setPayload(trackerService.getReportGen(genResponse.getId()));
+				response.setSuccess(true);
+			} else {
+				response.setStatus(genResponse.getStatus());
+			}
+		} catch(Exception e) {
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription(e.getMessage());
+			response.setStatus(status);
+		}
 		return response;
 	}
 
