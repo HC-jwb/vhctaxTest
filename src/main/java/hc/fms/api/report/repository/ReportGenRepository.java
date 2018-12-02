@@ -10,8 +10,12 @@ import hc.fms.api.report.entity.ReportGen;
 @Repository
 public interface ReportGenRepository extends JpaRepository <ReportGen, Long>{
 
-	public List<ReportGen> findAllByOrderByCreatedDateDesc();
+	//public List<ReportGen> findAllByOrderByCreatedDateDesc();
 
-	public List<ReportGen> findAllByFuelReportProcessed(boolean processed);
+	//public List<ReportGen> findAllByFuelReportProcessed(boolean processed);
+
+	public List<ReportGen> findAllByClientIdOrderByCreatedDateDesc(String clientId);
+
+	public List<ReportGen> findAllByClientIdAndFuelReportProcessed(String clientId, boolean b);
 
 }

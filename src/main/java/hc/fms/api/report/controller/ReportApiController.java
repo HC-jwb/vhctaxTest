@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import hc.fms.api.report.entity.FuelStatResult;
+import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
 import hc.fms.api.report.model.ReportGenResponse;
+import hc.fms.api.report.model.ReportResponse;
 import hc.fms.api.report.model.ResponseContainer;
 import hc.fms.api.report.model.ResponseStatus;
 import hc.fms.api.report.model.SensorResponse;
@@ -42,6 +44,7 @@ public class ReportApiController {
 	public AuthResponse initAuth(@RequestBody Map<String, String> authInfo, HttpSession session) {
 		AuthResponse response = authService.sendAuth(authInfo.get("login"), authInfo.get("password"));
 		if(response.getSuccess()) {
+			session.setAttribute("clientId", authInfo.get("login"));
 			session.setAttribute("hash", response.getHash());
 		}
 		return response;
@@ -80,7 +83,9 @@ public class ReportApiController {
 		}
 		*/
 		req.setHash(hashKey(session));
-		logger.info("session Key " + req.getHash());
+		req.setClientId(clientId(session));
+		logger.info(String.format("session Key %s, clientId: %s",req.getHash(), req.getClientId()));
+		
 		req.normalize();//add HH:mm:ss to from and to, modify end Date by changing to previous date and to 59:59:59
 		req.getTrackers().forEach(info -> {
 			SensorResponse sensorResponse = trackerService.getSensorList(req.getHash(), info.getTrackerId());
@@ -119,25 +124,16 @@ public class ReportApiController {
 		return response;
 	}
 
-	@RequestMapping("/stat/list/{reportId}")
-	public List<FuelStatResult> getStatisticsByReport(@PathVariable("reportId") Long reportId) {
-		return trackerService.getFuelStatisticsResultListByReportId(reportId);
+	@RequestMapping("/stat/list/{reportId}/{trackerId}")
+	public List<FuelStatResult> getStatisticsByReport(@PathVariable("reportId") Long reportId, @PathVariable("trackerId") Long trackerId) {
+		return trackerService.getFuelStatisticsResultListByReportId(reportId, trackerId);
 	}
-	private String hashKey (HttpSession session) {
-		String hash = null;
-		Object attrHash = session.getAttribute("hash");
-		if(attrHash != null) {
-			hash = String.valueOf(attrHash);
-		} else {
-			throw new RuntimeException("no session hash");
-		}
-		return hash;
-	}
+
 	@RequestMapping("/genlist")
-	public ResponseContainer<List<ReportGen>> getGeneratedReportList() {
+	public ResponseContainer<List<ReportGen>> getGeneratedReportList(HttpSession session) {
 		ResponseContainer <List<ReportGen>> response = new ResponseContainer<>();
 		try {
-			response.setPayload(trackerService.getReportGenList());
+			response.setPayload(trackerService.getReportGenList(clientId(session)));
 			response.setSuccess(true);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -148,10 +144,10 @@ public class ReportApiController {
 		return response;
 	}
 	@RequestMapping("/genlist/inprogress")
-	public  ResponseContainer<List<Long>> getGenListInProgress() {
+	public  ResponseContainer<List<Long>> getGenListInProgress(HttpSession session) {
 		ResponseContainer<List<Long>> response = new ResponseContainer<>();
 		try {
-			response.setPayload(trackerService.getReportGenListInProgress());
+			response.setPayload(trackerService.getReportGenListInProgress(clientId(session)));
 			response.setSuccess(true);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -161,5 +157,39 @@ public class ReportApiController {
 		}
 		
 		return response;
+	}
+	@RequestMapping("/section/list")
+	public ResponseContainer<List<GenSection>> getSectionListFor(@RequestBody ReportGen reportGen) {
+		ResponseContainer<List<GenSection>> response = new ResponseContainer<>();
+		try {
+			List<GenSection> sectionList = trackerService.getSectionListFor(reportGen.getId());
+			response.setPayload(sectionList);
+			response.setSuccess(true);
+		} catch(Exception e) {
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription(e.getMessage());
+			response.setStatus(status);
+		}
+		return response;
+	}
+	
+	/** retrieve original report not processed by this module, this is for testing use*/
+	@RequestMapping("/retrieve/source/{sourceId}")
+	public ReportResponse retrieveReportSource(HttpSession session, @PathVariable("sourceId")Long sourceId) {
+		return trackerService.retrieveReport(hashKey(session), sourceId);
+	}
+	
+	private String hashKey (HttpSession session) {
+		String hash = null;
+		Object attrHash = session.getAttribute("hash");
+		if(attrHash != null) {
+			hash = String.valueOf(attrHash);
+		} else {
+			throw new RuntimeException("no session hash");
+		}
+		return hash;
+	}
+	private String clientId(HttpSession session) {
+		return (String)session.getAttribute("clientId");
 	}
 }

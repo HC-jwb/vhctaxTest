@@ -20,6 +20,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import hc.fms.api.report.entity.FuelStatResult;
+import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.ReportResponse;
 import hc.fms.api.report.model.GroupResponse;
@@ -36,6 +37,7 @@ import hc.fms.api.report.model.tracker.request.TrackerInfo;
 import hc.fms.api.report.model.tracker.request.TripRequest;
 import hc.fms.api.report.properties.FmsProperties;
 import hc.fms.api.report.repository.FuelStatisticsRepository;
+import hc.fms.api.report.repository.GenSectionRepository;
 import hc.fms.api.report.repository.ReportGenRepository;
 import hc.fms.api.report.util.HttpUtil;
 
@@ -66,6 +68,9 @@ public class TrackerService {
 	private FuelStatisticsRepository fuelStatRepository;
 	@Autowired
 	private ReportGenRepository reportGenRepository;
+	@Autowired
+	private GenSectionRepository sectionRepository;
+	
 	public TrackerResponse getTrackerList(String hash) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", hash);
@@ -210,6 +215,7 @@ public class TrackerService {
 				reportGen.setLabel(req.getLabel());
 				reportGen.setFrom(from);
 				reportGen.setTo(to);
+				reportGen.setClientId(req.getClientId());
 				final ReportGen reportGenSaved = reportProcessor.logReportGen(reportGen);
 				response.setSuccess(true);
 				response.setId(reportGenSaved.getId());
@@ -282,18 +288,21 @@ public class TrackerService {
 		}
 		return response;//all successful and created a single report reponse which includes both of the sub reports
 	}
-	public List<FuelStatResult> getFuelStatisticsResultListByReportId(Long reportId) {
-		return fuelStatRepository.getFuelStatResultList(reportId);
+	public List<FuelStatResult> getFuelStatisticsResultListByReportId(Long reportId, Long trackerId) {
+		return fuelStatRepository.getFuelStatResultList(reportId, trackerId);
 	}
-	public List<ReportGen> getReportGenList() {
-		return reportGenRepository.findAllByOrderByCreatedDateDesc();
+	public List<ReportGen> getReportGenList(String clientId) {
+		return reportGenRepository.findAllByClientIdOrderByCreatedDateDesc(clientId);
 		
 	}
-	public List<Long> getReportGenListInProgress() {
-		List<ReportGen> genList = reportGenRepository.findAllByFuelReportProcessed(false);
+	public List<Long> getReportGenListInProgress(String clientId) {
+		List<ReportGen> genList = reportGenRepository.findAllByClientIdAndFuelReportProcessed(clientId, false);
 		return genList.stream().map(reportGen -> reportGen.getId()).collect(Collectors.toList());
 	}
 	public ReportGen getReportGen(Long genId) {
 		return reportGenRepository.findById(genId).get();
+	}
+	public List<GenSection> getSectionListFor(Long reportId) {
+		return sectionRepository.findAllByReportId(reportId);
 	}
 }

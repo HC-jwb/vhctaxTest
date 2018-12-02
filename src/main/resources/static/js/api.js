@@ -1,35 +1,58 @@
 var ReportApi = {
-		apiBase: '/report/api',
-		authUri: '/authenticate',
-		groupListUri:'/tracker/group/list',
-		trackerListUri: '/tracker/list',
-		genRequestUri:'/generate',
-		genListUri: '/genlist',
-		genListInProgressUri: '/genlist/inprogress',
-		authenticate: function (authJson, callback) {
-			Api.postJson(this.apiBase + this.authUri, authJson, callback, function(data) {
-				alert("시스템 접속에 실패하였습니다.\n잠시후 다시 시도해 주십시요.");
+	apiBase: '/report/api',
+	authUri: '/authenticate',
+	groupListUri:'/tracker/group/list',
+	trackerListUri: '/tracker/list',
+	genRequestUri:'/generate',
+	genListUri: '/genlist',
+	genListInProgressUri: '/genlist/inprogress',
+	sectionListUri:'/section/list',
+	progressTimerId: null,
+	authenticate: function (authJson, callback) {
+		Api.postJson(this.apiBase + this.authUri, authJson, callback, function(data) {
+			alert("시스템 접속에 실패하였습니다.\n잠시후 다시 시도해 주십시요.");
+		});
+	},
+	getGroupList: function(callback) {
+		Api.sendGet(this.apiBase + this.groupListUri, callback);
+	},
+	getTrackerList: function(groupJson, callback) {
+		Api.postJson(this.apiBase + this.trackerListUri, groupJson, callback, function(response) {
+			console.log(response);
+		});
+	},
+	sendGenRequest: function(genRequestJson, callback) {
+		Api.postJson(this.apiBase + this.genRequestUri, genRequestJson, callback, function(response) {
+			console.log(response);
+		});
+	},
+	getReportGenList: function(callback) {
+		Api.sendGet(this.apiBase + this.genListUri, callback);
+	},
+	getSectionList: function(reportGenJson, callback) {
+		Api.postJson(this.apiBase + this.sectionListUri, reportGenJson, callback, function(response) {
+			console.log(response);
+		});
+	},
+	startCheckProgress: function() {
+		if(this.progressTimerId != null) return; 
+		this.progressTimerId = setInterval(function() {
+			Api.sendGet(ReportApi.apiBase + ReportApi.genListInProgressUri, function(response) {
+				if(response.success) {
+					refreshStatus(response.payload);
+					if(response.payload.length == 0) {ReportApi.stopCheckProgress();}
+				} else {
+					console.log("startCheckProgress error", response);
+				}
 			});
-		},
-		getGroupList: function(callback) {
-			Api.sendGet(this.apiBase + this.groupListUri, callback);
-		},
-		getTrackerList: function(groupJson, callback) {
-			Api.postJson(this.apiBase + this.trackerListUri, groupJson, callback, function(response) {
-				console.log(response);
-			});
-		},
-		sendGenRequest: function(genRequestJson, callback) {
-			Api.postJson(this.apiBase + this.genRequestUri, genRequestJson, callback, function(response) {
-				console.log(response);
-			});
-		},
-		getReportGenList: function(callback) {
-			Api.sendGet(this.apiBase + this.genListUri, callback);
-		},
-		getReportGenListInProgress: function(callback) {
-			Api.sendGet(this.apiBase + this.genListInProgressUri, callback);
+		},5000);
+	},
+	stopCheckProgress: function() {
+		if(this.progressTimerId !=null) {
+			clearInterval(this.progressTimerId);
+			this.progressTimerId = null;
 		}
+	}
 };
 $.datepicker.setDefaults({
 	dateFormat: 'yy-mm-dd',
@@ -118,7 +141,7 @@ var Api = {
 			}
 		});
 	}, sendGet: function(url, callback) {
-		$.getJSON(url, callback).fail(function() {
+		$.getJSON(url, callback).fail(function(res) {
 			console.log("$.getJson failed ");
 		});
 	}, sendAuth:function (authObj, callback) {

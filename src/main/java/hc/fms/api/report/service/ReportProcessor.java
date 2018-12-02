@@ -12,18 +12,22 @@ import org.springframework.stereotype.Component;
 
 import hc.fms.api.report.entity.FuelStatDetail;
 import hc.fms.api.report.entity.FuelStatistics;
+import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.Section;
 import hc.fms.api.report.model.fuel.ReportDesc;
 import hc.fms.api.report.model.fuel.Sheet;
 import hc.fms.api.report.repository.FuelStatDetailRepository;
 import hc.fms.api.report.repository.FuelStatisticsRepository;
+import hc.fms.api.report.repository.GenSectionRepository;
 import hc.fms.api.report.repository.ReportGenRepository;
 
 @Component
 public class ReportProcessor {
 	@Autowired
 	private ReportGenRepository reportGenRepository;
+	@Autowired
+	private GenSectionRepository genSectionRepository;
 	@Autowired
 	private FuelStatisticsRepository fuelRepository;
 	@Autowired
@@ -44,11 +48,18 @@ public class ReportProcessor {
 		for(Sheet sheet : sheets) {
 			processSheet(sheet, "M", reportGenSaved.getId(), reportGenSaved.getMileageReportId());
 		}
+		List<GenSection> genSectionList = sheets.stream().map(sheet -> {
+			GenSection genSection = new GenSection();
+			genSection.setReportId(reportGenSaved.getId());
+			genSection.setTrackerId(sheet.getEntityIds().get(0));
+			genSection.setHeader(sheet.getHeader());
+			return genSection;
+		}).collect(Collectors.toList());
 		reportGenSaved.setFuelReportProcessed(true);
 		reportGenRepository.save(reportGenSaved);
+		genSectionRepository.saveAll(genSectionList);
 	}
 	private void processSheet(Sheet sheet, final String type, final long reportId, final long generationId) {
-		//String header = sheet.getHeader();
 		final Long trackerId = sheet.getEntityIds().get(0);
 		//filter only table type section
 		List<Section> sectionList = sheet.getSections().stream().filter(section -> section.getType().equalsIgnoreCase("table")).collect(Collectors.toList());
@@ -56,12 +67,12 @@ public class ReportProcessor {
 		List<FuelStatistics> statList = statSection.getData().get(0).getRows().stream().map(row -> {
 			FuelStatistics fuelStat = new FuelStatistics();
 			try {
-			fuelStat.setReportId(reportId);
-			fuelStat.setGenerationId(generationId);
-			fuelStat.setTrackerId(trackerId);
-			fuelStat.setType(type);
-			fuelStat.setStatDate(row.getDate().getV());
-			fuelStat.setRawDate(row.getDate().getRaw());
+				fuelStat.setReportId(reportId);
+				fuelStat.setGenerationId(generationId);
+				fuelStat.setTrackerId(trackerId);
+				fuelStat.setType(type);
+				fuelStat.setStatDate(row.getDate().getV());
+				fuelStat.setRawDate(row.getDate().getRaw());
 
 				if(row.getMin().getRaw() != null) fuelStat.setMin(row.getMin().getRaw().doubleValue());
 				if(row.getMax().getRaw() != null) fuelStat.setMax(row.getMax().getRaw().doubleValue());

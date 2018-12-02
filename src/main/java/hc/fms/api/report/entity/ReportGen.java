@@ -32,7 +32,7 @@ public class ReportGen {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="report_id")
 	private Long id;
-	
+	private String clientId;
 	private long fuelReportId;
 	private long mileageReportId;
 	@Column(name="start")

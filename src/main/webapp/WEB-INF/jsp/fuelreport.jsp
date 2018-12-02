@@ -9,6 +9,7 @@
   	<link rel="stylesheet" type="text/css" href="/css/main.css">
   	<link rel="stylesheet" type="text/css" href="/css/jquery-ui.min.css">
 		<link rel="stylesheet" type="text/css" href="/css/modules.min.css">
+		<link rel="stylesheet" type="text/css" href="/css/scrolltabs.css">
 		<style>
 		@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css); .notosanskr * { font-family: 'Noto Sans KR', sans-serif; }
 		@import url(//fonts.googleapis.com/earlyaccess/nanumgothiccoding.css); .nanumgothiccoding * { font-family: 'Nanum Gothic Coding', monospace; }
@@ -19,8 +20,17 @@
 		.ui.list .description {font-size: 0.95em;}
 		.ui.list .content .active-header{font-weight: 600; color: #415059;}
 		.left-column {display: inline-block; width: 370px; padding:0.3em 0; vertical-align: top; overflow: auto;}
-		div.right-column{display: inline-block; width: calc(100% - 375px); padding: 0 0.5em;}
+		div.right-column{display: inline-block; width: calc(100% - 380px); padding: 0 0.5em;}
 		#reportGenFrm {min-width: 850px;}
+		@media (min-width: 1601px){.scrolltabs-container {width: 1220px;}	}
+		@media (min-width: 1501px) and (max-width: 1600px){	.scrolltabs-container {width: 1120px;} }
+		@media (min-width: 1301px) and (max-width: 1500px){ .scrolltabs-container {width: 920px;} }
+		@media (min-width: 1201px) and (max-width: 1300px){ .scrolltabs-container {width: 820px;} }
+		@media (min-width: 1101px) and (max-width: 1200px){ .scrolltabs-container {width: 720px;} }
+		@media (min-width: 1001px) and (max-width: 1100px){ .scrolltabs-container {width: 620px;} }
+		@media (min-width: 901px) and (max-width: 1000px){ .scrolltabs-container {width: 520px;} }
+		@media (max-width: 900px){ .scrolltabs-container {width: 400px;} }
+		.scroll_tabs_theme_light div.scroll_tab_inner span, .scroll_tabs_theme_light div.scroll_tab_inner li {font-size: 12px;}
 		</style>
 	<title>연료 소모량 리포트</title>
 </head>
@@ -28,13 +38,13 @@
 <div class="main-container">
 	<div class="left-column">
 		<div class="ui raised segment">
-			<div class="ui blue large top attached label"><i class="line bar chart icon"></i>연료 분석 레포트</div>	
+			<div class="ui blue large top attached label"><i class="line bar chart icon"></i>연비 분석 레포트</div>	
 				<div class="ui relaxed divided tiny selection list" id="genReportList"></div>
 		</div>
 	</div>
 	<div class="right-column">
-		<div class="ui small accordion">
-			<div class="active title"><i class="dropdown icon"></i><div class="ui teal tag label">연비 보고서 생성하기</div></div>
+		<div class="ui small accordion" id="reportGenAccordion">
+			<div class="title"><i class="dropdown icon"></i><div class="ui teal tag label">연비 보고서 생성하기</div></div>
 			<div class="content">
 				<div class="ui fluid small form" id="reportGenFrm">
 					<div class="fields">
@@ -78,22 +88,30 @@
 								<input type="text" placeholder="종료일" id="toDate" name="toDate"><i class="calendar alternate outline icon"></i>
 							</div>
 						</div>
-						<div class="ui two wide field">
-							<label>처리</label>
-							<div class="ui small blue compact generate button">생성</div>
+					</div>
+					<div class="fields">
+						<div class="ui thirteen wide field">
+							<div style="text-align: right;">
+								<div class="ui small close compact button">닫기</div>
+								<div class="ui small blue compact generate button">보고서 생성</div>
+							</div>
 						</div>
 					</div>
+					<div class="fields"><div class="thirteen wide error field"></div></div>
 				</div><!--  end of form-->
 			</div><!-- end of content -->
 		</div><!-- end of accordion -->
-		<div class="ui segment">
+		<div class="scrolltabs-container">
+				<ul id="scrollTabs" class="scroll_tabs_theme_light"></ul>
 		</div>
+
 	</div><!--  end of right column -->
 </div><!-- end of main -->
-<script src="/js/nprogress.js"></script>
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/jquery-ui.min.js"></script>
 <script src="/js/modules.min.js"></script>
+<script src="/js/jquery.scrolltabs.js"></script>
+  <script src="/js/jquery.mousewheel.js"></script>
 <script src="/js/api.js"></script>
 <script>
 function getGroupList() {
@@ -101,7 +119,7 @@ function getGroupList() {
 		if(response.success) {
 			console.log(response);
 		} else {
-			alert(response.status.description);
+			FormUI.displayMsgIn($reportGenFrm, response.status.description);
 		}
 	});
 }
@@ -118,7 +136,7 @@ function getTrackerList(groupId) {
 				$menu.append("<div class='tracker item' data-value='" + list[i].id + "'>" + list[i].label + "</div>");
 			}
 		} else {
-			console.log(response.status.description);
+			FormUI.displayMsgIn($reportGenFrm, response.status.description);;
 		}
 	});
 }
@@ -142,9 +160,11 @@ function generateReport() {
 				label: valueMap.description
 			}, function(response) {
 			if(response.success) {
-				console.log(response.payload);
+				closeAccordion();
+				prependReportGen(response.payload);
+				ReportApi.startCheckProgress();
 			} else {
-				console.log(response.status.description);
+				FormUI.displayMsgIn($reportGenFrm, response.status.description);
 			}
 		});
 	}
@@ -152,19 +172,13 @@ function generateReport() {
 function getReportGenList() {
 	ReportApi.getReportGenList(function(response) {
 		if(response.success) {
-			console.log(response.payload);
 			var list = response.payload;
 			$genReportList.empty();
 			for(var i = 0; i < list.length; i++) {
 				$genReportList.append(reportGenAsItem(list[i]));
 			}
-			ReportApi.getReportGenListInProgress(function(response) {
-				if(response.success) {
-					console.log("check reportGen in progress", response.payload);
-				} else {
-					console.log(response);
-				}
-			});
+			ReportApi.startCheckProgress();
+			
 		} else {
 			console.log(response);
 		}
@@ -173,30 +187,65 @@ function getReportGenList() {
 function reportGenAsItem(reportGen) {
 	var $clone = $reportGenItem.clone(false);
 	$clone.data("report", reportGen);
-	$clone.find(".description").text("생성일: " + reportGen.formattedCreatedDate);/*+ "생성일:" + genReport.createdDate*/
+	$clone.find(".description").text(reportGen.from + " - " + reportGen.to);/*"생성일: " + reportGen.formattedCreatedDate*/
 	if(reportGen.fuelReportProcessed) {
-		$clone.find(".content").prepend("<div class='active-header'>" + reportGen.label + "</div>");
+		$clone.addClass('processed').find(".content").prepend("<div class='active-header'>" + reportGen.label + "</div>");
 	} else {
-		$clone.find(".content").prepend("<div class=''>" + reportGen.label + " <i class='spinner loading icon'></i></div>");
+		$clone.addClass('processing').find(".content").prepend("<div class=''>" + reportGen.label + " <i class='spinner loading icon'></i></div>");
 	}
 	return $clone;
 }
 function prependReportGen(reportGen) {
-	$genReportList.prepend(reportGen);
+	$genReportList.prepend(reportGenAsItem(reportGen));
 }
-var $reportGenFrm, $trackerListDropdown, $genReportList, $reportGenItem;
+function refreshStatus(pendingReportGenIds) {
+	$genReportList.find(".processing.item").each(function() {
+		var $this = $(this);
+		var reportGen = $this.data("report");
+		var found = false;
+		for(var i = 0; i < pendingReportGenIds.length; i++) {
+			if(reportGen.id == pendingReportGenIds[i]) {
+				found = true;
+				break;
+			}
+		}
+		if(!found) {
+			$this.removeClass("processing").addClass("processed").find(".content > div").first().addClass('active-header').find("i").remove();
+		}
+	});
+}
+function closeAccordion() {
+	$reportGenAccordion.accordion('close', 0);
+}
+
+function buildReportTab(sectionList) {
+	scrollTabs.clearTabs();
+	$scrollTabs.data('reportid', sectionList[0].reportId);
+	for(var i = 0; i < sectionList.length; i++) {
+		scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>")
+	}
+}
+function reportTabClicked() {
+	console.log($scrollTabs.data('reportid'),$(this).data("trackerid"));
+}
+var $reportGenFrm, $trackerListDropdown, $genReportList, $reportGenItem, $reportGenAccordion, scrollTabs, $scrollTabs;
 $(function() {
+	$scrollTabs = $("#scrollTabs");
+	scrollTabs = $scrollTabs.scrollTabs({click_callback: reportTabClicked});
+	$reportGenAccordion = $("#reportGenAccordion");
 	$reportGenFrm = $("#reportGenFrm");
 	$trackerListDropdown = $("#trackerListDropdown");
 	$genReportList = $("#genReportList");
 	$reportGenItem = $("<div class='item'><div class='content'><div class='description'></div></div>");
-	$(".ui.accordion").accordion();
+	$reportGenAccordion.accordion();
 	$("#trackerGroupListDropdown").dropdown({onChange: getTrackerList});
 	$trackerListDropdown.dropdown({fullTextSearch: true, clearable: true});
 	
+	$reportGenFrm.find(".close.button").click(closeAccordion);
 	$reportGenFrm.form({
 		fields: {description: 'empty', trackerGroup: 'empty', trackerList: 'empty', fromDate:'empty', toDate: 'empty'}
 	});
+	$reportGenAccordion
 	$reportGenFrm.find(".generate.button").click(generateReport);
 	from = $( "#fromDate").datepicker({dateFormat:'yy-mm-dd',defaultDate: "-28d",changeMonth: true,numberOfMonths: 1})
 	.on("change", function() {
@@ -213,6 +262,17 @@ $(function() {
 		} catch( error ) { date = null; }
 		return date;
 	}
+	
+	$genReportList.on("click", ".processed.item", function() {
+		ReportApi.getSectionList($(this).data("report"), function(response){
+			if(response.success) {
+				buildReportTab(response.payload);
+			} else {
+				console.log(response.status.description);
+			}
+		});
+	});
+	
 /*	
 	ReportApi.authenticate({login:'test@cesco.co.kr', password:'123456'}, function(response) {
 		if(!response.success) {
@@ -222,8 +282,22 @@ $(function() {
 */
 //getGroupList();
 getReportGenList();
+
 });
-	
+$('.error.field').on('click','.close', function() {
+	$(this).closest('.message').transition('fade');
+});
+var FormUI = {
+		errMsgDiv: '<div class="ui error message"><i class="close icon"></i><span class="msg" style="padding: 1em;"></span></div>'
+		, displayMsgIn: function ($frm, msg) {
+			setTimeout(function() {
+				$frm.find(".error.field").empty().append(FormUI.errMsgDiv);
+				$frm.find(".error.field .error.message .msg").text(msg);
+				$frm.removeClass("success").addClass("error");
+			}, 100);
+			
+		}
+	};
 </script>
 </body>
 </html>
