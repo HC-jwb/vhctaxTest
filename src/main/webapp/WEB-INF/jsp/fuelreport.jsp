@@ -31,6 +31,10 @@
 		@media (min-width: 901px) and (max-width: 1000px){ .scrolltabs-container {width: 520px;} }
 		@media (max-width: 900px){ .scrolltabs-container {width: 400px;} }
 		.scroll_tabs_theme_light div.scroll_tab_inner span, .scroll_tabs_theme_light div.scroll_tab_inner li {font-size: 12px;}
+		.scroll_tabs_theme_light div.scroll_tab_inner span, .scroll_tabs_theme_light div.scroll_tab_inner li {padding-left: 10px; padding-right: 10px; line-height: 30px;}
+		.scroll_tabs_theme_light .scroll_tab_left_button,.scroll_tabs_theme_light .scroll_tab_right_button{height: 31px;}
+		.scroll_tabs_theme_light .scroll_tab_right_button::before,.scroll_tabs_theme_light .scroll_tab_left_button::before  {line-height: 31px;}
+		
 		</style>
 	<title>연료 소모량 리포트</title>
 </head>
