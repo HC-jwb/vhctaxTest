@@ -273,15 +273,18 @@ $(function() {
 		});
 	});
 	
-/*	
+
 	ReportApi.authenticate({login:'test@cesco.co.kr', password:'123456'}, function(response) {
-		if(!response.success) {
+		if(response.success) {
+			getReportGenList();
+			
+		} else {
 			alert(response.status.description);
 		}
 	});
-*/
+
 //getGroupList();
-getReportGenList();
+
 
 });
 $('.error.field').on('click','.close', function() {
