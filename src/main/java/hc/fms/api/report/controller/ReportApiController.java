@@ -18,12 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import hc.fms.api.report.entity.FuelStatResult;
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
+import hc.fms.api.report.model.FuelStat;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
 import hc.fms.api.report.model.ReportGenResponse;
 import hc.fms.api.report.model.ReportResponse;
 import hc.fms.api.report.model.ResponseContainer;
 import hc.fms.api.report.model.ResponseStatus;
+import hc.fms.api.report.model.SectionStat;
 import hc.fms.api.report.model.SensorResponse;
 import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.auth.AuthResponse;
@@ -124,9 +126,29 @@ public class ReportApiController {
 		return response;
 	}
 
-	@RequestMapping("/stat/list/{reportId}/{trackerId}")
-	public List<FuelStatResult> getStatisticsByReport(@PathVariable("reportId") Long reportId, @PathVariable("trackerId") Long trackerId) {
-		return trackerService.getFuelStatisticsResultListByReportId(reportId, trackerId);
+	@RequestMapping("/stat/section")
+	public ResponseContainer<SectionStat> getStatisticsByReport(@RequestBody Map<String, Long> sectionData) {
+		ResponseContainer<SectionStat> response = new ResponseContainer<>();
+		try {
+			List<FuelStatResult> resultList = trackerService.getFuelStatisticsResultListByReportId(sectionData.get("reportId"), sectionData.get("trackerId"));
+			SectionStat stat = new SectionStat();
+			List<FuelStat> statList = resultList.stream().map(statResult-> {
+				stat.addFuelUsed(statResult.getFuelUsed());
+				stat.addDistanceTravelled(statResult.getDistanceTravelled());
+				return new FuelStat(statResult);
+			}).collect(Collectors.toList());
+			
+			stat.setStatList(statList);
+			response.setPayload(stat);
+			response.setSuccess(true);
+		} catch(Exception e) {
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription(e.getMessage());
+			response.setStatus(status);
+			e.printStackTrace();
+		}
+		return response;
+		
 	}
 
 	@RequestMapping("/genlist")

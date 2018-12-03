@@ -16,24 +16,32 @@
 		
 		html,body, .main-container, .left-column, .ui.segment {height: 100%; font-family: 'Nanum Gothic Coding';}
 		.ui.dropdown .menu .item {font-size: 0.95em;}
+		.ui.table > tbody > tr.positive {font-weight: 600;}
 		.main-container {padding: 0.2em 0.3em ;}
 		.ui.list .description {font-size: 0.95em;}
 		.ui.list .content .active-header{font-weight: 600; color: #415059;}
 		.left-column {display: inline-block; width: 370px; padding:0.3em 0; vertical-align: top; overflow: auto;}
 		div.right-column{display: inline-block; width: calc(100% - 380px); padding: 0 0.5em;}
+		#genReportList > .selected.item {background:#1c80cc;}
+		#genReportList > .selected.item div.active-header, #genReportList > .selected.item .description {color: white;}
 		#reportGenFrm {min-width: 850px;}
-		@media (min-width: 1601px){.scrolltabs-container {width: 1220px;}	}
-		@media (min-width: 1501px) and (max-width: 1600px){	.scrolltabs-container {width: 1120px;} }
-		@media (min-width: 1301px) and (max-width: 1500px){ .scrolltabs-container {width: 920px;} }
-		@media (min-width: 1201px) and (max-width: 1300px){ .scrolltabs-container {width: 820px;} }
-		@media (min-width: 1101px) and (max-width: 1200px){ .scrolltabs-container {width: 720px;} }
-		@media (min-width: 1001px) and (max-width: 1100px){ .scrolltabs-container {width: 620px;} }
-		@media (min-width: 901px) and (max-width: 1000px){ .scrolltabs-container {width: 520px;} }
-		@media (max-width: 900px){ .scrolltabs-container {width: 400px;} }
+
+		@media (min-width:1901px) {#scrolltabsContainer {width: 1530px;}}
+		@media (min-width: 1801px) and (max-width: 1900px) {#scrolltabsContainer {width: 1450px;}	}
+		@media (min-width: 1701px) and (max-width: 1800px) {#scrolltabsContainer {width: 1350px;}	}
+		@media (min-width: 1601px) and (max-width: 1700px){#scrolltabsContainer {width: 1220px;} }
+		@media (min-width: 1501px) and (max-width: 1600px){#scrolltabsContainer {width: 1120px;} }
+		@media (min-width: 1301px) and (max-width: 1500px){#scrolltabsContainer {width: 920px;} }
+		@media (min-width: 1201px) and (max-width: 1300px){#scrolltabsContainer {width: 820px;} }
+		@media (min-width: 1101px) and (max-width: 1200px){#scrolltabsContainer {width: 720px;} }
+		@media (min-width: 1001px) and (max-width: 1100px){#scrolltabsContainer {width: 620px;} }
+		@media (min-width: 901px) and (max-width: 1000px){#scrolltabsContainer {width: 520px;} }
+		@media (max-width: 900px){#scrolltabsContainer {width: 400px;} }
+
 		.scroll_tabs_theme_light div.scroll_tab_inner span, .scroll_tabs_theme_light div.scroll_tab_inner li {font-size: 12px;}
-		.scroll_tabs_theme_light div.scroll_tab_inner span, .scroll_tabs_theme_light div.scroll_tab_inner li {padding-left: 10px; padding-right: 10px; line-height: 30px;}
+		.scroll_tabs_theme_light div.scroll_tab_inner span, .scroll_tabs_theme_light div.scroll_tab_inner li {padding-left: 10px; padding-right: 10px; line-height: 29px;}
 		.scroll_tabs_theme_light .scroll_tab_left_button,.scroll_tabs_theme_light .scroll_tab_right_button{height: 31px;}
-		.scroll_tabs_theme_light .scroll_tab_right_button::before,.scroll_tabs_theme_light .scroll_tab_left_button::before  {line-height: 31px;}
+		.scroll_tabs_theme_light .scroll_tab_right_button::before,.scroll_tabs_theme_light .scroll_tab_left_button::before  {line-height: 28px;}
 		
 		</style>
 	<title>연료 소모량 리포트</title>
@@ -105,8 +113,24 @@
 				</div><!--  end of form-->
 			</div><!-- end of content -->
 		</div><!-- end of accordion -->
-		<div class="scrolltabs-container">
-				<ul id="scrollTabs" class="scroll_tabs_theme_light"></ul>
+		<div class="ui divider"></div>
+		<div id="scrolltabsContainer" style="display:none;">
+			<div class="ui compact right labeled icon small blue basic button">다운로드 <i class="file excel icon"></i></div>
+			<ul id="scrollTabs" class="scroll_tabs_theme_dark"></ul>
+			<div id="statTableContainer" style="display:none;">
+				<div class="ui loader"></div>
+				<table class="ui teal celled striped compact small table">
+					<thead>
+					<tr>
+					<th class="center aligned">일자</th>
+					<th class="center aligned">연료소비량(L)</th>
+					<th class="center aligned">운행거리(KM)</th>
+					<th class="center aligned">연비(KM/L)</th>
+					</tr>
+					</thead>
+					<tbody></tbody>
+				</table>	
+			</div>
 		</div>
 
 	</div><!--  end of right column -->
@@ -226,20 +250,61 @@ function buildReportTab(sectionList) {
 	scrollTabs.clearTabs();
 	$scrollTabs.data('reportid', sectionList[0].reportId);
 	for(var i = 0; i < sectionList.length; i++) {
-		scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>")
+		if(i == 0) scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>")
+		else scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>")
 	}
+	$scrolltabsContainer.fadeIn();
+	$scrollTabs.find("li:first()").click();
 }
 function reportTabClicked() {
+	$statTableContainer.show();
+	$statTableContainer.find(".ui.loader").addClass("active");
 	console.log($scrollTabs.data('reportid'),$(this).data("trackerid"));
+	ReportApi.getReportSection({reportId: $scrollTabs.data('reportid'), trackerId: $(this).data("trackerid")}, function(response) {
+		if(response.success) {
+			buildStatTable(response.payload);
+			setTimeout(function() {$statTableContainer.find(".ui.loader").removeClass("active");}, 500);
+		} else {
+			console.log(response.status.description);
+		}
+	});
 }
-var $reportGenFrm, $trackerListDropdown, $genReportList, $reportGenItem, $reportGenAccordion, scrollTabs, $scrollTabs;
+function buildStatTable(sectionStat) {
+	var $statItem ;
+	var $statTableBody = $statTableContainer.find("table > tbody");
+	$statTableBody.empty();
+	var $tr;
+	var stat;
+	var statList = sectionStat.statList;
+	for(var i = 0; i < statList.length; i++) {
+		stat = statList[i];
+		$tr = $("<tr></tr>");
+
+		$statItem = $("<td class='collapsing'>" +stat.statDate+"</td>");
+		$tr.append($statItem);
+		
+		$statItem = $("<td class='right aligned'>"+stat.fuelUsed+"</td>");
+		$tr.append($statItem);
+		
+		$statItem = $("<td class='right aligned'>"+stat.distanceTravelled+"</td>");
+		$tr.append($statItem);
+
+		$statItem = $("<td class='right aligned'>"+stat.fuelEffRate+"</td>");
+		$tr.append($statItem);
+		$statTableBody.append($tr);
+	}
+	$statTableBody.append("<tr class='positive'><td>합계</td><td class='right aligned'>"+sectionStat.totalFuelUsed+"</td><td class='right aligned'>"+sectionStat.totalDistanceTravelled+"</td><td class='right aligned'>"+sectionStat.totalFuelEffRate+"</td></tr>");
+}
+var $reportGenFrm, $trackerListDropdown, $genReportList, $reportGenItem, $reportGenAccordion, scrollTabs, $scrollTabs, $statTableContainer, $scrolltabsContainer;
 $(function() {
 	$scrollTabs = $("#scrollTabs");
+	$scrolltabsContainer = $("#scrolltabsContainer");
 	scrollTabs = $scrollTabs.scrollTabs({click_callback: reportTabClicked});
 	$reportGenAccordion = $("#reportGenAccordion");
 	$reportGenFrm = $("#reportGenFrm");
 	$trackerListDropdown = $("#trackerListDropdown");
 	$genReportList = $("#genReportList");
+	$statTableContainer = $("#statTableContainer");
 	$reportGenItem = $("<div class='item'><div class='content'><div class='description'></div></div>");
 	$reportGenAccordion.accordion();
 	$("#trackerGroupListDropdown").dropdown({onChange: getTrackerList});
@@ -268,7 +333,10 @@ $(function() {
 	}
 	
 	$genReportList.on("click", ".processed.item", function() {
-		ReportApi.getSectionList($(this).data("report"), function(response){
+		$genReportList.find(".processed.item").removeClass("selected");
+		var $this = $(this);
+		$this.addClass("selected");
+		ReportApi.getSectionList($this.data("report"), function(response){
 			if(response.success) {
 				buildReportTab(response.payload);
 			} else {
@@ -276,7 +344,6 @@ $(function() {
 			}
 		});
 	});
-	
 
 	ReportApi.authenticate({login:'test@cesco.co.kr', password:'123456'}, function(response) {
 		if(response.success) {
@@ -286,10 +353,7 @@ $(function() {
 			alert(response.status.description);
 		}
 	});
-
 //getGroupList();
-
-
 });
 $('.error.field').on('click','.close', function() {
 	$(this).closest('.message').transition('fade');
@@ -302,7 +366,6 @@ var FormUI = {
 				$frm.find(".error.field .error.message .msg").text(msg);
 				$frm.removeClass("success").addClass("error");
 			}, 100);
-			
 		}
 	};
 </script>

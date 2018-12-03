@@ -7,6 +7,7 @@ var ReportApi = {
 	genListUri: '/genlist',
 	genListInProgressUri: '/genlist/inprogress',
 	sectionListUri:'/section/list',
+	reportSectionUri:'/stat/section',
 	progressTimerId: null,
 	authenticate: function (authJson, callback) {
 		Api.postJson(this.apiBase + this.authUri, authJson, callback, function(data) {
@@ -31,6 +32,11 @@ var ReportApi = {
 	},
 	getSectionList: function(reportGenJson, callback) {
 		Api.postJson(this.apiBase + this.sectionListUri, reportGenJson, callback, function(response) {
+			console.log(response);
+		});
+	},///{reportId}/{trackerId}
+	getReportSection: function(sectionData, callback) {
+		Api.postJson(this.apiBase + this.reportSectionUri, sectionData, callback, function(response) {
 			console.log(response);
 		});
 	},

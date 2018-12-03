@@ -257,14 +257,14 @@ ul.scroll_tabs_container {
 }
 
 .scroll_tabs_theme_dark div.scroll_tab_inner span, .scroll_tabs_theme_dark div.scroll_tab_inner li {
-  padding-left: 20px;
-  padding-right: 20px;
-  line-height: 40px;
-  font-size: 14px;
-  background-color: #333333;
-  border-left: 1px solid #222222;
-  border-top: 1px solid #222222;
-  border-bottom: 1px solid #222222;
+  padding-left: 10px;
+  padding-right: 10px;
+  line-height: 29px;
+  font-size: 12px;
+  background-color: #1f7dc3;
+  border-left: 1px solid #0c5992;
+  border-top: 1px solid #0c5992;
+  border-bottom: 1px solid #0c5992;
   color: #FFFFFF;
   cursor: pointer;
 }
@@ -294,7 +294,7 @@ ul.scroll_tabs_container {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   border-left: 0px;
-  border-right: 1px solid #222222;
+  border-right: 1px solid #6da8d4;
 }
 
 .scroll_tabs_theme_dark div.scroll_tab_inner span.scroll_tab_over, .scroll_tabs_theme_dark div.scroll_tab_inner li.scroll_tab_over {
@@ -302,8 +302,8 @@ ul.scroll_tabs_container {
 }
 
 .scroll_tabs_theme_dark .scroll_tab_left_button {
-  height: 42px;
-  background-color: #333333;
+  height: 31px;
+  background-color: #084c80;
   color: #FFFFFF;
   -webkit-border-top-left-radius: 5px;
   -webkit-border-bottom-left-radius: 5px;
@@ -311,7 +311,7 @@ ul.scroll_tabs_container {
   -moz-border-radius-bottomleft: 5px;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
-  border: 1px solid #222222;
+  border: 1px solid #08395f;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -322,7 +322,7 @@ ul.scroll_tabs_container {
 
 .scroll_tabs_theme_dark .scroll_tab_left_button::before {
   content: "\25C0";
-  line-height: 40px;
+  line-height: 28px;
   padding-left: 5px;
 }
 
@@ -331,20 +331,20 @@ ul.scroll_tabs_container {
 }
 
 .scroll_tabs_theme_dark .scroll_tab_left_button_disabled {
-  color: #444444;
-  background-color: #333333;
+  color: #13629e;
+  background-color:#084c80;
 }
 
 .scroll_tabs_theme_dark .scroll_tab_right_button {
-  height: 42px;
+  height: 31px;
   -webkit-border-top-right-radius: 5px;
   -webkit-border-bottom-right-radius: 5px;
   -moz-border-radius-topright: 5px;
   -moz-border-radius-bottomright: 5px;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-  background-color: #333333;
-  border: 1px solid #222222;
+  background-color: #084c80;
+  border: 1px solid #08395f;
   color: #FFFFFF;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -356,7 +356,7 @@ ul.scroll_tabs_container {
 
 .scroll_tabs_theme_dark .scroll_tab_right_button::before {
   content: "\25B6";
-  line-height: 40px;
+  line-height: 28px;
   padding-left: 5px;
 }
 
@@ -365,10 +365,10 @@ ul.scroll_tabs_container {
 }
 
 .scroll_tabs_theme_dark .scroll_tab_right_button_disabled{
-  color: #444444;
-  background-color: #333333;
+  color: #13629e;
+  background-color: #084c80;
 }
 
 .scroll_tabs_theme_dark div.scroll_tab_inner span.tab_selected, .scroll_tabs_theme_dark div.scroll_tab_inner li.tab_selected {
-  background-color: #666666;
+  background-color: #d87636;
 }
