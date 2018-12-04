@@ -1,6 +1,9 @@
 package hc.fms.api.report.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -23,6 +26,9 @@ import hc.fms.api.report.entity.FuelStatResult;
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.ReportResponse;
+import hc.fms.api.report.model.SectionStat;
+import hc.fms.api.report.model.ExportableReport;
+import hc.fms.api.report.model.FuelStat;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
 import hc.fms.api.report.model.ReportGenResponse;
@@ -304,5 +310,31 @@ public class TrackerService {
 	}
 	public List<GenSection> getSectionListFor(Long reportId) {
 		return sectionRepository.findAllByReportId(reportId);
+	}
+	public ExportableReport getExportableReport(Long reportId) {
+		ExportableReport report = new ExportableReport();
+		ReportGen reportGen = getReportGen(reportId);
+		List<GenSection> genSectionList = getSectionListFor(reportGen.getId());
+		Map<Long, List<SectionStat>> sectionMap = new HashMap<>();
+		
+		for(GenSection genSection: genSectionList) {
+			List<SectionStat> sectionStatList = new ArrayList<>();
+			Long trackerId = genSection.getTrackerId();
+			List<FuelStatResult> resultList = getFuelStatisticsResultListByReportId(reportId, trackerId);
+			SectionStat sectionStat = new SectionStat();
+			List<FuelStat> statList = resultList.stream().map(statResult-> {
+				sectionStat.addFuelUsed(statResult.getFuelUsed());
+				sectionStat.addDistanceTravelled(statResult.getDistanceTravelled());
+				return new FuelStat(statResult);
+			}).collect(Collectors.toList());
+			sectionStat.setStatList(statList);
+			sectionStatList.add(sectionStat);
+			sectionMap.put(trackerId, sectionStatList);
+		}
+
+		report.setReportGen(reportGen);
+		report.setSectionInfoList(genSectionList);
+		report.setSectionDataMap(sectionMap);
+		return report;
 	}
 }

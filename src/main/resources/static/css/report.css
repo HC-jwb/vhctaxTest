@@ -1,0 +1,28 @@
+@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css); .notosanskr * { font-family: 'Noto Sans KR', sans-serif; }
+@import url(//fonts.googleapis.com/earlyaccess/nanumgothiccoding.css); .nanumgothiccoding * { font-family: 'Nanum Gothic Coding', monospace; }
+html,body, .main-container, .left-column, .ui.segment {height: 100%; font-family: 'Nanum Gothic Coding';}
+.ui.dropdown .menu .item {font-size: 0.95em;}
+.ui.table > tbody > tr.positive {font-weight: 600;}
+.main-container {padding: 0.2em 0.3em ;}
+.ui.list .description {font-size: 0.95em;}
+.ui.list .content .active-header{font-weight: 600; color: #415059;}
+.left-column {display: inline-block; width: 370px; padding:0.3em 0; vertical-align: top; overflow: auto;}
+div.right-column{display: inline-block; width: calc(100% - 380px); padding: 0 0.5em;}
+#genReportList > .selected.item {background:#d87636;border-radius: 3px;}
+#genReportList > .selected.item div.active-header, #genReportList > .selected.item .description {color: white;}
+#reportGenFrm {min-width: 850px;}
+@media (min-width:2401px) {#scrolltabsContainer {width: 100%;}}
+@media (min-width: 2301px) and (max-width: 2400px) {#scrolltabsContainer {width: 1820px;}	}
+@media (min-width: 2101px) and (max-width: 2200px) {#scrolltabsContainer {width: 1720px;}	}
+@media (min-width: 2001px) and (max-width: 2100px) {#scrolltabsContainer {width: 1620px;}	}
+@media (min-width: 1901px) and (max-width: 2000px) {#scrolltabsContainer {width: 1520px;}	}
+@media (min-width: 1801px) and (max-width: 1900px) {#scrolltabsContainer {width: 1420px;}	}
+@media (min-width: 1701px) and (max-width: 1800px) {#scrolltabsContainer {width: 1320px;}	}
+@media (min-width: 1601px) and (max-width: 1700px){#scrolltabsContainer {width: 1220px;} }
+@media (min-width: 1501px) and (max-width: 1600px){#scrolltabsContainer {width: 1120px;} }
+@media (min-width: 1301px) and (max-width: 1500px){#scrolltabsContainer {width: 920px;} }
+@media (min-width: 1201px) and (max-width: 1300px){#scrolltabsContainer {width: 820px;} }
+@media (min-width: 1101px) and (max-width: 1200px){#scrolltabsContainer {width: 720px;} }
+@media (min-width: 1001px) and (max-width: 1100px){#scrolltabsContainer {width: 620px;} }
+@media (min-width: 901px) and (max-width: 1000px){#scrolltabsContainer {width: 520px;} }
+@media (max-width: 900px){#scrolltabsContainer {width: 400px;} }

@@ -8,6 +8,7 @@ var ReportApi = {
 	genListInProgressUri: '/genlist/inprogress',
 	sectionListUri:'/section/list',
 	reportSectionUri:'/stat/section',
+	reportExportXlsUri: '/xlsdownload',
 	progressTimerId: null,
 	authenticate: function (authJson, callback) {
 		Api.postJson(this.apiBase + this.authUri, authJson, callback, function(data) {
@@ -34,11 +35,14 @@ var ReportApi = {
 		Api.postJson(this.apiBase + this.sectionListUri, reportGenJson, callback, function(response) {
 			console.log(response);
 		});
-	},///{reportId}/{trackerId}
+	},
 	getReportSection: function(sectionData, callback) {
 		Api.postJson(this.apiBase + this.reportSectionUri, sectionData, callback, function(response) {
 			console.log(response);
 		});
+	},
+	exportReportInXls:function(reportId) {
+		document.location.href=this.apiBase + this.reportExportXlsUri + '/' + reportId;
 	},
 	startCheckProgress: function() {
 		if(this.progressTimerId != null) return; 

@@ -1,5 +1,6 @@
 package hc.fms.api.report.controller;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -9,6 +10,11 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import hc.fms.api.report.entity.FuelStatResult;
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
+import hc.fms.api.report.model.ExportableReport;
 import hc.fms.api.report.model.FuelStat;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
@@ -32,21 +39,25 @@ import hc.fms.api.report.model.auth.AuthResponse;
 import hc.fms.api.report.model.tracker.Tracker;
 import hc.fms.api.report.model.tracker.TrackerSensor;
 import hc.fms.api.report.service.AuthService;
+import hc.fms.api.report.service.FileExportService;
 import hc.fms.api.report.service.TrackerService;
-
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/report/api")
 public class ReportApiController {
 	@Autowired
 	private AuthService authService;
 	@Autowired
 	private TrackerService trackerService;
+	@Autowired
+	private FileExportService exportService;
 	private Logger logger = LoggerFactory.getLogger(ReportApiController.class);
 	@PostMapping("/authenticate")
 	public AuthResponse initAuth(@RequestBody Map<String, String> authInfo, HttpSession session) {
 		AuthResponse response = authService.sendAuth(authInfo.get("login"), authInfo.get("password"));
 		if(response.getSuccess()) {
 			session.setAttribute("clientId", authInfo.get("login"));
+			session.setAttribute("password", authInfo.get("password"));
 			session.setAttribute("hash", response.getHash());
 		}
 		return response;
@@ -129,8 +140,10 @@ public class ReportApiController {
 	@RequestMapping("/stat/section")
 	public ResponseContainer<SectionStat> getStatisticsByReport(@RequestBody Map<String, Long> sectionData) {
 		ResponseContainer<SectionStat> response = new ResponseContainer<>();
+		Long reportId = sectionData.get("reportId");
+		Long trackerId = sectionData.get("trackerId");
 		try {
-			List<FuelStatResult> resultList = trackerService.getFuelStatisticsResultListByReportId(sectionData.get("reportId"), sectionData.get("trackerId"));
+			List<FuelStatResult> resultList = trackerService.getFuelStatisticsResultListByReportId(reportId, trackerId);
 			SectionStat stat = new SectionStat();
 			List<FuelStat> statList = resultList.stream().map(statResult-> {
 				stat.addFuelUsed(statResult.getFuelUsed());
@@ -201,6 +214,18 @@ public class ReportApiController {
 		return trackerService.retrieveReport(hashKey(session), sourceId);
 	}
 	
+	@RequestMapping("/xlsdownload/{reportId}")
+	public ResponseEntity<InputStreamResource> downloadReportAsExcel(@PathVariable("reportId") Long reportId) {
+		ExportableReport reportSource = trackerService.getExportableReport(reportId);
+		ReportGen reportGen = reportSource.getReportGen();
+		ByteArrayInputStream in = exportService.exportToExcel(reportSource);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Disposition",String.format("attachment; filename=FuelReport_%s_%s.xlsx", reportGen.getFrom(), reportGen.getTo()));
+		return ResponseEntity
+				.ok()
+				.contentType(MediaType.parseMediaType("application/octet-stream"))
+				.headers(headers).body(new InputStreamResource(in));
+	}
 	private String hashKey (HttpSession session) {
 		String hash = null;
 		Object attrHash = session.getAttribute("hash");

@@ -20,7 +20,6 @@ public class GenSection {
 	private Long reportId;
 	@Id
 	private Long trackerId;
-	
 	private String header;
 	
 	@Getter
