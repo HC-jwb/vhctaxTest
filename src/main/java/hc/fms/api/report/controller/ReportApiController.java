@@ -52,6 +52,19 @@ public class ReportApiController {
 	@Autowired
 	private FileExportService exportService;
 	private Logger logger = LoggerFactory.getLogger(ReportApiController.class);
+	@RequestMapping("/validate")
+	public ResponseContainer<Boolean> validateSession(HttpSession session) {
+		ResponseContainer<Boolean> response = new ResponseContainer<>();
+		if(hashKey(session)== null) {
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription("session invalid or expired");
+		} else {
+			response.setSuccess(true);
+			response.setPayload(Boolean.TRUE);
+		}
+		return response;
+		
+	}
 	@PostMapping("/authenticate")
 	public AuthResponse initAuth(@RequestBody Map<String, String> authInfo, HttpSession session) {
 		AuthResponse response = authService.sendAuth(authInfo.get("login"), authInfo.get("password"));
@@ -69,7 +82,6 @@ public class ReportApiController {
 			List<Tracker> filteredList = response.getList().stream().filter(tracker -> tracker.getGroupId().equals(groupId)).collect(Collectors.toList());
 			response.setList(filteredList);
 		}
-		//trackerListReponse.getList().stream().forEach(System.out::println);
 		return response;
 	}
 	@RequestMapping("/tracker/group/list")
@@ -225,6 +237,20 @@ public class ReportApiController {
 				.ok()
 				.contentType(MediaType.parseMediaType("application/octet-stream"))
 				.headers(headers).body(new InputStreamResource(in));
+	}
+	@RequestMapping("/fmsurl")
+	public ResponseContainer<String> getFmsUrl(HttpSession session) {
+		ResponseContainer <String> response = new ResponseContainer<>();
+		String hashKey = hashKey(session);
+		if(hashKey != null) {
+			response.setPayload(String.format("http://tracker.myhandycar.com/pro/demo/?session_key=%s", hashKey));
+			response.setSuccess(true);
+		} else {
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription("Hash session key has not been found");
+			response.setStatus(status);
+		}
+		return response;
 	}
 	private String hashKey (HttpSession session) {
 		String hash = null;

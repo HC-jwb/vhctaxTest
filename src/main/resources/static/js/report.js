@@ -113,10 +113,12 @@ function buildReportTab(sectionList) {
 	$scrollTabs.find("li:first()").click();
 }
 function reportTabClicked() {
+	var $this = $(this);
+	var trackerId = $this.data("trackerid");
+	if(!trackerId) return;
 	$statTableContainer.show();
 	$statTableContainer.find(".ui.loader").addClass("active");
-	console.log($scrollTabs.data('reportid'),$(this).data("trackerid"));
-	ReportApi.getReportSection({reportId: $scrollTabs.data('reportid'), trackerId: $(this).data("trackerid")}, function(response) {
+	ReportApi.getReportSection({reportId: $scrollTabs.data('reportid'), trackerId: trackerId}, function(response) {
 		if(response.success) {
 			buildStatTable(response.payload);
 			setTimeout(function() {$statTableContainer.find(".ui.loader").removeClass("active");}, 500);
@@ -149,7 +151,7 @@ function buildStatTable(sectionStat) {
 		$tr.append($statItem);
 		$statTableBody.append($tr);
 	}
-	$statTableBody.append("<tr class='positive'><td>합계</td><td class='right aligned'>"+sectionStat.totalFuelUsed+"</td><td class='right aligned'>"+sectionStat.totalDistanceTravelled+"</td><td class='right aligned'>"+sectionStat.totalFuelEffRate+"</td></tr>");
+	$statTableBody.append("<tr class='positive'><td class='center aligned'>합계</td><td class='right aligned'>"+sectionStat.totalFuelUsed+"</td><td class='right aligned'>"+sectionStat.totalDistanceTravelled+"</td><td class='right aligned'>"+sectionStat.totalFuelEffRate+"</td></tr>");
 }
 var $reportGenFrm, $trackerListDropdown, $genReportList, $reportGenItem, $reportGenAccordion, scrollTabs, $scrollTabs, $statTableContainer, $scrolltabsContainer;
 $(function() {
@@ -203,14 +205,14 @@ $(function() {
 		ReportApi.exportReportInXls($genReportList.find(".processed.selected.item").data("report").id);
 	});
 	
-	ReportApi.authenticate({login:'test@cesco.co.kr', password:'123456'}, function(response) {
-		if(response.success) {
+	ReportApi.validateSession(function(response) {
+		if(response.success && response.payload) {
 			getReportGenList();
-			
 		} else {
-			alert(response.status.description);
+			window.location.replace('/login.html');
 		}
 	});
+
 /*getGroupList();*/
 });
 

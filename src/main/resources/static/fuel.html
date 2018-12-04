@@ -1,4 +1,3 @@
-<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,24 +9,15 @@
 	<link rel="stylesheet" type="text/css" href="/css/scrolltabs.css">
 	<link rel="stylesheet" type="text/css" href="/css/report.css">
 	<title>연료 소모량 리포트</title>
-	<style>
-	.ui.fixed.menu {
-	padding: 0.25em 0;
-	margin: 0;
-  	border: 1px solid #ddd;
-  	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
-}
-	</style>
 </head>
 <body>
 <div class="ui fixed main secondary small blue inverted menu" id="topMenu">
 	<div class="ui container">
-		<%-- <div class="logo-item"><div class="logo-container"><img class="ui image" src="/images/logo.png"></div></div> --%>
 		<a class="fuel report active enabled item"><i class="bar chart outline icon"></i> 연비 분석</a>
 		<a class="filling report item"><i class="chart line icon"></i> 주유 분석</a>
 		<a class="tracking enabled item"><i class="road icon"></i> 운행관제</a>
 		<div class="right menu">
-			<a class="ui logout item" href="/logout" title="로그아웃"><i class="sign-out icon"></i></a>
+			<a class="ui logout item" href="/" title="로그아웃"><i class="sign-out icon"></i></a>
 		</div>
 	</div>
 </div>
@@ -124,6 +114,7 @@
 <script src="/js/modules.min.js"></script>
 <script src="/js/jquery.scrolltabs.js"></script>
 <script src="/js/jquery.mousewheel.js"></script>
+<script src="/js/common.js"></script>
 <script src="/js/report-api.js"></script>
 <script src="/js/report.js"></script>
 </body>
