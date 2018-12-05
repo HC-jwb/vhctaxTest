@@ -4,6 +4,7 @@ import java.util.List;
 
 import hc.fms.api.report.model.fuel.Column;
 import hc.fms.api.report.model.fuel.Datum;
+import hc.fms.api.report.model.fuel.FuelMileageRow;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,9 +14,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class Section {
-	private String type;
+	private String type;//I will extract type 'table' only
 	private String header;//"Statistics data", "Data breakdown"
 	private String timezone;
 	private List<Column> columns;
-	private List<Datum> data;
+	private List<Datum<FuelMileageRow>> data;
 }

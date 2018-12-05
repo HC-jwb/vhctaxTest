@@ -274,7 +274,11 @@ public class TrackerService {
 						}
 						if(fuelReport != null && mileageReport != null) {
 							logger.info("retrieved both reports " + reportGenSaved);
-							reportProcessor.process(reportGenSaved, fuelReport, mileageReport);
+							try {
+								reportProcessor.process(reportGenSaved, fuelReport, mileageReport);
+							} catch(Exception e) {
+								e.printStackTrace();
+							}
 							break;
 						}
 						elapsed = System.currentTimeMillis() - start;

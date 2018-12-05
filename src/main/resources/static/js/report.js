@@ -109,19 +109,26 @@ function buildReportTab(sectionList) {
 		if(i == 0) scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>")
 		else scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>")
 	}
-	$scrolltabsContainer.fadeIn();
-	$scrollTabs.find("li:first()").click();
+	$scrolltabsContainer.fadeIn(400, function (){
+		$scrollTabs.find("li:first()").click();
+	});
+	
 }
 function reportTabClicked() {
 	var $this = $(this);
 	var trackerId = $this.data("trackerid");
 	if(!trackerId) return;
+	if($this.data('cached')) {
+		buildStatTable($this.data('cached'));
+		return;
+	}
 	$statTableContainer.show();
 	$statTableContainer.find(".ui.loader").addClass("active");
 	ReportApi.getReportSection({reportId: $scrollTabs.data('reportid'), trackerId: trackerId}, function(response) {
 		if(response.success) {
 			buildStatTable(response.payload);
 			setTimeout(function() {$statTableContainer.find(".ui.loader").removeClass("active");}, 500);
+			$this.data('cached', response.payload);
 		} else {
 			console.log(response.status.description);
 		}
@@ -151,7 +158,14 @@ function buildStatTable(sectionStat) {
 		$tr.append($statItem);
 		$statTableBody.append($tr);
 	}
-	$statTableBody.append("<tr class='positive'><td class='center aligned'>합계</td><td class='right aligned'>"+sectionStat.totalFuelUsed+"</td><td class='right aligned'>"+sectionStat.totalDistanceTravelled+"</td><td class='right aligned'>"+sectionStat.totalFuelEffRate+"</td></tr>");
+	if(statList.length == 0) {
+		$statTableBody.append("<tr class='positive'><td class='center aligned' colspan='4'>가져올 데이터가 없습니다.</tr>");
+		/*$scrolltabsContainer.find(".excel-download.button").addClass("disabled");*/
+	} else {
+		$statTableBody.append("<tr class='positive'><td class='center aligned'>합계</td><td class='right aligned'>"+sectionStat.totalFuelUsed+"</td><td class='right aligned'>"+sectionStat.totalDistanceTravelled+"</td><td class='right aligned'>"+sectionStat.totalFuelEffRate+"</td></tr>");
+		/*$scrolltabsContainer.find(".excel-download.button").removeClass("disabled");*/
+	}
+	
 }
 var $reportGenFrm, $trackerListDropdown, $genReportList, $reportGenItem, $reportGenAccordion, scrollTabs, $scrollTabs, $statTableContainer, $scrolltabsContainer;
 $(function() {

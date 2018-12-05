@@ -257,9 +257,9 @@ public class ReportApiController {
 		Object attrHash = session.getAttribute("hash");
 		if(attrHash != null) {
 			hash = String.valueOf(attrHash);
-		} else {
+		} /*else {
 			throw new RuntimeException("no session hash");
-		}
+		}*/
 		return hash;
 	}
 	private String clientId(HttpSession session) {

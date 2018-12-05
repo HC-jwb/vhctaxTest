@@ -7,10 +7,12 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class DatumTotal {
-	private String text;
-	
-	private ColVal<Double> min;
+public class FillDrainRow {
+	private ColVal<Long>  date;
+	private ColVal<Double> volume;
 	private ColVal<Double> max;
 	private ColVal<Double> avg;
+	private ColVal<Double> time;
+	private ColVal<Double> value;
+	private StringVal address;
 }

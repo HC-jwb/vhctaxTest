@@ -3,7 +3,7 @@ $(function() {
 		if(response.success) {
 			$("#trackingFrame").attr("src", response.payload);
 		} else {
-			alert(response.status.description);
+			window.location.replace("/login");
 		}
 	});
 });
