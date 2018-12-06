@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
 
 import hc.fms.api.report.model.ReportResponse;
+import hc.fms.api.report.model.FuelMileageSection;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenResponse;
 import hc.fms.api.report.model.SensorResponse;
@@ -34,8 +35,8 @@ public class ParameterizedTypeReferenceFactory {
 		return new ParameterizedTypeReference<ReportGenResponse>() {};
 	}
 	@Bean
-	ParameterizedTypeReference<ReportResponse> reportConsumptionResponseTypeRef() {
-		return new ParameterizedTypeReference<ReportResponse>() {};
+	ParameterizedTypeReference<ReportResponse<FuelMileageSection>> reportConsumptionResponseTypeRef() {
+		return new ParameterizedTypeReference<ReportResponse<FuelMileageSection>>() {};
 	}
 	@Bean
 	ParameterizedTypeReference<TrackerResponse> trackerResponseTypeRef() {

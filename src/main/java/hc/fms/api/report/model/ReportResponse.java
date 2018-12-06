@@ -12,9 +12,9 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class ReportResponse {
+public class ReportResponse<T> {
 	private boolean success;
 	private ResponseStatus status;
 	private List<ResponseError> errors;
-	private ReportDesc report;
+	private ReportDesc<T> report;
 }

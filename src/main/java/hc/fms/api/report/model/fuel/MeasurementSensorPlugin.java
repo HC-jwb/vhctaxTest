@@ -14,7 +14,8 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class Plugin {
+/*This plugin is for fuel consumption and hardware mileage data*/
+public class MeasurementSensorPlugin {
 	@JsonProperty("details_interval_minutes")
 	private int detailsIntervalMinutes = 60 * 6;
 	@JsonProperty("plugin_id")

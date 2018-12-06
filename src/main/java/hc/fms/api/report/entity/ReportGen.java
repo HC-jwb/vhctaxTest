@@ -33,8 +33,11 @@ public class ReportGen {
 	@Column(name="report_id")
 	private Long id;
 	private String clientId;
-	private long fuelReportId;
-	private long mileageReportId;
+	private Long fuelReportId;
+	private Long mileageReportId;
+	
+	@Column(name="fill_report_id")
+	private Long fillingReportId;
 	@Column(name="start")
 	private String from;
 	@Column(name="end")

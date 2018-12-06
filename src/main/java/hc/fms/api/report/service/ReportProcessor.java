@@ -16,7 +16,7 @@ import hc.fms.api.report.entity.FuelStatDetail;
 import hc.fms.api.report.entity.FuelStatistics;
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
-import hc.fms.api.report.model.Section;
+import hc.fms.api.report.model.FuelMileageSection;
 import hc.fms.api.report.model.fuel.Datum;
 import hc.fms.api.report.model.fuel.FuelMileageRow;
 import hc.fms.api.report.model.fuel.ReportDesc;
@@ -43,21 +43,21 @@ public class ReportProcessor {
 	}
 
 	@Transactional
-	public void process(ReportGen reportGenSaved, ReportDesc fuelReport, ReportDesc mileageReport) {
-		List<Sheet> sheets = fuelReport.getSheets();
-		for(Sheet sheet : sheets) {
+	public void process(ReportGen reportGenSaved, ReportDesc<FuelMileageSection> fuelReport, ReportDesc<FuelMileageSection> mileageReport) {
+		List<Sheet<FuelMileageSection>> sheets = fuelReport.getSheets();
+		for(Sheet<FuelMileageSection> sheet : sheets) {
 			logger.info("ReportProcessor.process -> fuel sheet " + sheet);
 			processSheet(sheet, "F", reportGenSaved.getId(), reportGenSaved.getFuelReportId());
 			logger.info("fuel sheet processed");
 		}
 		sheets = mileageReport.getSheets();
-		for(Sheet sheet : sheets) {
+		for(Sheet<FuelMileageSection> sheet : sheets) {
 			logger.info("sheet " + sheet);
 			processSheet(sheet, "M", reportGenSaved.getId(), reportGenSaved.getMileageReportId());
 			logger.info("sheet processed");
 		}
 		List<GenSection> genSectionList = new ArrayList<>();
-		for(Sheet sheet : sheets) {
+		for(Sheet<FuelMileageSection> sheet : sheets) {
 			GenSection genSection = new GenSection();
 			genSection.setReportId(reportGenSaved.getId());
 			genSection.setTrackerId(sheet.getEntityIds().get(0));
@@ -77,15 +77,15 @@ public class ReportProcessor {
 		reportGenRepository.save(reportGenSaved);
 		genSectionRepository.saveAll(genSectionList);
 	}
-	private void processSheet(Sheet sheet, final String type, final long reportId, final long generationId) {
+	private void processSheet(Sheet<FuelMileageSection> sheet, final String type, final long reportId, final long generationId) {
 		final Long trackerId = sheet.getEntityIds().get(0);
 		//filter only table type section
-		List<Section> sectionList = sheet.getSections().stream().filter(section -> "table".equalsIgnoreCase(section.getType())).collect(Collectors.toList());
+		List<FuelMileageSection> sectionList = sheet.getSections().stream().filter(section -> "table".equalsIgnoreCase(section.getType())).collect(Collectors.toList());
 		if(sectionList.size() == 0 ) {
 			logger.info("No data found in sections");
 			return;
 		}
-		Section statSection = sectionList.get(0);
+		FuelMileageSection statSection = sectionList.get(0);
 		List<FuelMileageRow> sectionRows = statSection.getData().get(0).getRows();
 		List<FuelStatistics> statList = new ArrayList<>();
 		FuelStatistics fuelStat;
@@ -129,7 +129,7 @@ public class ReportProcessor {
 			return fuelStat;
 		}).collect(Collectors.toList());
 */		
-		Section statDetailSection = sectionList.get(1);
+		FuelMileageSection statDetailSection = sectionList.get(1);
 		final List<FuelStatDetail> statDetailList = new ArrayList<>();
 		List<Datum<FuelMileageRow>> data =  statDetailSection.getData();
 		for(Datum<FuelMileageRow> datum : data) {

@@ -1,5 +1,7 @@
-package hc.fms.api.report.model.fuel;
+package hc.fms.api.report.model.fuel.filling;
 
+import hc.fms.api.report.model.fuel.ColVal;
+import hc.fms.api.report.model.fuel.StringVal;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

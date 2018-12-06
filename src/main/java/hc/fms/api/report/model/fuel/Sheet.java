@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import hc.fms.api.report.model.Section;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,9 +13,9 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class Sheet {
+public class Sheet<T> {//FuelMileageSection or FillDrainSection
 	private String header;//"tracker Name"
 	@JsonProperty("entity_ids")
 	private List<Long> entityIds;
-	private List<Section> sections;
+	private List<T> sections;
 }

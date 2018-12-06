@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import hc.fms.api.report.model.fuel.Plugin;
 import hc.fms.api.report.model.fuel.TimeFilter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +16,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class GenerateRequest {
+public class GenerateRequest<T> {
 	private static ObjectMapper jsonMapper = new ObjectMapper(); 
 	private String hash;
 	private List<Integer> trackers;
@@ -26,7 +25,8 @@ public class GenerateRequest {
 	private String geocoder = "google";
 	@JsonProperty("time_filter")
 	private TimeFilter timeFilter = new TimeFilter();
-	private Plugin plugin;
+	//private FuelMileagePlugin plugin;
+	private T plugin;
 	
 	public String getTimeFilter() {
 		try {

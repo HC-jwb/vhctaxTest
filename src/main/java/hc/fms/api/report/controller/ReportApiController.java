@@ -25,6 +25,7 @@ import hc.fms.api.report.entity.FuelStatResult;
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.ExportableReport;
+import hc.fms.api.report.model.FuelMileageSection;
 import hc.fms.api.report.model.FuelStat;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
@@ -131,7 +132,7 @@ public class ReportApiController {
 			}
 		});
 		logger.info(req.toString());
-		ReportGenResponse genResponse = trackerService.generateReport(req);
+		ReportGenResponse genResponse = trackerService.generateFuelMileageReport(req);
 		
 		ResponseContainer<ReportGen> response = new ResponseContainer<>();
 		try {
@@ -222,8 +223,8 @@ public class ReportApiController {
 	
 	/** retrieve original report not processed by this module, this is for testing use*/
 	@RequestMapping("/retrieve/source/{sourceId}")
-	public ReportResponse retrieveReportSource(HttpSession session, @PathVariable("sourceId")Long sourceId) {
-		return trackerService.retrieveReport(hashKey(session), sourceId);
+	public ReportResponse<FuelMileageSection> retrieveReportSource(HttpSession session, @PathVariable("sourceId")Long sourceId) {
+		return trackerService.retrieveFuelMileageReport(hashKey(session), sourceId);
 	}
 	
 	@RequestMapping("/xlsdownload/{reportId}")

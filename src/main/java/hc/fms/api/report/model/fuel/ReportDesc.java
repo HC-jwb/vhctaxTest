@@ -13,12 +13,12 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-public class ReportDesc {
+public class ReportDesc<T> {
 	private String created;
 	@JsonProperty("time_filter")
 	private TimeFilter timeFilter;
 	//private String title;
-	private List<Sheet> sheets;
+	private List<Sheet<T>> sheets;
 	private String from;
 	private String to;
 }

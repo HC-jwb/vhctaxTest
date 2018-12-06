@@ -28,6 +28,7 @@ import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.ReportResponse;
 import hc.fms.api.report.model.SectionStat;
 import hc.fms.api.report.model.ExportableReport;
+import hc.fms.api.report.model.FuelMileageSection;
 import hc.fms.api.report.model.FuelStat;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
@@ -35,7 +36,7 @@ import hc.fms.api.report.model.ReportGenResponse;
 import hc.fms.api.report.model.SensorResponse;
 import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.TripResponse;
-import hc.fms.api.report.model.fuel.Plugin;
+import hc.fms.api.report.model.fuel.MeasurementSensorPlugin;
 import hc.fms.api.report.model.fuel.ReportDesc;
 import hc.fms.api.report.model.tracker.request.GenerateRequest;
 import hc.fms.api.report.model.tracker.request.SensorRequest;
@@ -66,7 +67,7 @@ public class TrackerService {
 	@Autowired
 	private ParameterizedTypeReference<ReportGenResponse> reportGenResponseTypeRef;
 	@Autowired
-	private ParameterizedTypeReference<ReportResponse> reportConsumptionResponseTypeRef;
+	private ParameterizedTypeReference<ReportResponse<FuelMileageSection>> reportConsumptionResponseTypeRef;
 	@Autowired
 	private ParameterizedTypeReference<TrackerResponse> trackerResponseTypeRef;
 	
@@ -140,7 +141,7 @@ public class TrackerService {
 		}
 		return response;
 	}
-	public ReportGenResponse requestReportGen(GenerateRequest req) {
+	public ReportGenResponse requestReportGen(GenerateRequest<MeasurementSensorPlugin> req) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", req.getHash());
 		map.add("from", req.getFrom());
@@ -159,22 +160,22 @@ public class TrackerService {
 		}
 		return response;
 	}
-	public ReportResponse retrieveReport(String hash, long reportId) {
+	@SuppressWarnings("unchecked")
+	public ReportResponse<FuelMileageSection> retrieveFuelMileageReport(String hash, long reportId) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", hash);
 		map.add("report_id", String.valueOf(reportId));
-		ReportResponse response = null;
+		ReportResponse<FuelMileageSection> response = null;
 		try {
-			ResponseEntity<ReportResponse> responseEntity = restTemplate.exchange(String.format("%s%s", fmsProps.getBaseUrl(), fmsProps.getApi().getReportRetrieve()), HttpMethod.POST, new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), reportConsumptionResponseTypeRef);
+			ResponseEntity<ReportResponse<FuelMileageSection>> responseEntity = restTemplate.exchange(String.format("%s%s", fmsProps.getBaseUrl(), fmsProps.getApi().getReportRetrieve()), HttpMethod.POST, new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), reportConsumptionResponseTypeRef);
 			response= responseEntity.getBody();
 		} catch(HttpStatusCodeException e) {
-			//e.printStackTrace();
 			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), ReportResponse.class);} catch(Exception ex) {ex.printStackTrace();}
 		}
 		return response;
 	}
 	
-	public ReportGenResponse generateReport(ReportGenFlatRequest req) {
+	public ReportGenResponse generateFuelMileageReport(ReportGenFlatRequest req) {
 		List<TrackerInfo> infoList = req.getTrackers();
 		List<Integer> trackerIdList = infoList.stream().map(info -> info.getTrackerId()).collect(Collectors.toList());
 		
@@ -183,30 +184,30 @@ public class TrackerService {
 		String hash = req.getHash();
 		int detailsIntervalMinutes = req.getIntervalInMin();
 		
-		GenerateRequest fuelGenReq = new GenerateRequest();
+		GenerateRequest<MeasurementSensorPlugin> fuelGenReq = new GenerateRequest<>();
 		fuelGenReq.setHash(hash);
 
 		fuelGenReq.setTrackers(trackerIdList);
 		fuelGenReq.setFrom(from);
 		fuelGenReq.setTo(to);
 		
-		Plugin plugin = new Plugin();
+		MeasurementSensorPlugin plugin = new MeasurementSensorPlugin();
 		plugin.setDetailsIntervalMinutes(detailsIntervalMinutes);
 		//logger.info(infoList.stream().map(info -> new Plugin.Sensor(info.getTrackerId(), info.getFuelConsumptionSensorId())).collect(Collectors.toList()) + "");
-		plugin.setSensors(infoList.stream().map(info -> new Plugin.Sensor(info.getTrackerId(), info.getFuelConsumptionSensorId())).collect(Collectors.toList()));
+		plugin.setSensors(infoList.stream().map(info -> new MeasurementSensorPlugin.Sensor(info.getTrackerId(), info.getFuelConsumptionSensorId())).collect(Collectors.toList()));
 		fuelGenReq.setPlugin(plugin);
 				
 		
-		GenerateRequest mileageGenReq = new GenerateRequest();
+		GenerateRequest<MeasurementSensorPlugin> mileageGenReq = new GenerateRequest<>();
 		mileageGenReq.setHash(hash);
 
 		mileageGenReq.setTrackers(trackerIdList);
 		mileageGenReq.setFrom(from);
 		mileageGenReq.setTo(to);
 		
-		plugin = new Plugin();
+		plugin = new MeasurementSensorPlugin();
 		plugin.setDetailsIntervalMinutes(detailsIntervalMinutes);
-		plugin.setSensors(infoList.stream().map(info -> new Plugin.Sensor(info.getTrackerId(), info.getHardwareMileageSensorId())).collect(Collectors.toList()));
+		plugin.setSensors(infoList.stream().map(info -> new MeasurementSensorPlugin.Sensor(info.getTrackerId(), info.getHardwareMileageSensorId())).collect(Collectors.toList()));
 		mileageGenReq.setPlugin(plugin);
 		
 		
@@ -231,7 +232,7 @@ public class TrackerService {
 					long elapsed = 0L, start = System.currentTimeMillis();
 					long fuelReportId = reportGenSaved.getFuelReportId();
 					long mileageReportId = reportGenSaved.getMileageReportId();
-					ReportDesc fuelReport = null, mileageReport = null;
+					ReportDesc<FuelMileageSection> fuelReport = null, mileageReport = null;
 					while(true) {
 						try {
 							Thread.sleep(5 * 1000);
@@ -240,7 +241,7 @@ public class TrackerService {
 						}
 						if(fuelReport == null) {
 							try {
-								ReportResponse fuelReportResponse = retrieveReport(req.getHash(), fuelReportId);
+								ReportResponse<FuelMileageSection> fuelReportResponse = retrieveFuelMileageReport(req.getHash(), fuelReportId);
 								if(fuelReportResponse.isSuccess()) {
 									fuelReport = fuelReportResponse.getReport();
 								} else if(fuelReportResponse.getStatus().getCode() == 229) {
@@ -257,7 +258,7 @@ public class TrackerService {
 						}
 						if(mileageReport == null) {
 							try {
-								ReportResponse mileageReportResponse = retrieveReport(req.getHash(), mileageReportId);
+								ReportResponse<FuelMileageSection> mileageReportResponse = retrieveFuelMileageReport(req.getHash(), mileageReportId);
 								if(mileageReportResponse.isSuccess()) {
 									mileageReport = mileageReportResponse.getReport();
 								} else if(mileageReportResponse.getStatus().getCode() == 229) {
