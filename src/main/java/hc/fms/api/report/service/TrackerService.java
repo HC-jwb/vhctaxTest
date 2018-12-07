@@ -38,6 +38,7 @@ import hc.fms.api.report.model.fuel.FuelStat;
 import hc.fms.api.report.model.fuel.MeasurementSensorPlugin;
 import hc.fms.api.report.model.fuel.ReportDesc;
 import hc.fms.api.report.model.fuel.SectionStat;
+import hc.fms.api.report.model.fuel.filldrain.ObdFuelPlugin;
 import hc.fms.api.report.model.tracker.request.GenerateRequest;
 import hc.fms.api.report.model.tracker.request.SensorRequest;
 import hc.fms.api.report.model.tracker.request.TrackerInfo;
@@ -210,7 +211,6 @@ public class TrackerService {
 		plugin.setSensors(infoList.stream().map(info -> new MeasurementSensorPlugin.Sensor(info.getTrackerId(), info.getHardwareMileageSensorId())).collect(Collectors.toList()));
 		mileageGenReq.setPlugin(plugin);
 		
-		
 		ReportGenResponse response = new ReportGenResponse();
 		ReportGenResponse fuelGenResponse = requestReportGen(fuelGenReq);
 		if(fuelGenResponse.isSuccess()) {
@@ -290,7 +290,6 @@ public class TrackerService {
 					logger.info("Report generation Thread exited");
 				});
 				execService.shutdown();
-				
 			} else {
 				return mileageGenResponse;//fuel generation successful but faile to generate mileageReport 
 			}
@@ -298,6 +297,28 @@ public class TrackerService {
 			return fuelGenResponse;//fuel generation failed
 		}
 		return response;//all successful and created a single report reponse which includes both of the sub reports
+	}
+	public ReportGenResponse generateFillDrainReport(ReportGenFlatRequest req) {
+		List<TrackerInfo> infoList = req.getTrackers();
+		List<Integer> trackerIdList = infoList.stream().map(info -> info.getTrackerId()).collect(Collectors.toList());
+		
+		String from = req.getFrom();
+		String to = req.getTo();
+		String hash = req.getHash();
+		
+		GenerateRequest<ObdFuelPlugin> fillDrainGenReq = new GenerateRequest<>();
+		fillDrainGenReq.setHash(hash);
+		fillDrainGenReq.setTrackers(trackerIdList);
+		fillDrainGenReq.setFrom(from);
+		fillDrainGenReq.setTo(to);
+		
+		ObdFuelPlugin plugin = new ObdFuelPlugin();
+		fillDrainGenReq.setPlugin(plugin);
+				
+		ReportGenResponse response = new ReportGenResponse();
+		ReportGenResponse fillDrainGenResponse;// = requestReportGen(fuelGenReq);
+		if(true)throw new RuntimeException("report generation for filldrain -not yet implemented- have to implement requestReportGen function");
+		return fillDrainGenResponse;
 	}
 	public List<FuelStatResult> getFuelStatisticsResultListByReportId(Long reportId, Long trackerId) {
 		return fuelStatRepository.getFuelStatResultList(reportId, trackerId);

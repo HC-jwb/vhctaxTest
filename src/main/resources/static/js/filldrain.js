@@ -36,11 +36,11 @@ function generateReport() {
 		} else {
 			trackers.push({trackerId:valueMap.trackerList});
 		}
-		ReportApi.sendGenRequest({
+		ReportApi.sendGenFillDrainRequest({
 				trackers: trackers,
 				from: valueMap.fromDate,
 				to:valueMap.toDate,
-				intervalInMin: 360,
+/*				intervalInMin: 360,*/
 				label: valueMap.description
 			}, function(response) {
 			if(response.success) {

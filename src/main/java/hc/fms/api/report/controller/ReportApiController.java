@@ -109,7 +109,7 @@ public class ReportApiController {
 		*/
 		req.setHash(hashKey(session));
 		req.setClientId(clientId(session));
-		logger.info(String.format("session Key %s, clientId: %s",req.getHash(), req.getClientId()));
+		logger.info(String.format("requestFuelEffRateReportGen:: session Key %s, clientId: %s",req.getHash(), req.getClientId()));
 		
 		req.normalize();//add HH:mm:ss to from and to, modify end Date by changing to previous date and to 59:59:59
 		req.getTrackers().forEach(info -> {
@@ -148,7 +148,41 @@ public class ReportApiController {
 		}
 		return response;
 	}
-
+	@PostMapping("/generatefilldrain")
+	public ResponseContainer<ReportGen> requestFillDrainReportGen(@RequestBody ReportGenFlatRequest req, HttpSession session) {
+		/*
+		 * session Key: d222e37acb3d15cd0da78c229a7b9d70
+		{
+			"trackers": [78,72],
+			"from":"2018-11-01 00:00:00",
+			"to":"2018-11-26 23:59:59",
+			"label": "01-레이벤-45하8608(2017) & 02-모닝-45하9940(2016) 누적운행거리"
+		}
+		*/
+		req.setHash(hashKey(session));
+		req.setClientId(clientId(session));
+		logger.info(String.format("requestFillDrainReportGen::session Key %s, clientId: %s",req.getHash(), req.getClientId()));
+		
+		req.normalize();//add HH:mm:ss to from and to, modify end Date by changing to previous date and to 59:59:59
+		logger.info(req.toString());
+		ReportGenResponse genResponse = trackerService.generateFillDrainReport(req);
+		
+		ResponseContainer<ReportGen> response = new ResponseContainer<>();
+		try {
+			if(genResponse.isSuccess()) {
+				response.setPayload(trackerService.getReportGen(genResponse.getId()));
+				response.setSuccess(true);
+			} else {
+				response.setStatus(genResponse.getStatus());
+			}
+		} catch(Exception e) {
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription(e.getMessage());
+			response.setStatus(status);
+		}
+		return response;
+	}
+	
 	@RequestMapping("/stat/section")
 	public ResponseContainer<SectionStat> getStatisticsByReport(@RequestBody Map<String, Long> sectionData) {
 		ResponseContainer<SectionStat> response = new ResponseContainer<>();

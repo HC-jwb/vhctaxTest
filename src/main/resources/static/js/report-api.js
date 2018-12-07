@@ -5,6 +5,7 @@ var ReportApi = {
 	groupListUri:'/tracker/group/list',
 	trackerListUri: '/tracker/list',
 	genRequestUri:'/generate',
+	genFillDrainRequestUri:'/generatefilldrain',
 	genListUri: '/genlist',
 	getFillDrainListUri:'/genlist/filldrain',
 	genListInProgressUri: '/genlist/inprogress',
@@ -31,6 +32,10 @@ var ReportApi = {
 	},
 	sendGenRequest: function(genRequestJson, callback) {
 		Api.postJson(this.apiBase + this.genRequestUri, genRequestJson, callback, function(response) {
+			console.log(response);
+		});
+	},sendGenFillDrainRequest: function(genRequestJson, callback) {
+		Api.postJson(this.apiBase + this.genFillDrainRequestUri, genRequestJson, callback, function(response) {
 			console.log(response);
 		});
 	},
