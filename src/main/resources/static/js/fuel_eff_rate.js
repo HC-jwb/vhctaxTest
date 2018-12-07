@@ -104,15 +104,12 @@ function closeAccordion() {
 
 function buildReportTab(sectionList) {
 	scrollTabs.clearTabs();
+	$scrolltabsContainer.fadeIn();
 	$scrollTabs.data('reportid', sectionList[0].reportId);
 	for(var i = 0; i < sectionList.length; i++) {
-		if(i == 0) scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>")
-		else scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>")
+		scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>");
 	}
-	$scrolltabsContainer.fadeIn(400, function (){
-		$scrollTabs.find("li:first()").click();
-	});
-	
+	$scrollTabs.find("li:first()").click();
 }
 function reportTabClicked() {
 	var $this = $(this);
