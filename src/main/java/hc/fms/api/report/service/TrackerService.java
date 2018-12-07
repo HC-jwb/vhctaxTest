@@ -309,11 +309,11 @@ public class TrackerService {
 		return reportGenRepository.findAllFillDrainReportByClientIdOrderByCreatedDateDesc(clientId);
 	}
 	public List<Long> getReportGenListInProgress(String clientId) {
-		List<ReportGen> genList = reportGenRepository.findAllProcessingFuelEffRateGenByClientId(clientId);
+		List<ReportGen> genList = reportGenRepository.findAllInProgressFuelEffRateGenByClientId(clientId);
 		return genList.stream().map(reportGen -> reportGen.getId()).collect(Collectors.toList());
 	}
 	public List<Long> getFillDrainReportGenListInProgress(String clientId) {
-		List<ReportGen> genList = reportGenRepository.findAllProcessingFillDrainGenByClientId(clientId);
+		List<ReportGen> genList = reportGenRepository.findAllInProgressFillDrainGenByClientId(clientId);
 		return genList.stream().map(reportGen -> reportGen.getId()).collect(Collectors.toList());
 	}
 	public ReportGen getReportGen(Long genId) {

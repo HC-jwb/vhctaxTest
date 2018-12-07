@@ -21,7 +21,7 @@ public interface ReportGenRepository extends JpaRepository <ReportGen, Long>{
 	public List<ReportGen> findAllFillDrainReportByClientIdOrderByCreatedDateDesc(@Param("clientId") String clientId);
 	
 	@Query(value="select gen from ReportGen gen where gen.clientId=:clientId and  gen.fuelReportId is not null and gen.mileageReportId is not null and gen.fuelReportProcessed=false")
-	public List<ReportGen> findAllProcessingFuelEffRateGenByClientId(@Param("clientId") String clientId);
+	public List<ReportGen> findAllInProgressFuelEffRateGenByClientId(@Param("clientId") String clientId);
 	@Query(value="select gen from ReportGen gen where gen.clientId=:clientId and  gen.fillDrainReportId is not null and gen.fuelReportProcessed=false")
-	public List<ReportGen> findAllProcessingFillDrainGenByClientId(@Param("clientId") String clientId);
+	public List<ReportGen> findAllInProgressFillDrainGenByClientId(@Param("clientId") String clientId);
 }
