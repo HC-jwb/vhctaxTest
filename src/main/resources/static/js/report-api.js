@@ -6,7 +6,9 @@ var ReportApi = {
 	trackerListUri: '/tracker/list',
 	genRequestUri:'/generate',
 	genListUri: '/genlist',
+	getFillDrainListUri:'/genlist/filldrain',
 	genListInProgressUri: '/genlist/inprogress',
+	genFillDrainListInProgressUri:'/genfilldrainlist/inprogress',
 	sectionListUri:'/section/list',
 	reportSectionUri:'/stat/section',
 	reportExportXlsUri: '/xlsdownload',
@@ -35,6 +37,9 @@ var ReportApi = {
 	getReportGenList: function(callback) {
 		Api.sendGet(this.apiBase + this.genListUri, callback);
 	},
+	getFillDrainReportGenList: function(callback) {
+		Api.sendGet(this.apiBase + this.getFillDrainListUri, callback);
+	},
 	getSectionList: function(reportGenJson, callback) {
 		Api.postJson(this.apiBase + this.sectionListUri, reportGenJson, callback, function(response) {
 			console.log(response);
@@ -48,10 +53,10 @@ var ReportApi = {
 	exportReportInXls:function(reportId) {
 		document.location.href=this.apiBase + this.reportExportXlsUri + '/' + reportId;
 	},
-	startCheckProgress: function() {
+	startCheckProgress: function(type) {
 		if(this.progressTimerId != null) return; 
 		this.progressTimerId = setInterval(function() {
-			Api.sendGet(ReportApi.apiBase + ReportApi.genListInProgressUri, function(response) {
+			Api.sendGet(ReportApi.apiBase + ((type === 'filldrain')? ReportApi.genFillDrainListInProgressUri: ReportApi.genListInProgressUri), function(response) {
 				if(response.success) {
 					refreshStatus(response.payload);
 					if(response.payload.length == 0) {ReportApi.stopCheckProgress();}
@@ -60,6 +65,9 @@ var ReportApi = {
 				}
 			});
 		},5000);
+	},
+	startCheckFillDrainProgress: function() {
+		this.startCheckProgress('filldrain');
 	},
 	stopCheckProgress: function() {
 		if(this.progressTimerId !=null) {

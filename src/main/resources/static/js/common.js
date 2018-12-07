@@ -41,6 +41,16 @@ var Api = {
 	}
 };
 Api.init();
+var FormUI = {
+	errMsgDiv: '<div class="ui error message"><i class="close icon"></i><span class="msg" style="padding: 1em;"></span></div>'
+	, displayMsgIn: function ($frm, msg) {
+		setTimeout(function() {
+			$frm.find(".error.field").empty().append(FormUI.errMsgDiv);
+			$frm.find(".error.field .error.message .msg").text(msg);
+			$frm.removeClass("success").addClass("error");
+		}, 100);
+	}
+};
 $(function () {
 	$("#topMenu .enabled.item").click(function() {
 		var $this = $(this);
@@ -48,6 +58,11 @@ $(function () {
 			window.location.replace("/fuel.html");
 		} else if($this.hasClass("tracking")) {
 			window.location.replace("/fms.html");
+		} else if($this.hasClass("filldrain")) {
+			window.location.replace("/filldrain.html")
 		}
+	});
+	$('.error.field').on('click','.close', function() {
+		$(this).closest('.message').transition('fade');
 	});
 });

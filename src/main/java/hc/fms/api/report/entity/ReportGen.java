@@ -37,7 +37,7 @@ public class ReportGen {
 	private Long mileageReportId;
 	
 	@Column(name="fill_report_id")
-	private Long fillingReportId;
+	private Long fillDrainReportId;
 	@Column(name="start")
 	private String from;
 	@Column(name="end")

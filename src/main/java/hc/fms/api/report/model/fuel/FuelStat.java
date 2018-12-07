@@ -1,4 +1,4 @@
-package hc.fms.api.report.model;
+package hc.fms.api.report.model.fuel;
 
 import java.text.DecimalFormat;
 

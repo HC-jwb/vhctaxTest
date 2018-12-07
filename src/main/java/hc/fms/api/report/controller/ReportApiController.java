@@ -25,18 +25,18 @@ import hc.fms.api.report.entity.FuelStatResult;
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.ExportableReport;
-import hc.fms.api.report.model.FuelMileageSection;
-import hc.fms.api.report.model.FuelStat;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
 import hc.fms.api.report.model.ReportGenResponse;
 import hc.fms.api.report.model.ReportResponse;
 import hc.fms.api.report.model.ResponseContainer;
 import hc.fms.api.report.model.ResponseStatus;
-import hc.fms.api.report.model.SectionStat;
 import hc.fms.api.report.model.SensorResponse;
 import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.auth.AuthResponse;
+import hc.fms.api.report.model.fuel.FuelMileageSection;
+import hc.fms.api.report.model.fuel.FuelStat;
+import hc.fms.api.report.model.fuel.SectionStat;
 import hc.fms.api.report.model.tracker.Tracker;
 import hc.fms.api.report.model.tracker.TrackerSensor;
 import hc.fms.api.report.service.AuthService;
@@ -100,7 +100,6 @@ public class ReportApiController {
 		/*
 		 * session Key: d222e37acb3d15cd0da78c229a7b9d70
 		{
-			
 			"trackers": [{"trackerId": 78, "mileageSensorId": 656, "fuelSensorId": 640}, {"trackerId": 72, "mileageSensorId": 655, "fuelSensorId": 644}],
 			"from":"2018-11-01 00:00:00",
 			"to":"2018-11-26 23:59:59",
@@ -181,7 +180,7 @@ public class ReportApiController {
 	public ResponseContainer<List<ReportGen>> getGeneratedReportList(HttpSession session) {
 		ResponseContainer <List<ReportGen>> response = new ResponseContainer<>();
 		try {
-			response.setPayload(trackerService.getReportGenList(clientId(session)));
+			response.setPayload(trackerService.getFuelReportGenList(clientId(session)));
 			response.setSuccess(true);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -191,11 +190,41 @@ public class ReportApiController {
 		}
 		return response;
 	}
+	@RequestMapping("/genlist/filldrain")
+	public ResponseContainer<List<ReportGen>> getGeneratedFillDrainReportList(HttpSession session) {
+		ResponseContainer <List<ReportGen>> response = new ResponseContainer<>();
+		try {
+			response.setPayload(trackerService.getFillDrainReportGenList(clientId(session)));
+			response.setSuccess(true);
+		} catch(Exception e) {
+			e.printStackTrace();
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription(e.getMessage());
+			response.setStatus(status);
+		}
+		return response;
+	}
+	
 	@RequestMapping("/genlist/inprogress")
 	public  ResponseContainer<List<Long>> getGenListInProgress(HttpSession session) {
 		ResponseContainer<List<Long>> response = new ResponseContainer<>();
 		try {
 			response.setPayload(trackerService.getReportGenListInProgress(clientId(session)));
+			response.setSuccess(true);
+		} catch(Exception e) {
+			e.printStackTrace();
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription(e.getMessage());
+			response.setStatus(status);
+		}
+		
+		return response;
+	}
+	@RequestMapping("/genfilldrainlist/inprogress")
+	public  ResponseContainer<List<Long>> getGenFillDrainListInProgress(HttpSession session) {
+		ResponseContainer<List<Long>> response = new ResponseContainer<>();
+		try {
+			response.setPayload(trackerService.getFillDrainReportGenListInProgress(clientId(session)));
 			response.setSuccess(true);
 		} catch(Exception e) {
 			e.printStackTrace();

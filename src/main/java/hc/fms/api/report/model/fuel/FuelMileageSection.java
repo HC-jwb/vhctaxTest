@@ -1,10 +1,7 @@
-package hc.fms.api.report.model;
+package hc.fms.api.report.model.fuel;
 
 import java.util.List;
 
-import hc.fms.api.report.model.fuel.Column;
-import hc.fms.api.report.model.fuel.Datum;
-import hc.fms.api.report.model.fuel.FuelMileageRow;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

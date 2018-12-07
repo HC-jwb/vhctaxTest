@@ -1,10 +1,9 @@
-package hc.fms.api.report.model;
+package hc.fms.api.report.model.fuel.filldrain;
 
 import java.util.List;
 
 import hc.fms.api.report.model.fuel.Column;
 import hc.fms.api.report.model.fuel.Datum;
-import hc.fms.api.report.model.fuel.filling.FillDrainRow;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

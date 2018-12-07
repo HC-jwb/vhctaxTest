@@ -1,4 +1,4 @@
-package hc.fms.api.report.model.fuel.filling;
+package hc.fms.api.report.model.fuel.filldrain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -28,7 +28,7 @@ public class ObdFuelPlugin {
 	private boolean surgeFilter = true;
 	
 	@JsonProperty("surge_filter_threshold")
-	private double surgeFilterThreshold = 0.19;
+	private double surgeFilterThreshold = 0.19;//19%
 	@JsonProperty("speed_filter")
 	private boolean speedFilter = false;
 	@JsonProperty("speed_filter_threshold")

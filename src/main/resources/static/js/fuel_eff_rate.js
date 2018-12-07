@@ -191,8 +191,8 @@ $(function() {
 	.on("change", function() {
 		to.datepicker("option", "minDate", getDate(this));
 	}),
-	to = $( "#toDate" ).datepicker({dateFormat:'yy-mm-dd', defaultDate: "-1d", maxDate: "0", changeMonth: true, numberOfMonths: 1})
-	.on( "change", function() {
+	to = $("#toDate" ).datepicker({dateFormat:'yy-mm-dd', defaultDate: "-1d", maxDate: "0", changeMonth: true, numberOfMonths: 1})
+	.on("change", function() {
 		from.datepicker( "option", "maxDate", getDate(this));
 	});
 	function getDate( element ) {
@@ -229,17 +229,3 @@ $(function() {
 
 /*getGroupList();*/
 });
-
-$('.error.field').on('click','.close', function() {
-	$(this).closest('.message').transition('fade');
-});
-var FormUI = {
-	errMsgDiv: '<div class="ui error message"><i class="close icon"></i><span class="msg" style="padding: 1em;"></span></div>'
-	, displayMsgIn: function ($frm, msg) {
-		setTimeout(function() {
-			$frm.find(".error.field").empty().append(FormUI.errMsgDiv);
-			$frm.find(".error.field .error.message .msg").text(msg);
-			$frm.removeClass("success").addClass("error");
-		}, 100);
-	}
-};

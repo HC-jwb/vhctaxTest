@@ -5,13 +5,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
 
 import hc.fms.api.report.model.ReportResponse;
-import hc.fms.api.report.model.FuelMileageSection;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenResponse;
 import hc.fms.api.report.model.SensorResponse;
 import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.TripResponse;
 import hc.fms.api.report.model.auth.AuthResponse;
+import hc.fms.api.report.model.fuel.FuelMileageSection;
 @Configuration
 public class ParameterizedTypeReferenceFactory {
 	@Bean

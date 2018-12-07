@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
 
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.model.ExportableReport;
-import hc.fms.api.report.model.FuelStat;
-import hc.fms.api.report.model.SectionStat;
+import hc.fms.api.report.model.fuel.FuelStat;
+import hc.fms.api.report.model.fuel.SectionStat;
 @Service
 public class FileExportService {
 	private static String [] fuleReportColumnNames = {"일자", "연료소비량(L)", "운행거리(KM)", "연비(KM/L)"};

@@ -26,18 +26,18 @@ import hc.fms.api.report.entity.FuelStatResult;
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
 import hc.fms.api.report.model.ReportResponse;
-import hc.fms.api.report.model.SectionStat;
 import hc.fms.api.report.model.ExportableReport;
-import hc.fms.api.report.model.FuelMileageSection;
-import hc.fms.api.report.model.FuelStat;
 import hc.fms.api.report.model.GroupResponse;
 import hc.fms.api.report.model.ReportGenFlatRequest;
 import hc.fms.api.report.model.ReportGenResponse;
 import hc.fms.api.report.model.SensorResponse;
 import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.TripResponse;
+import hc.fms.api.report.model.fuel.FuelMileageSection;
+import hc.fms.api.report.model.fuel.FuelStat;
 import hc.fms.api.report.model.fuel.MeasurementSensorPlugin;
 import hc.fms.api.report.model.fuel.ReportDesc;
+import hc.fms.api.report.model.fuel.SectionStat;
 import hc.fms.api.report.model.tracker.request.GenerateRequest;
 import hc.fms.api.report.model.tracker.request.SensorRequest;
 import hc.fms.api.report.model.tracker.request.TrackerInfo;
@@ -302,12 +302,18 @@ public class TrackerService {
 	public List<FuelStatResult> getFuelStatisticsResultListByReportId(Long reportId, Long trackerId) {
 		return fuelStatRepository.getFuelStatResultList(reportId, trackerId);
 	}
-	public List<ReportGen> getReportGenList(String clientId) {
-		return reportGenRepository.findAllByClientIdOrderByCreatedDateDesc(clientId);
-		
+	public List<ReportGen> getFuelReportGenList(String clientId) {
+		return reportGenRepository.findAllFuelEffReportByClientIdOrderByCreatedDateDesc(clientId);
+	}
+	public List<ReportGen> getFillDrainReportGenList(String clientId) {
+		return reportGenRepository.findAllFillDrainReportByClientIdOrderByCreatedDateDesc(clientId);
 	}
 	public List<Long> getReportGenListInProgress(String clientId) {
-		List<ReportGen> genList = reportGenRepository.findAllByClientIdAndFuelReportProcessed(clientId, false);
+		List<ReportGen> genList = reportGenRepository.findAllFuelEffRateGenByClientIdAndFuelReportProcessed(clientId, false);
+		return genList.stream().map(reportGen -> reportGen.getId()).collect(Collectors.toList());
+	}
+	public List<Long> getFillDrainReportGenListInProgress(String clientId) {
+		List<ReportGen> genList = reportGenRepository.findAllFillDrainGenByClientIdAndFuelReportProcessed(clientId, false);
 		return genList.stream().map(reportGen -> reportGen.getId()).collect(Collectors.toList());
 	}
 	public ReportGen getReportGen(Long genId) {

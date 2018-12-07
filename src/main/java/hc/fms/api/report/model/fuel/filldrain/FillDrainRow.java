@@ -1,4 +1,4 @@
-package hc.fms.api.report.model.fuel.filling;
+package hc.fms.api.report.model.fuel.filldrain;
 
 import hc.fms.api.report.model.fuel.ColVal;
 import hc.fms.api.report.model.fuel.StringVal;
