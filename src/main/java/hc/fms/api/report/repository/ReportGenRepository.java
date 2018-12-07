@@ -20,8 +20,8 @@ public interface ReportGenRepository extends JpaRepository <ReportGen, Long>{
 	@Query(value="select gen from ReportGen gen where gen.clientId=:clientId and gen.fillDrainReportId is not null order by gen.createdDate desc")
 	public List<ReportGen> findAllFillDrainReportByClientIdOrderByCreatedDateDesc(@Param("clientId") String clientId);
 	
-	@Query(value="select gen from ReportGen gen where gen.clientId=:clientId and  gen.fuelReportId is not null and gen.mileageReportId is not null and gen.fuelReportProcessed=:processed")
-	public List<ReportGen> findAllFuelEffRateGenByClientIdAndFuelReportProcessed(@Param("clientId") String clientId, @Param("processed") Boolean b);
-	@Query(value="select gen from ReportGen gen where gen.clientId=:clientId and  gen.fillDrainReportId is not null and gen.fuelReportProcessed=:processed")
-	public List<ReportGen> findAllFillDrainGenByClientIdAndFuelReportProcessed(@Param("clientId") String clientId, @Param("processed") Boolean b);
+	@Query(value="select gen from ReportGen gen where gen.clientId=:clientId and  gen.fuelReportId is not null and gen.mileageReportId is not null and gen.fuelReportProcessed=false")
+	public List<ReportGen> findAllProcessingFuelEffRateGenByClientId(@Param("clientId") String clientId);
+	@Query(value="select gen from ReportGen gen where gen.clientId=:clientId and  gen.fillDrainReportId is not null and gen.fuelReportProcessed=false")
+	public List<ReportGen> findAllProcessingFillDrainGenByClientId(@Param("clientId") String clientId);
 }
