@@ -5,15 +5,11 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -29,8 +25,8 @@ public class FileExportService {
 		Cell cell;
 		Font font;
 		CellStyle style;
+		XSSFWorkbook workbook = new XSSFWorkbook();
 		try (
-			XSSFWorkbook workbook = new XSSFWorkbook();
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 		){
 			XSSFSheet sheet = null;
@@ -57,28 +53,28 @@ public class FileExportService {
 
 					for(int colIdx = 0; colIdx < colCount; colIdx++) {
 						style = workbook.createCellStyle();
-						style.setAlignment(HorizontalAlignment.CENTER);
-						style.setVerticalAlignment(VerticalAlignment.CENTER);
+						style.setAlignment(CellStyle.ALIGN_CENTER);
+						style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
 						style.setFillForegroundColor(IndexedColors.TEAL.getIndex());
-						style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+						style.setFillPattern(CellStyle.SOLID_FOREGROUND);
 						style.setFont(font);
-						style.setAlignment(HorizontalAlignment.CENTER);
-						style.setVerticalAlignment(VerticalAlignment.CENTER);
+						style.setAlignment(CellStyle.ALIGN_CENTER);
+						style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
 						
 						font.setColor(IndexedColors.WHITE.getIndex());
 						if(colIdx == 0) {
-							style.setBorderLeft(BorderStyle.THIN);
+							style.setBorderLeft(CellStyle.BORDER_THIN);
 							style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
 							
-							style.setBorderRight(BorderStyle.THIN);
+							style.setBorderRight(CellStyle.BORDER_THIN);
 							style.setRightBorderColor(IndexedColors.WHITE.getIndex());
 							
 						} else if(colIdx == (colCount-1)) {
-							style.setBorderRight(BorderStyle.THIN);
+							style.setBorderRight(CellStyle.BORDER_THIN);
 							style.setRightBorderColor(IndexedColors.BLACK.getIndex());
 						} else {
-							style.setBorderLeft(BorderStyle.NONE);
-							style.setBorderRight(BorderStyle.THIN);
+							style.setBorderLeft(CellStyle.BORDER_NONE);
+							style.setBorderRight(CellStyle.BORDER_THIN);
 							style.setRightBorderColor(IndexedColors.WHITE.getIndex());
 						}
 						cell = row.createCell(colIdx + colOffset);
@@ -95,48 +91,48 @@ public class FileExportService {
 						
 						cell = row.createCell(0 + colOffset);
 						style = workbook.createCellStyle();
-						style.setVerticalAlignment(VerticalAlignment.CENTER);
-						style.setAlignment(HorizontalAlignment.CENTER);
-						style.setBorderLeft(BorderStyle.THIN);
-						style.setBorderRight(BorderStyle.THIN);
-						style.setBorderTop(BorderStyle.THIN);
-						style.setBorderBottom(BorderStyle.THIN);
+						style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+						style.setAlignment(CellStyle.ALIGN_CENTER);
+						style.setBorderLeft(CellStyle.BORDER_THIN);
+						style.setBorderRight(CellStyle.BORDER_THIN);
+						style.setBorderTop(CellStyle.BORDER_THIN);
+						style.setBorderBottom(CellStyle.BORDER_THIN);
 						style.setFont(font);
 						cell.setCellStyle(style);
 						cell.setCellValue(stat.getStatDate());
 						
 						cell = row.createCell(1 + colOffset);
 						style = workbook.createCellStyle();
-						style.setVerticalAlignment(VerticalAlignment.CENTER);
-						style.setAlignment(HorizontalAlignment.RIGHT);
-						style.setBorderLeft(BorderStyle.THIN);
-						style.setBorderRight(BorderStyle.THIN);
-						style.setBorderTop(BorderStyle.THIN);
-						style.setBorderBottom(BorderStyle.THIN);
+						style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+						style.setAlignment(CellStyle.ALIGN_RIGHT);
+						style.setBorderLeft(CellStyle.BORDER_THIN);
+						style.setBorderRight(CellStyle.BORDER_THIN);
+						style.setBorderTop(CellStyle.BORDER_THIN);
+						style.setBorderBottom(CellStyle.BORDER_THIN);
 						style.setFont(font);
 						cell.setCellStyle(style);
 						cell.setCellValue(stat.getFuelUsed());
 						
 						cell = row.createCell(2 + colOffset);
 						style = workbook.createCellStyle();
-						style.setVerticalAlignment(VerticalAlignment.CENTER);
-						style.setAlignment(HorizontalAlignment.RIGHT);
-						style.setBorderLeft(BorderStyle.THIN);
-						style.setBorderRight(BorderStyle.THIN);
-						style.setBorderTop(BorderStyle.THIN);
-						style.setBorderBottom(BorderStyle.THIN);
+						style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+						style.setAlignment(CellStyle.ALIGN_RIGHT);
+						style.setBorderLeft(CellStyle.BORDER_THIN);
+						style.setBorderRight(CellStyle.BORDER_THIN);
+						style.setBorderTop(CellStyle.BORDER_THIN);
+						style.setBorderBottom(CellStyle.BORDER_THIN);
 						style.setFont(font);
 						cell.setCellStyle(style);
 						cell.setCellValue(stat.getDistanceTravelled());
 						
 						cell = row.createCell(3 + colOffset);
 						style = workbook.createCellStyle();
-						style.setVerticalAlignment(VerticalAlignment.CENTER);
-						style.setAlignment(HorizontalAlignment.RIGHT);
-						style.setBorderLeft(BorderStyle.THIN);
-						style.setBorderRight(BorderStyle.THIN);
-						style.setBorderTop(BorderStyle.THIN);
-						style.setBorderBottom(BorderStyle.THIN);
+						style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+						style.setAlignment(CellStyle.ALIGN_RIGHT);
+						style.setBorderLeft(CellStyle.BORDER_THIN);
+						style.setBorderRight(CellStyle.BORDER_THIN);
+						style.setBorderTop(CellStyle.BORDER_THIN);
+						style.setBorderBottom(CellStyle.BORDER_THIN);
 						style.setFont(font);
 						cell.setCellStyle(style);
 						cell.setCellValue(stat.getFuelEffRate());
@@ -145,12 +141,12 @@ public class FileExportService {
 	
 					cell = row.createCell(0 + colOffset);
 					style = workbook.createCellStyle();
-					style.setVerticalAlignment(VerticalAlignment.CENTER);
-					style.setAlignment(HorizontalAlignment.RIGHT);
-					style.setBorderLeft(BorderStyle.THIN);
-					style.setBorderRight(BorderStyle.THIN);
-					style.setBorderTop(BorderStyle.THIN);
-					style.setBorderBottom(BorderStyle.THIN);
+					style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+					style.setAlignment(CellStyle.ALIGN_RIGHT);
+					style.setBorderLeft(CellStyle.BORDER_THIN);
+					style.setBorderRight(CellStyle.BORDER_THIN);
+					style.setBorderTop(CellStyle.BORDER_THIN);
+					style.setBorderBottom(CellStyle.BORDER_THIN);
 					font = workbook.createFont();
 
 					font.setColor(IndexedColors.BLACK.getIndex());
@@ -161,12 +157,12 @@ public class FileExportService {
 					
 					cell = row.createCell(1 + colOffset);
 					style = workbook.createCellStyle();
-					style.setVerticalAlignment(VerticalAlignment.CENTER);
-					style.setAlignment(HorizontalAlignment.RIGHT);
-					style.setBorderLeft(BorderStyle.THIN);
-					style.setBorderRight(BorderStyle.THIN);
-					style.setBorderTop(BorderStyle.THIN);
-					style.setBorderBottom(BorderStyle.THIN);
+					style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+					style.setAlignment(CellStyle.ALIGN_RIGHT);
+					style.setBorderLeft(CellStyle.BORDER_THIN);
+					style.setBorderRight(CellStyle.BORDER_THIN);
+					style.setBorderTop(CellStyle.BORDER_THIN);
+					style.setBorderBottom(CellStyle.BORDER_THIN);
 					font = workbook.createFont();
 
 					font.setColor(IndexedColors.BLACK.getIndex());
@@ -177,12 +173,12 @@ public class FileExportService {
 					
 					cell = row.createCell(2 + colOffset);
 					style = workbook.createCellStyle();
-					style.setVerticalAlignment(VerticalAlignment.CENTER);
-					style.setAlignment(HorizontalAlignment.RIGHT);
-					style.setBorderLeft(BorderStyle.THIN);
-					style.setBorderRight(BorderStyle.THIN);
-					style.setBorderTop(BorderStyle.THIN);
-					style.setBorderBottom(BorderStyle.THIN);
+					style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+					style.setAlignment(CellStyle.ALIGN_RIGHT);
+					style.setBorderLeft(CellStyle.BORDER_THIN);
+					style.setBorderRight(CellStyle.BORDER_THIN);
+					style.setBorderTop(CellStyle.BORDER_THIN);
+					style.setBorderBottom(CellStyle.BORDER_THIN);
 					font = workbook.createFont();
 
 					font.setColor(IndexedColors.BLACK.getIndex());
@@ -193,12 +189,12 @@ public class FileExportService {
 
 					cell = row.createCell(3 + colOffset);
 					style = workbook.createCellStyle();
-					style.setVerticalAlignment(VerticalAlignment.CENTER);
-					style.setAlignment(HorizontalAlignment.RIGHT);
-					style.setBorderLeft(BorderStyle.THIN);
-					style.setBorderRight(BorderStyle.THIN);
-					style.setBorderTop(BorderStyle.THIN);
-					style.setBorderBottom(BorderStyle.THIN);
+					style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+					style.setAlignment(CellStyle.ALIGN_RIGHT);
+					style.setBorderLeft(CellStyle.BORDER_THIN);
+					style.setBorderRight(CellStyle.BORDER_THIN);
+					style.setBorderTop(CellStyle.BORDER_THIN);
+					style.setBorderBottom(CellStyle.BORDER_THIN);
 					font = workbook.createFont();
 
 					font.setColor(IndexedColors.BLACK.getIndex());
