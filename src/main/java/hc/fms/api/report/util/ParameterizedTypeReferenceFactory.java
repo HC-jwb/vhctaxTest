@@ -12,6 +12,7 @@ import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.TripResponse;
 import hc.fms.api.report.model.auth.AuthResponse;
 import hc.fms.api.report.model.fuel.FuelMileageSection;
+import hc.fms.api.report.model.fuel.filldrain.FillDrainSection;
 @Configuration
 public class ParameterizedTypeReferenceFactory {
 	@Bean
@@ -37,6 +38,10 @@ public class ParameterizedTypeReferenceFactory {
 	@Bean
 	ParameterizedTypeReference<ReportResponse<FuelMileageSection>> reportConsumptionResponseTypeRef() {
 		return new ParameterizedTypeReference<ReportResponse<FuelMileageSection>>() {};
+	}
+	@Bean
+	ParameterizedTypeReference<ReportResponse<FillDrainSection>> reportFillDrainResponseTypeRef() {
+		return new ParameterizedTypeReference<ReportResponse<FillDrainSection>>() {};
 	}
 	@Bean
 	ParameterizedTypeReference<TrackerResponse> trackerResponseTypeRef() {

@@ -21,6 +21,8 @@ import hc.fms.api.report.model.fuel.FuelMileageRow;
 import hc.fms.api.report.model.fuel.FuelMileageSection;
 import hc.fms.api.report.model.fuel.ReportDesc;
 import hc.fms.api.report.model.fuel.Sheet;
+import hc.fms.api.report.model.fuel.filldrain.FillDrainRow;
+import hc.fms.api.report.model.fuel.filldrain.FillDrainSection;
 import hc.fms.api.report.repository.FuelStatDetailRepository;
 import hc.fms.api.report.repository.FuelStatisticsRepository;
 import hc.fms.api.report.repository.GenSectionRepository;
@@ -43,17 +45,17 @@ public class ReportProcessor {
 	}
 
 	@Transactional
-	public void process(ReportGen reportGenSaved, ReportDesc<FuelMileageSection> fuelReport, ReportDesc<FuelMileageSection> mileageReport) {
+	public void processFuelMileageReport(ReportGen reportGenSaved, ReportDesc<FuelMileageSection> fuelReport, ReportDesc<FuelMileageSection> mileageReport) {
 		List<Sheet<FuelMileageSection>> sheets = fuelReport.getSheets();
 		for(Sheet<FuelMileageSection> sheet : sheets) {
 			logger.info("ReportProcessor.process -> fuel sheet " + sheet);
-			processSheet(sheet, "F", reportGenSaved.getId(), reportGenSaved.getFuelReportId());
+			processFuelMileageSheet(sheet, "F", reportGenSaved.getId(), reportGenSaved.getFuelReportId());
 			logger.info("fuel sheet processed");
 		}
 		sheets = mileageReport.getSheets();
 		for(Sheet<FuelMileageSection> sheet : sheets) {
 			logger.info("sheet " + sheet);
-			processSheet(sheet, "M", reportGenSaved.getId(), reportGenSaved.getMileageReportId());
+			processFuelMileageSheet(sheet, "M", reportGenSaved.getId(), reportGenSaved.getMileageReportId());
 			logger.info("sheet processed");
 		}
 		List<GenSection> genSectionList = new ArrayList<>();
@@ -77,7 +79,7 @@ public class ReportProcessor {
 		reportGenRepository.save(reportGenSaved);
 		genSectionRepository.saveAll(genSectionList);
 	}
-	private void processSheet(Sheet<FuelMileageSection> sheet, final String type, final long reportId, final long generationId) {
+	private void processFuelMileageSheet(Sheet<FuelMileageSection> sheet, final String type, final long reportId, final long generationId) {
 		final Long trackerId = sheet.getEntityIds().get(0);
 		//filter only table type section
 		List<FuelMileageSection> sectionList = sheet.getSections().stream().filter(section -> "table".equalsIgnoreCase(section.getType())).collect(Collectors.toList());
@@ -207,5 +209,60 @@ public class ReportProcessor {
 			return (fuelDetail != null);
 		}).collect(Collectors.toList()));
 	}
-	
+
+	public void processFillDrainReport(ReportGen reportGenSaved, ReportDesc<FillDrainSection> fillDrainReport) {
+		List<Sheet<FillDrainSection>> sheets = fillDrainReport.getSheets();
+		for(Sheet<FillDrainSection> sheet : sheets) {
+			logger.info("ReportProcessor.process -> FillDrain sheet " + sheet);
+			processFillDrainSheet(sheet, reportGenSaved.getId(), reportGenSaved.getFuelReportId());
+			logger.info("fuel sheet processed");
+		}
+		
+		List<GenSection> genSectionList = new ArrayList<>();
+		for(Sheet<FillDrainSection> sheet : sheets) {
+			GenSection genSection = new GenSection();
+			genSection.setReportId(reportGenSaved.getId());
+			genSection.setTrackerId(sheet.getEntityIds().get(0));
+			genSection.setHeader(sheet.getHeader());
+			genSectionList.add(genSection);
+		}
+		reportGenSaved.setFuelReportProcessed(true);
+		reportGenRepository.save(reportGenSaved);
+		genSectionRepository.saveAll(genSectionList);
+	}
+	private void processFillDrainSheet(Sheet<FillDrainSection> sheet, final long reportId, final long generationId) {
+		final Long trackerId = sheet.getEntityIds().get(0);
+		//filter only table type section
+		List<FillDrainSection> sectionList = sheet.getSections().stream().filter(section -> "table".equalsIgnoreCase(section.getType())).collect(Collectors.toList());
+		if(sectionList.size() == 0 ) {
+			logger.info("No data found in FillDrain sections");
+			return;
+		}
+		FillDrainSection statSection = sectionList.get(0);
+		List<FillDrainRow> sectionRows = statSection.getData().get(0).getRows();
+/*		
+		List<FuelStatistics> statList = new ArrayList<>();
+		FuelStatistics fuelStat;
+		for(FillDrainRow row: sectionRows) {
+			fuelStat = new FuelStatistics();
+			try {
+				fuelStat.setReportId(reportId);
+				fuelStat.setGenerationId(generationId);
+				fuelStat.setTrackerId(trackerId);
+				fuelStat.setType(type);
+				fuelStat.setStatDate(row.getDate().getV());
+				fuelStat.setRawDate(row.getDate().getRaw());
+
+				if(row.getMin().getRaw() != null) fuelStat.setMin(row.getMin().getRaw().doubleValue());
+				if(row.getMax().getRaw() != null) fuelStat.setMax(row.getMax().getRaw().doubleValue());
+				fuelStat.setStatDate(row.getDate().getV());
+				statList.add(fuelStat);
+			} catch(Exception e) {
+				e.printStackTrace();
+				throw e;
+			}
+		}
+		statList = fuelRepository.saveAll(statList);
+*/
+	}
 }

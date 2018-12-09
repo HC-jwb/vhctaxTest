@@ -47,6 +47,7 @@ import hc.fms.api.report.properties.FmsProperties;
 import hc.fms.api.report.repository.FuelStatisticsRepository;
 import hc.fms.api.report.repository.GenSectionRepository;
 import hc.fms.api.report.repository.ReportGenRepository;
+import hc.fms.api.report.model.fuel.filldrain.FillDrainSection;
 import hc.fms.api.report.util.HttpUtil;
 
 @Service
@@ -69,6 +70,8 @@ public class TrackerService {
 	private ParameterizedTypeReference<ReportGenResponse> reportGenResponseTypeRef;
 	@Autowired
 	private ParameterizedTypeReference<ReportResponse<FuelMileageSection>> reportConsumptionResponseTypeRef;
+	@Autowired
+	private ParameterizedTypeReference<ReportResponse<FillDrainSection>> reportFillDrainResponseTypeRef;
 	@Autowired
 	private ParameterizedTypeReference<TrackerResponse> trackerResponseTypeRef;
 	
@@ -142,7 +145,7 @@ public class TrackerService {
 		}
 		return response;
 	}
-	public ReportGenResponse requestReportGen(GenerateRequest<MeasurementSensorPlugin> req) {
+	public <T>ReportGenResponse requestReportGen(GenerateRequest<T> req) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", req.getHash());
 		map.add("from", req.getFrom());
@@ -158,6 +161,20 @@ public class TrackerService {
 			response= responseEntity.getBody();
 		} catch(HttpStatusCodeException  e) {
 			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), ReportGenResponse.class);} catch(Exception ex) {	ex.printStackTrace();}
+		}
+		return response;
+	}
+	@SuppressWarnings("unchecked")
+	public ReportResponse<FillDrainSection> retrieveFillDrainReport(String hash, long reportId) {
+		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
+		map.add("hash", hash);
+		map.add("report_id", String.valueOf(reportId));
+		ReportResponse<FillDrainSection> response = null;
+		try {
+			ResponseEntity<ReportResponse<FillDrainSection>> responseEntity = restTemplate.exchange(String.format("%s%s", fmsProps.getBaseUrl(), fmsProps.getApi().getReportRetrieve()), HttpMethod.POST, new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), reportFillDrainResponseTypeRef);
+			response= responseEntity.getBody();
+		} catch(HttpStatusCodeException e) {
+			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), ReportResponse.class);} catch(Exception ex) {ex.printStackTrace();}
 		}
 		return response;
 	}
@@ -276,7 +293,7 @@ public class TrackerService {
 						if(fuelReport != null && mileageReport != null) {
 							logger.info("retrieved both reports " + reportGenSaved);
 							try {
-								reportProcessor.process(reportGenSaved, fuelReport, mileageReport);
+								reportProcessor.processFuelMileageReport(reportGenSaved, fuelReport, mileageReport);
 							} catch(Exception e) {
 								e.printStackTrace();
 							}
@@ -284,6 +301,7 @@ public class TrackerService {
 						}
 						elapsed = System.currentTimeMillis() - start;
 						if(elapsed > 60 * 1000 * 60) {
+							logger.info("Waited too long for fuel report to be ready... try exiting thread");
 							break;
 						}
 					}
@@ -291,7 +309,7 @@ public class TrackerService {
 				});
 				execService.shutdown();
 			} else {
-				return mileageGenResponse;//fuel generation successful but faile to generate mileageReport 
+				return mileageGenResponse;//fuel generation successful but failed to generate mileageReport 
 			}
 		} else {
 			return fuelGenResponse;//fuel generation failed
@@ -299,6 +317,7 @@ public class TrackerService {
 		return response;//all successful and created a single report reponse which includes both of the sub reports
 	}
 	public ReportGenResponse generateFillDrainReport(ReportGenFlatRequest req) {
+		ReportGenResponse response = new ReportGenResponse();
 		List<TrackerInfo> infoList = req.getTrackers();
 		List<Integer> trackerIdList = infoList.stream().map(info -> info.getTrackerId()).collect(Collectors.toList());
 		
@@ -314,11 +333,66 @@ public class TrackerService {
 		
 		ObdFuelPlugin plugin = new ObdFuelPlugin();
 		fillDrainGenReq.setPlugin(plugin);
-				
-		ReportGenResponse response = new ReportGenResponse();
-		ReportGenResponse fillDrainGenResponse;// = requestReportGen(fuelGenReq);
-		if(true)throw new RuntimeException("report generation for filldrain -not yet implemented- have to implement requestReportGen function");
-		return fillDrainGenResponse;
+		ReportGenResponse fillDrainGenResponse = requestReportGen(fillDrainGenReq);
+		
+		if(fillDrainGenResponse.isSuccess()) {
+			ReportGen reportGen = new ReportGen();
+			reportGen.setFillDrainReportId(fillDrainGenResponse.getId());
+			reportGen.setLabel(req.getLabel());
+			reportGen.setFrom(from);
+			reportGen.setTo(to);
+			reportGen.setClientId(req.getClientId());
+			final ReportGen reportGenSaved = reportProcessor.logReportGen(reportGen);
+			response.setSuccess(true);
+			response.setId(reportGenSaved.getId());
+			ExecutorService execService = Executors.newSingleThreadExecutor();
+			execService.submit(() -> {
+				long elapsed = 0L, start = System.currentTimeMillis();
+				long fillDrainReportId = reportGenSaved.getFillDrainReportId();
+				ReportDesc<FillDrainSection> fillDrainReport = null;
+				while(true) {
+					try {
+						Thread.sleep(5 * 1000);
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+					if(fillDrainReport == null) {
+						try {
+							ReportResponse<FillDrainSection> fillDrainReportResposne = retrieveFillDrainReport(req.getHash(), fillDrainReportId);
+							if(fillDrainReportResposne.isSuccess()) {
+								fillDrainReport = fillDrainReportResposne.getReport();
+								logger.info("retrieved FillDrain reports " + reportGenSaved);
+								try {
+									reportProcessor.processFillDrainReport(reportGenSaved, fillDrainReport);
+								} catch(Exception e) {
+									e.printStackTrace();
+								}
+								break;
+							} else if(fillDrainReportResposne.getStatus().getCode() == 229) {
+								logger.info("FillDrain report generation still in progress ..");
+							} else if(fillDrainReportResposne.getStatus().getCode() == 204) {
+								logger.info("FillDrain report not found");
+								break;
+							} else {
+								logger.info("FillDrain report unknown error status " + fillDrainReportResposne);
+							}
+						} catch(Exception e) {
+							e.printStackTrace();
+						}
+					}
+					elapsed = System.currentTimeMillis() - start;
+					if(elapsed > 60 * 1000 * 60) {
+						logger.info("Waited too long for fill drain report to be ready... try exiting thread");
+						break;
+					}
+				}
+				logger.info("FillDrain Report generation Thread exited");
+			});
+			execService.shutdown();
+		} else {
+			return fillDrainGenResponse;
+		}
+		return response;
 	}
 	public List<FuelStatResult> getFuelStatisticsResultListByReportId(Long reportId, Long trackerId) {
 		return fuelStatRepository.getFuelStatResultList(reportId, trackerId);
