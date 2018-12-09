@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import hc.fms.api.report.entity.FillDrainStatistics;
 import hc.fms.api.report.entity.FuelStatDetail;
 import hc.fms.api.report.entity.FuelStatistics;
 import hc.fms.api.report.entity.GenSection;
@@ -23,6 +24,7 @@ import hc.fms.api.report.model.fuel.ReportDesc;
 import hc.fms.api.report.model.fuel.Sheet;
 import hc.fms.api.report.model.fuel.filldrain.FillDrainRow;
 import hc.fms.api.report.model.fuel.filldrain.FillDrainSection;
+import hc.fms.api.report.repository.FillDrainStatisticsRepository;
 import hc.fms.api.report.repository.FuelStatDetailRepository;
 import hc.fms.api.report.repository.FuelStatisticsRepository;
 import hc.fms.api.report.repository.GenSectionRepository;
@@ -38,6 +40,9 @@ public class ReportProcessor {
 	private FuelStatisticsRepository fuelRepository;
 	@Autowired
 	private FuelStatDetailRepository fuelDetailRepository;
+	@Autowired
+	private FillDrainStatisticsRepository fillDrainStatRepository;
+	
 	private Logger logger = LoggerFactory.getLogger(ReportProcessor.class);
 	public ReportGen logReportGen(ReportGen reportGen) {
 		reportGen.setCreatedDate(new Date());
@@ -209,12 +214,12 @@ public class ReportProcessor {
 			return (fuelDetail != null);
 		}).collect(Collectors.toList()));
 	}
-
+	@Transactional
 	public void processFillDrainReport(ReportGen reportGenSaved, ReportDesc<FillDrainSection> fillDrainReport) {
 		List<Sheet<FillDrainSection>> sheets = fillDrainReport.getSheets();
 		for(Sheet<FillDrainSection> sheet : sheets) {
 			logger.info("ReportProcessor.process -> FillDrain sheet " + sheet);
-			processFillDrainSheet(sheet, reportGenSaved.getId(), reportGenSaved.getFuelReportId());
+			processFillDrainSheet(sheet, reportGenSaved.getId(), reportGenSaved.getFillDrainReportId());
 			logger.info("fuel sheet processed");
 		}
 		
@@ -240,29 +245,29 @@ public class ReportProcessor {
 		}
 		FillDrainSection statSection = sectionList.get(0);
 		List<FillDrainRow> sectionRows = statSection.getData().get(0).getRows();
-/*		
-		List<FuelStatistics> statList = new ArrayList<>();
-		FuelStatistics fuelStat;
+		
+		List<FillDrainStatistics> statList = new ArrayList<>();
+		FillDrainStatistics fillDrainStat;
 		for(FillDrainRow row: sectionRows) {
-			fuelStat = new FuelStatistics();
+			fillDrainStat = new FillDrainStatistics();
 			try {
-				fuelStat.setReportId(reportId);
-				fuelStat.setGenerationId(generationId);
-				fuelStat.setTrackerId(trackerId);
-				fuelStat.setType(type);
-				fuelStat.setStatDate(row.getDate().getV());
-				fuelStat.setRawDate(row.getDate().getRaw());
-
-				if(row.getMin().getRaw() != null) fuelStat.setMin(row.getMin().getRaw().doubleValue());
-				if(row.getMax().getRaw() != null) fuelStat.setMax(row.getMax().getRaw().doubleValue());
-				fuelStat.setStatDate(row.getDate().getV());
-				statList.add(fuelStat);
+				fillDrainStat.setReportId(reportId);
+				fillDrainStat.setGenerationId(generationId);
+				fillDrainStat.setTrackerId(trackerId);
+				//fillDrainStat.setType(type);
+				fillDrainStat.setEventDate(row.getTime().getV());
+				fillDrainStat.setRawDate(row.getTime().getRaw());
+				fillDrainStat.setAddress(row.getAddress().getV());
+				fillDrainStat.setVolume(row.getVolume().getRaw());
+				fillDrainStat.setMileageFrom(row.getMileage().getRaw());
+				fillDrainStat.setEventId(row.getNumber().getRaw());
+				fillDrainStat.setType(String.valueOf(row.getType().getV().charAt(0)));
+				statList.add(fillDrainStat);
 			} catch(Exception e) {
 				e.printStackTrace();
 				throw e;
 			}
 		}
-		statList = fuelRepository.saveAll(statList);
-*/
+		statList = fillDrainStatRepository.saveAll(statList);
 	}
 }

@@ -184,7 +184,7 @@ public class ReportApiController {
 	}
 	
 	@RequestMapping("/stat/section")
-	public ResponseContainer<SectionStat> getStatisticsByReport(@RequestBody Map<String, Long> sectionData) {
+	public ResponseContainer<SectionStat> getFuelEffRateSectionByReport(@RequestBody Map<String, Long> sectionData) {
 		ResponseContainer<SectionStat> response = new ResponseContainer<>();
 		Long reportId = sectionData.get("reportId");
 		Long trackerId = sectionData.get("trackerId");
@@ -209,7 +209,32 @@ public class ReportApiController {
 		return response;
 		
 	}
-
+	@RequestMapping("/filldrain/section")
+	public ResponseContainer<SectionStat> getFillDrainSectionByReport(@RequestBody Map<String, Long> sectionData) {
+		ResponseContainer<SectionStat> response = new ResponseContainer<>();
+		Long reportId = sectionData.get("reportId");
+		Long trackerId = sectionData.get("trackerId");
+		try {
+			List<FuelStatResult> resultList = trackerService.getFuelStatisticsResultListByReportId(reportId, trackerId);
+			SectionStat stat = new SectionStat();
+			List<FuelStat> statList = resultList.stream().map(statResult-> {
+				stat.addFuelUsed(statResult.getFuelUsed());
+				stat.addDistanceTravelled(statResult.getDistanceTravelled());
+				return new FuelStat(statResult);
+			}).collect(Collectors.toList());
+			
+			stat.setStatList(statList);
+			response.setPayload(stat);
+			response.setSuccess(true);
+		} catch(Exception e) {
+			ResponseStatus status = new ResponseStatus();
+			status.setDescription(e.getMessage());
+			response.setStatus(status);
+			e.printStackTrace();
+		}
+		return response;
+		
+	}
 	@RequestMapping("/genlist")
 	public ResponseContainer<List<ReportGen>> getGeneratedReportList(HttpSession session) {
 		ResponseContainer <List<ReportGen>> response = new ResponseContainer<>();

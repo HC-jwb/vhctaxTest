@@ -12,6 +12,7 @@ var ReportApi = {
 	genFillDrainListInProgressUri:'/genfilldrainlist/inprogress',
 	sectionListUri:'/section/list',
 	reportSectionUri:'/stat/section',
+	reportFillDrainSectionUri: '/filldrain/section',
 	reportExportXlsUri: '/xlsdownload',
 	progressTimerId: null,
 	authenticate: function (authJson, callback) {
@@ -52,6 +53,11 @@ var ReportApi = {
 	},
 	getReportSection: function(sectionData, callback) {
 		Api.postJson(this.apiBase + this.reportSectionUri, sectionData, callback, function(response) {
+			console.log(response);
+		});
+	},
+	getFillDrainReportSection: function(sectionData, callback) {
+		Api.postJson(this.apiBase + this.reportFillDrainSectionUri, sectionData, callback, function(response) {
 			console.log(response);
 		});
 	},
