@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.model.ExportableReport;
 import hc.fms.api.report.model.fuel.FuelStat;
-import hc.fms.api.report.model.fuel.SectionStat;
+import hc.fms.api.report.model.fuel.FuelEffRateStatSection;
 @Service
 public class FileExportService {
 	private static String [] fuleReportColumnNames = {"일자", "연료소비량(L)", "운행거리(KM)", "연비(KM/L)"};
@@ -32,15 +32,15 @@ public class FileExportService {
 			XSSFSheet sheet = null;
 			//ReportGen reportGen = report.getReportGen();
 			List<GenSection> sectionInfoList = report.getSectionInfoList();
-			Map<Long, List<SectionStat>> sectionMap = report.getSectionDataMap();
-			List<SectionStat> sectionStatList;
+			Map<Long, List<FuelEffRateStatSection>> sectionMap = report.getSectionDataMap();
+			List<FuelEffRateStatSection> sectionStatList;
 			int colCount = fuleReportColumnNames.length;
 			int rowNum = 0;
 			Row row;
 			int colOffset = 1;
 			for(GenSection genSection: sectionInfoList) {
 				sectionStatList = sectionMap.get(genSection.getTrackerId());
-				for(SectionStat sectionStat: sectionStatList) {
+				for(FuelEffRateStatSection sectionStat: sectionStatList) {
 					sheet = workbook.createSheet(genSection.getHeader());
 					rowNum = 1;
 					row = sheet.createRow(rowNum++);//header row

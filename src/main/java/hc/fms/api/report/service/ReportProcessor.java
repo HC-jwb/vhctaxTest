@@ -105,7 +105,7 @@ public class ReportProcessor {
 				fuelStat.setType(type);
 				fuelStat.setStatDate(row.getDate().getV());
 				fuelStat.setRawDate(row.getDate().getRaw());
-
+				
 				if(row.getMin().getRaw() != null) fuelStat.setMin(row.getMin().getRaw().doubleValue());
 				if(row.getMax().getRaw() != null) fuelStat.setMax(row.getMax().getRaw().doubleValue());
 				fuelStat.setStatDate(row.getDate().getV());
@@ -153,7 +153,7 @@ public class ReportProcessor {
 					fuelDetail.setType(type);
 					fuelDetail.setGenerationId(generationId);
 					fuelDetail.setTrackerId(trackerId);
-					fuelDetail.setAddress(row.getAddress().getAddress());
+					fuelDetail.setAddress(row.getAddress().getV());
 					fuelDetail.setTrackerId(trackerId);
 					fuelDetail.setMin(row.getMin().getRaw());
 					fuelDetail.setMax(row.getMax().getRaw());
@@ -262,6 +262,8 @@ public class ReportProcessor {
 				fillDrainStat.setMileageFrom(row.getMileage().getRaw());
 				fillDrainStat.setEventId(row.getNumber().getRaw());
 				fillDrainStat.setType(String.valueOf(row.getType().getV().charAt(0)));
+				fillDrainStat.setStartVolume(row.getStartVolume().getRaw());
+				fillDrainStat.setEndVolume(row.getEndVolume().getRaw());
 				statList.add(fillDrainStat);
 			} catch(Exception e) {
 				e.printStackTrace();

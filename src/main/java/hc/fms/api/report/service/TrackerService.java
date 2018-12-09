@@ -22,6 +22,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import hc.fms.api.report.entity.FillDrainStatistics;
 import hc.fms.api.report.entity.FuelStatResult;
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
@@ -37,13 +38,14 @@ import hc.fms.api.report.model.fuel.FuelMileageSection;
 import hc.fms.api.report.model.fuel.FuelStat;
 import hc.fms.api.report.model.fuel.MeasurementSensorPlugin;
 import hc.fms.api.report.model.fuel.ReportDesc;
-import hc.fms.api.report.model.fuel.SectionStat;
+import hc.fms.api.report.model.fuel.FuelEffRateStatSection;
 import hc.fms.api.report.model.fuel.filldrain.ObdFuelPlugin;
 import hc.fms.api.report.model.tracker.request.GenerateRequest;
 import hc.fms.api.report.model.tracker.request.SensorRequest;
 import hc.fms.api.report.model.tracker.request.TrackerInfo;
 import hc.fms.api.report.model.tracker.request.TripRequest;
 import hc.fms.api.report.properties.FmsProperties;
+import hc.fms.api.report.repository.FillDrainStatisticsRepository;
 import hc.fms.api.report.repository.FuelStatisticsRepository;
 import hc.fms.api.report.repository.GenSectionRepository;
 import hc.fms.api.report.repository.ReportGenRepository;
@@ -81,7 +83,8 @@ public class TrackerService {
 	private ReportGenRepository reportGenRepository;
 	@Autowired
 	private GenSectionRepository sectionRepository;
-	
+	@Autowired
+	private FillDrainStatisticsRepository fillDrainStatRepository;
 	public TrackerResponse getTrackerList(String hash) {
 		MultiValueMap<String, String> map= new LinkedMultiValueMap<String, String>();
 		map.add("hash", hash);
@@ -394,8 +397,11 @@ public class TrackerService {
 		}
 		return response;
 	}
-	public List<FuelStatResult> getFuelStatisticsResultListByReportId(Long reportId, Long trackerId) {
+	public List<FuelStatResult> getFuelStatisticsResultListByReportIdAndTrackerId(Long reportId, Long trackerId) {
 		return fuelStatRepository.getFuelStatResultList(reportId, trackerId);
+	}
+	public List<FillDrainStatistics> getFillDrainStatisticsByReportIdAndTrackerId(Long reportId, Long trackerId) {
+		return fillDrainStatRepository.findAllByReportIdAndTrackerIdOrderByRawDateDesc();
 	}
 	public List<ReportGen> getFuelReportGenList(String clientId) {
 		return reportGenRepository.findAllFuelEffReportByClientIdOrderByCreatedDateDesc(clientId);
@@ -421,13 +427,13 @@ public class TrackerService {
 		ExportableReport report = new ExportableReport();
 		ReportGen reportGen = getReportGen(reportId);
 		List<GenSection> genSectionList = getSectionListFor(reportGen.getId());
-		Map<Long, List<SectionStat>> sectionMap = new HashMap<>();
+		Map<Long, List<FuelEffRateStatSection>> sectionMap = new HashMap<>();
 		
 		for(GenSection genSection: genSectionList) {
-			List<SectionStat> sectionStatList = new ArrayList<>();
+			List<FuelEffRateStatSection> sectionStatList = new ArrayList<>();
 			Long trackerId = genSection.getTrackerId();
-			List<FuelStatResult> resultList = getFuelStatisticsResultListByReportId(reportId, trackerId);
-			SectionStat sectionStat = new SectionStat();
+			List<FuelStatResult> resultList = getFuelStatisticsResultListByReportIdAndTrackerId(reportId, trackerId);
+			FuelEffRateStatSection sectionStat = new FuelEffRateStatSection();
 			List<FuelStat> statList = resultList.stream().map(statResult-> {
 				sectionStat.addFuelUsed(statResult.getFuelUsed());
 				sectionStat.addDistanceTravelled(statResult.getDistanceTravelled());

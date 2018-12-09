@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import hc.fms.api.report.entity.FillDrainStatistics;
 import hc.fms.api.report.entity.FuelStatResult;
 import hc.fms.api.report.entity.GenSection;
 import hc.fms.api.report.entity.ReportGen;
@@ -36,7 +37,8 @@ import hc.fms.api.report.model.TrackerResponse;
 import hc.fms.api.report.model.auth.AuthResponse;
 import hc.fms.api.report.model.fuel.FuelMileageSection;
 import hc.fms.api.report.model.fuel.FuelStat;
-import hc.fms.api.report.model.fuel.SectionStat;
+import hc.fms.api.report.model.fuel.FuelEffRateStatSection;
+import hc.fms.api.report.model.fuel.filldrain.FillDrainStatSection;
 import hc.fms.api.report.model.tracker.Tracker;
 import hc.fms.api.report.model.tracker.TrackerSensor;
 import hc.fms.api.report.service.AuthService;
@@ -184,13 +186,13 @@ public class ReportApiController {
 	}
 	
 	@RequestMapping("/stat/section")
-	public ResponseContainer<SectionStat> getFuelEffRateSectionByReport(@RequestBody Map<String, Long> sectionData) {
-		ResponseContainer<SectionStat> response = new ResponseContainer<>();
+	public ResponseContainer<FuelEffRateStatSection> getFuelEffRateSectionByReport(@RequestBody Map<String, Long> sectionData) {
+		ResponseContainer<FuelEffRateStatSection> response = new ResponseContainer<>();
 		Long reportId = sectionData.get("reportId");
 		Long trackerId = sectionData.get("trackerId");
 		try {
-			List<FuelStatResult> resultList = trackerService.getFuelStatisticsResultListByReportId(reportId, trackerId);
-			SectionStat stat = new SectionStat();
+			List<FuelStatResult> resultList = trackerService.getFuelStatisticsResultListByReportIdAndTrackerId(reportId, trackerId);
+			FuelEffRateStatSection stat = new FuelEffRateStatSection();
 			List<FuelStat> statList = resultList.stream().map(statResult-> {
 				stat.addFuelUsed(statResult.getFuelUsed());
 				stat.addDistanceTravelled(statResult.getDistanceTravelled());
@@ -210,20 +212,14 @@ public class ReportApiController {
 		
 	}
 	@RequestMapping("/filldrain/section")
-	public ResponseContainer<SectionStat> getFillDrainSectionByReport(@RequestBody Map<String, Long> sectionData) {
-		ResponseContainer<SectionStat> response = new ResponseContainer<>();
+	public ResponseContainer<FillDrainStatSection> getFillDrainSectionByReport(@RequestBody Map<String, Long> sectionData) {
+		ResponseContainer<FillDrainStatSection> response = new ResponseContainer<>();
 		Long reportId = sectionData.get("reportId");
 		Long trackerId = sectionData.get("trackerId");
 		try {
-			List<FuelStatResult> resultList = trackerService.getFuelStatisticsResultListByReportId(reportId, trackerId);
-			SectionStat stat = new SectionStat();
-			List<FuelStat> statList = resultList.stream().map(statResult-> {
-				stat.addFuelUsed(statResult.getFuelUsed());
-				stat.addDistanceTravelled(statResult.getDistanceTravelled());
-				return new FuelStat(statResult);
-			}).collect(Collectors.toList());
-			
-			stat.setStatList(statList);
+			List<FillDrainStatistics> statList = trackerService.getFillDrainStatisticsByReportIdAndTrackerId(reportId, trackerId);
+			FillDrainStatSection stat = new FillDrainStatSection();
+
 			response.setPayload(stat);
 			response.setSuccess(true);
 		} catch(Exception e) {

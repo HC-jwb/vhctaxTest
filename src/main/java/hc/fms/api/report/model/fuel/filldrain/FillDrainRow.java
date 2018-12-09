@@ -11,11 +11,10 @@ import lombok.ToString;
 public class FillDrainRow {
 	private ColVal<Integer> number;
 	private ColVal<Double> volume;
-	private ColVal<Double> max;
-	private ColVal<Double> avg;
+	private ColVal<Double> startVolume;
+	private ColVal<Double> endVolume;
 	private ColVal<Long> time;
 	private ColVal<Double> mileage;
-	private ColVal<Double> value;
 	private ColVal<String> address;
 	private ColVal<String> type;
 }

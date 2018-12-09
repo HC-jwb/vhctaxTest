@@ -23,6 +23,6 @@ public class FuelMileageRow {
 	private ColVal<Double> avg;
 	private ColVal<Double> time;
 	private ColVal<Double> value;
-	private StringVal address;
+	private ColVal<String> address;
 	
 }

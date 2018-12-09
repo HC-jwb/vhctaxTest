@@ -2,7 +2,7 @@ package hc.fms.api.report.model.fuel;
 
 import java.util.List;
 
-public class SectionStat {
+public class FuelEffRateStatSection {
 	private List<FuelStat> statList;
 	private Double totalFuelUsed = 0D;
 	private Double totalDistanceTravelled = 0D;
