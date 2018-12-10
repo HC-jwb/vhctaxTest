@@ -100,18 +100,15 @@ function refreshStatus(pendingReportGenIds) {
 function closeAccordion() {
 	$reportGenAccordion.accordion('close', 0);
 }
-
 function buildReportTab(sectionList) {
 	scrollTabs.clearTabs();
+	$scrolltabsContainer.show();
 	$scrollTabs.data('reportid', sectionList[0].reportId);
 	for(var i = 0; i < sectionList.length; i++) {
 		if(i == 0) scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>")
 		else scrollTabs.addTab("<li data-trackerid='" + sectionList[i].trackerId+ "'>" + sectionList[i].header+ "</li>")
 	}
-	$scrolltabsContainer.fadeIn(400, function (){
-		$scrollTabs.find("li:first()").click();
-	});
-	
+	$scrollTabs.find("li:first()").click();
 }
 function reportTabClicked() {
 	var $this = $(this);
@@ -154,7 +151,6 @@ function buildStatTable(sectionStat) {
 		$tr.append($statItem);
 		
 		$statItem = $("<td class='collapsing'>"+(stat.type == "F" ? "주유": "<span style='color:red'>누유</span>")+"</td>");
-		console.log("stat type ", stat.type);
 		$tr.append($statItem);
 		
 		$statItem = $("<td class='right aligned'>"+stat.startVolume+"</td>");
@@ -199,16 +195,12 @@ function calculateMileageDiff(sectionStat, curIdx) {
 	return (diff == null)?  (statList[statList.length-1].mileageFrom - curStat.mileageFrom).toFixed(1) : diff.toFixed(1);
 }
 function rebuildTableByVolumeDiff(pcnt) {
-	var cached = $scrollTabs.find(".tab_selected").data("cached");
+	var cached = $scrollTabs.find("li.tab_selected").data("cached");
 	if(cached) {
 		cached.percentMin = pcnt;
-		console.log(cached);
 		buildStatTable(cached);
-		
 	}
-	
 } 
-
 var $reportGenFrm, $trackerListDropdown, $genReportList, $reportGenItem, $reportGenAccordion, scrollTabs, $scrollTabs, $statTableContainer, $scrolltabsContainer;
 $(function() {
 	$scrollTabs = $("#scrollTabs");
