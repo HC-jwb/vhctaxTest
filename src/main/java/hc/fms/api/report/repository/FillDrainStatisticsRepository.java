@@ -9,7 +9,5 @@ import hc.fms.api.report.entity.FillDrainStatistics;
 
 @Repository
 public interface FillDrainStatisticsRepository extends JpaRepository<FillDrainStatistics, Long>{
-
-	public List<FillDrainStatistics> findAllByReportIdAndTrackerIdOrderByRawDateDesc();
-
+	public List<FillDrainStatistics> findAllByReportIdAndTrackerIdOrderByEventIdAsc(Long reportId, Long trackerId);
 }

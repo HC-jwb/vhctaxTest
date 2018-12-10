@@ -218,9 +218,11 @@ public class ReportApiController {
 		Long trackerId = sectionData.get("trackerId");
 		try {
 			List<FillDrainStatistics> statList = trackerService.getFillDrainStatisticsByReportIdAndTrackerId(reportId, trackerId);
-			FillDrainStatSection stat = new FillDrainStatSection();
-
-			response.setPayload(stat);
+			FillDrainStatSection statSection = new FillDrainStatSection();
+			statSection.setStatList(statList);
+			statSection.setFillingList(statList.stream().filter(stat -> stat.getType().equals(FillDrainStatSection.TYPE_FILLING)).collect(Collectors.toList()));
+			statSection.setDrainingList(statList.stream().filter(stat -> stat.getType().equals(FillDrainStatSection.TYPE_DRAINING)).collect(Collectors.toList()));
+			response.setPayload(statSection);
 			response.setSuccess(true);
 		} catch(Exception e) {
 			ResponseStatus status = new ResponseStatus();
@@ -313,16 +315,18 @@ public class ReportApiController {
 	
 	@RequestMapping("/xlsdownload/{reportId}")
 	public ResponseEntity<InputStreamResource> downloadReportAsExcel(@PathVariable("reportId") Long reportId) {
-		ExportableReport reportSource = trackerService.getExportableReport(reportId);
+		ExportableReport<?> reportSource = trackerService.getExportableReport(reportId);
 		ReportGen reportGen = reportSource.getReportGen();
 		ByteArrayInputStream in = exportService.exportToExcel(reportSource);
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Disposition",String.format("attachment; filename=FuelReport_%s_%s.xlsx", reportGen.getFrom(), reportGen.getTo()));
+		String filePrefix = reportGen.getFillDrainReportId() != null? "Filling_Report" : "FuelReport"; 
+		headers.add("Content-Disposition",String.format("attachment; filename=%s_%s_%s.xlsx", filePrefix, reportGen.getFrom().substring(0, 10), reportGen.getTo().substring(0, 10)));
 		return ResponseEntity
 				.ok()
 				.contentType(MediaType.parseMediaType("application/octet-stream"))
 				.headers(headers).body(new InputStreamResource(in));
 	}
+	
 	@RequestMapping("/fmsurl")
 	public ResponseContainer<String> getFmsUrl(HttpSession session) {
 		ResponseContainer <String> response = new ResponseContainer<>();

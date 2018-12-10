@@ -50,6 +50,7 @@ import hc.fms.api.report.repository.FuelStatisticsRepository;
 import hc.fms.api.report.repository.GenSectionRepository;
 import hc.fms.api.report.repository.ReportGenRepository;
 import hc.fms.api.report.model.fuel.filldrain.FillDrainSection;
+import hc.fms.api.report.model.fuel.filldrain.FillDrainStatSection;
 import hc.fms.api.report.util.HttpUtil;
 
 @Service
@@ -401,7 +402,7 @@ public class TrackerService {
 		return fuelStatRepository.getFuelStatResultList(reportId, trackerId);
 	}
 	public List<FillDrainStatistics> getFillDrainStatisticsByReportIdAndTrackerId(Long reportId, Long trackerId) {
-		return fillDrainStatRepository.findAllByReportIdAndTrackerIdOrderByRawDateDesc();
+		return fillDrainStatRepository.findAllByReportIdAndTrackerIdOrderByEventIdAsc(reportId, trackerId);
 	}
 	public List<ReportGen> getFuelReportGenList(String clientId) {
 		return reportGenRepository.findAllFuelEffReportByClientIdOrderByCreatedDateDesc(clientId);
@@ -423,22 +424,51 @@ public class TrackerService {
 	public List<GenSection> getSectionListFor(Long reportId) {
 		return sectionRepository.findAllByReportId(reportId);
 	}
-	public ExportableReport getExportableReport(Long reportId) {
-		ExportableReport report = new ExportableReport();
+	public ExportableReport<?> getExportableReport(Long reportId) {
 		ReportGen reportGen = getReportGen(reportId);
-		List<GenSection> genSectionList = getSectionListFor(reportGen.getId());
+		if(reportGen.getFillDrainReportId() != null) {
+			return getExportableFillDrainReport(reportGen);
+		} else {
+			return getFuelEffRateExportableReport(reportGen);
+		}
+	}
+	private ExportableReport<FuelEffRateStatSection> getFuelEffRateExportableReport(ReportGen reportGen) {
+		ExportableReport<FuelEffRateStatSection> report = new ExportableReport<>();
 		Map<Long, List<FuelEffRateStatSection>> sectionMap = new HashMap<>();
-		
+		List<GenSection> genSectionList = getSectionListFor(reportGen.getId());
 		for(GenSection genSection: genSectionList) {
 			List<FuelEffRateStatSection> sectionStatList = new ArrayList<>();
 			Long trackerId = genSection.getTrackerId();
-			List<FuelStatResult> resultList = getFuelStatisticsResultListByReportIdAndTrackerId(reportId, trackerId);
+			List<FuelStatResult> resultList = getFuelStatisticsResultListByReportIdAndTrackerId(reportGen.getId(), trackerId);
 			FuelEffRateStatSection sectionStat = new FuelEffRateStatSection();
 			List<FuelStat> statList = resultList.stream().map(statResult-> {
 				sectionStat.addFuelUsed(statResult.getFuelUsed());
 				sectionStat.addDistanceTravelled(statResult.getDistanceTravelled());
 				return new FuelStat(statResult);
 			}).collect(Collectors.toList());
+			sectionStat.setStatList(statList);
+			sectionStatList.add(sectionStat);
+			sectionMap.put(trackerId, sectionStatList);
+		}
+
+		report.setReportGen(reportGen);
+		report.setSectionInfoList(genSectionList);
+		report.setSectionDataMap(sectionMap);
+		return report;
+	}
+	private ExportableReport<FillDrainStatSection> getExportableFillDrainReport(ReportGen reportGen) {
+		ExportableReport<FillDrainStatSection> report = new ExportableReport<>();
+		List<GenSection> genSectionList = getSectionListFor(reportGen.getId());
+		Map<Long, List<FillDrainStatSection>> sectionMap = new HashMap<>();
+		
+		for(GenSection genSection: genSectionList) {
+			List<FillDrainStatSection> sectionStatList = new ArrayList<>();
+			Long trackerId = genSection.getTrackerId();
+			List<FillDrainStatistics> statList = getFillDrainStatisticsByReportIdAndTrackerId(reportGen.getId(), trackerId);
+			
+			FillDrainStatSection sectionStat = new FillDrainStatSection();
+			sectionStat.setFillingList(statList.stream().filter(stat -> stat.getType().equals(FillDrainStatSection.TYPE_FILLING)).collect(Collectors.toList()));
+			sectionStat.setDrainingList(statList.stream().filter(stat -> stat.getType().equals(FillDrainStatSection.TYPE_DRAINING)).collect(Collectors.toList()));
 			sectionStat.setStatList(statList);
 			sectionStatList.add(sectionStat);
 			sectionMap.put(trackerId, sectionStatList);

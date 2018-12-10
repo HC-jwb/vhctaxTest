@@ -12,8 +12,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ExportableReport {
-	private Map<Long, List<FuelEffRateStatSection>> sectionDataMap;
+public class ExportableReport<F> {//F--> FuelEffRateStatSection, or FillDrainStatSection
+	private Map<Long, List<F>> sectionDataMap;
 	private ReportGen reportGen;
 	private List<GenSection> sectionInfoList;
 }

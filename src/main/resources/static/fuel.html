@@ -13,9 +13,10 @@
 <body>
 <div class="ui fixed main secondary small blue inverted menu" id="topMenu">
 	<div class="ui container">
-		<a class="fuel report active enabled item"><i class="olive bar chart outline icon"></i> 연비 분석</a>
-		<a class="filldrain report enabled item"><i class="chart line icon"></i> 주유 분석</a>
 		<a class="tracking enabled item"><i class="road icon"></i> 운행관제</a>
+		<a class="fuel report active enabled item"><i class="olive bar chart outline icon"></i> 연비 분석</a>
+		<a class="filling report enabled item"><i class="chart line icon"></i> 주유 분석</a>
+		<a class="draining report item"><i class="chart line icon"></i> 누유 분석</a>
 		<div class="right menu">
 			<a class="ui logout item" href="/" title="로그아웃"><i class="sign-out icon"></i></a>
 		</div>
@@ -92,7 +93,7 @@
 		<div id="scrolltabsContainer" style="display:none;">
 			<div style="width: 100%; text-align: right;"><div class="ui compact right labeled icon small teal button excel-download">보고서 다운로드<i class="file excel outline icon"></i></div></div>
 			<ul id="scrollTabs" class="scroll_tabs_theme_dark"></ul>
-			<div id="statTableContainer" style="display:none; height:100%;">
+			<div id="statTableContainer" style="display:none;">
 				<div class="ui loader"></div>
 				<table class="ui celled striped compact small table" style="margin-top: 0;">
 					<thead>
@@ -114,7 +115,7 @@
 <script src="/js/modules.min.js"></script>
 <script src="/js/jquery.scrolltabs.js"></script>
 <script src="/js/jquery.mousewheel.js"></script>
-<script src="/js/common.js?v=0.9"></script>
+<script src="/js/common.js?v=1.0"></script>
 <script src="/js/report-api.js?v=0.9"></script>
 <script src="/js/fuel_eff_rate.js"></script>
 </body>

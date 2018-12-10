@@ -225,9 +225,10 @@ public class ReportProcessor {
 		
 		List<GenSection> genSectionList = new ArrayList<>();
 		for(Sheet<FillDrainSection> sheet : sheets) {
+			if(sheet.getEntityIds() == null) continue;
 			GenSection genSection = new GenSection();
-			genSection.setReportId(reportGenSaved.getId());
 			genSection.setTrackerId(sheet.getEntityIds().get(0));
+			genSection.setReportId(reportGenSaved.getId());
 			genSection.setHeader(sheet.getHeader());
 			genSectionList.add(genSection);
 		}
@@ -236,7 +237,9 @@ public class ReportProcessor {
 		genSectionRepository.saveAll(genSectionList);
 	}
 	private void processFillDrainSheet(Sheet<FillDrainSection> sheet, final long reportId, final long generationId) {
-		final Long trackerId = sheet.getEntityIds().get(0);
+		List<Long> entityIds = sheet.getEntityIds();
+		if(entityIds == null) return;
+		final Long trackerId = entityIds.get(0);
 		//filter only table type section
 		List<FillDrainSection> sectionList = sheet.getSections().stream().filter(section -> "table".equalsIgnoreCase(section.getType())).collect(Collectors.toList());
 		if(sectionList.size() == 0 ) {

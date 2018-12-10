@@ -40,7 +40,6 @@ function generateReport() {
 				trackers: trackers,
 				from: valueMap.fromDate,
 				to:valueMap.toDate,
-/*				intervalInMin: 360,*/
 				label: valueMap.description
 			}, function(response) {
 			if(response.success) {
@@ -119,16 +118,19 @@ function reportTabClicked() {
 	var trackerId = $this.data("trackerid");
 	if(!trackerId) return;
 	if($this.data('cached')) {
-		buildStatTable($this.data('cached'));
+		var sectionData = $this.data('cached');
+		buildStatTable(sectionData);
+		$((sectionData.percentMin == 0)? "#pcntAll": "#pcnt" + sectionData.percentMin).checkbox("set checked");
 		return;
 	}
 	$statTableContainer.show();
 	$statTableContainer.find(".ui.loader").addClass("active");
-	ReportApi.getReportSection({reportId: $scrollTabs.data('reportid'), trackerId: trackerId}, function(response) {
+	ReportApi.getFillDrainReportSection({reportId: $scrollTabs.data('reportid'), trackerId: trackerId}, function(response) {
 		if(response.success) {
 			buildStatTable(response.payload);
 			setTimeout(function() {$statTableContainer.find(".ui.loader").removeClass("active");}, 500);
 			$this.data('cached', response.payload);
+			$("#pcnt20").checkbox("set checked");/*defaults to all data to be displayed*/
 		} else {
 			console.log(response.status.description);
 		}
@@ -140,33 +142,73 @@ function buildStatTable(sectionStat) {
 	$statTableBody.empty();
 	var $tr;
 	var stat;
-	var statList = sectionStat.statList;
+	var statList = sectionStat.fillingList;
 	for(var i = 0; i < statList.length; i++) {
 		stat = statList[i];
 		$tr = $("<tr></tr>");
 
-		$statItem = $("<td class='collapsing'>" +stat.statDate+"</td>");
+		$statItem = $("<td class='right aligned'>" +stat.eventId+"</td>");
 		$tr.append($statItem);
 		
-		$statItem = $("<td class='right aligned'>"+stat.fuelUsed+"</td>");
+		$statItem = $("<td class='collapsing'>" +stat.eventDate+"</td>");
 		$tr.append($statItem);
 		
-		$statItem = $("<td class='right aligned'>"+stat.distanceTravelled+"</td>");
+		$statItem = $("<td class='collapsing'>"+(stat.type == "F" ? "주유": "<span style='color:red'>누유</span>")+"</td>");
+		console.log("stat type ", stat.type);
 		$tr.append($statItem);
+		
+		$statItem = $("<td class='right aligned'>"+stat.startVolume+"</td>");
+		$tr.append($statItem);
+		$statItem = $("<td class='right aligned'>"+stat.endVolume+"</td>");
+		$tr.append($statItem);
+		$statItem = $("<td class='right aligned'>"+stat.volume+"</td>");
+		$tr.append($statItem);
+		$statItem = $("<td class=''>"+stat.address+"</td>");
+		$tr.append($statItem);
+			if(stat.volume < sectionStat.percentMin) {/*check against filling type event*/
+				$tr.addClass("hidden");
+			} else {
+				$statItem = $("<td class='right aligned collapsing'>"+ calculateMileageDiff(sectionStat, i)+"</td>");
+			}
 
-		$statItem = $("<td class='right aligned'>"+stat.fuelEffRate+"</td>");
 		$tr.append($statItem);
 		$statTableBody.append($tr);
 	}
 	if(statList.length == 0) {
-		$statTableBody.append("<tr class='positive'><td class='center aligned' colspan='4'>가져올 데이터가 없습니다.</tr>");
-		/*$scrolltabsContainer.find(".excel-download.button").addClass("disabled");*/
+		$statTableBody.append("<tr class='positive'><td class='center aligned' colspan='8'>가져올 데이터가 없습니다.</tr>");
 	} else {
-		$statTableBody.append("<tr class='positive'><td class='center aligned'>합계</td><td class='right aligned'>"+sectionStat.totalFuelUsed+"</td><td class='right aligned'>"+sectionStat.totalDistanceTravelled+"</td><td class='right aligned'>"+sectionStat.totalFuelEffRate+"</td></tr>");
-		/*$scrolltabsContainer.find(".excel-download.button").removeClass("disabled");*/
+		/*$statTableBody.append("<tr class='positive'><td class='center aligned'>합계</td><td class='right aligned'>"+sectionStat.+"</td><td class='right aligned'>"+sectionStat.+"</td><td class='right aligned'>"+sectionStat.+"</td></tr>");*/
+	}
+}
+function calculateMileageDiff(sectionStat, curIdx) {
+	var statList = sectionStat.fillingList;
+	var percentMin = sectionStat.percentMin;
+	var curStat = statList[curIdx];
+	
+	if(curIdx == (statList.length -1)) {
+		return '';
+	}
+	var diff = null;
+	for(var idx = curIdx + 1; idx < statList.length; idx++) {
+		var nextStat = statList[idx];
+		if(nextStat.volume >= percentMin) {
+			diff = nextStat.mileageFrom - curStat.mileageFrom;
+			break; 
+		}
+	}
+	return (diff == null)?  (statList[statList.length-1].mileageFrom - curStat.mileageFrom).toFixed(1) : diff.toFixed(1);
+}
+function rebuildTableByVolumeDiff(pcnt) {
+	var cached = $scrollTabs.find(".tab_selected").data("cached");
+	if(cached) {
+		cached.percentMin = pcnt;
+		console.log(cached);
+		buildStatTable(cached);
+		
 	}
 	
-}
+} 
+
 var $reportGenFrm, $trackerListDropdown, $genReportList, $reportGenItem, $reportGenAccordion, scrollTabs, $scrollTabs, $statTableContainer, $scrolltabsContainer;
 $(function() {
 	$scrollTabs = $("#scrollTabs");
@@ -226,6 +268,9 @@ $(function() {
 			window.location.replace('/login.html');
 		}
 	});
-
+	$(".ui.radio.checkbox").checkbox();
+	$(".ui.radio.checkbox").click(function() { 
+		rebuildTableByVolumeDiff($(this).find("input[type='radio']").val()); 
+	});
 /*getGroupList();*/
 });

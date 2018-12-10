@@ -58,8 +58,8 @@ $(function () {
 			window.location.replace("/fuel.html");
 		} else if($this.hasClass("tracking")) {
 			window.location.replace("/fms.html");
-		} else if($this.hasClass("filldrain")) {
-			window.location.replace("/filldrain.html")
+		} else if($this.hasClass("filling")) {
+			window.location.replace("/filling.html")
 		}
 	});
 	$('.error.field').on('click','.close', function() {
