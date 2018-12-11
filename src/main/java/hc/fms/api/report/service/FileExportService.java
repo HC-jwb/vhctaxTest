@@ -25,7 +25,7 @@ import hc.fms.api.report.model.fuel.FuelEffRateStatSection;
 @Service
 public class FileExportService {
 	private static String [] fuelReportColumnNames = {"일자", "연료소비량(L)", "운행거리(KM)", "연비(KM/L)"};
-	private static String [] fillDrainReportColumnNames = {"ID", "일자", "유형", "시작 연료량(%)", "종료 연료량(%)", "주유/누유량(%)", "주유/누유 위치", "총 거리(KM)"};
+	private static String [] fillDrainReportColumnNames = {"ID", "일자", "유형", "시작 연료량(%)", "종료 연료량(%)", "주유/누유량(%)", "주유/누유 위치", "운행거리(KM)"};
 	@SuppressWarnings("unchecked")
 	public ByteArrayInputStream exportToExcel(ExportableReport<?> report) {
 		if(report.getReportGen().getFillDrainReportId() != null) {
@@ -50,10 +50,31 @@ public class FileExportService {
 			int rowNum = 0;
 			Row row;
 			int colOffset = 1;
+			CellRangeAddress rangeAddress;
 			for(GenSection genSection: sectionInfoList) {
 				sectionStatList = sectionMap.get(genSection.getTrackerId());
 				for(FillDrainStatSection sectionStat: sectionStatList) {
 					sheet = workbook.createSheet(genSection.getHeader());
+/////////////////////////// top header /////////////////					
+					row = sheet.createRow(0);
+					font = workbook.createFont();
+					font.setFontName("monospaced");
+					font.setColor(IndexedColors.BLACK.getIndex());
+					font.setFontHeightInPoints((short)21);
+					
+					cell = row.createCell(colOffset);
+					style = workbook.createCellStyle();
+					style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+					style.setAlignment(CellStyle.ALIGN_CENTER);
+					style.setFont(font);
+					cell.setCellStyle(style);
+					cell.setCellValue(String.format("주유 판단 기준: %s%% 이상", sectionStat.getPercentMin()));
+					rangeAddress = new CellRangeAddress(0,0, colOffset, colCount -1 + colOffset);
+					//RegionUtil.setBorderTop(CellStyle.BORDER_THIN, rangeAddress, (XSSFSheet)sheet, workbook);
+					RegionUtil.setBorderBottom(CellStyle.BORDER_MEDIUM, rangeAddress, (XSSFSheet)sheet, workbook);
+					sheet.addMergedRegion(rangeAddress);
+/////////////////////////// top header /////////////////					
+
 					rowNum = 1;
 					row = sheet.createRow(rowNum++);//header row
 					row.setHeightInPoints(20);
@@ -112,14 +133,16 @@ public class FileExportService {
 						style.setFont(font);
 						cell.setCellStyle(style);
 						cell.setCellValue("가져올 데이터가 없습니다.");
-						CellRangeAddress rangeAddress = new CellRangeAddress(rowNum -1,rowNum -1, colOffset, fillDrainReportColumnNames.length -1 + colOffset);
+						rangeAddress = new CellRangeAddress(rowNum -1,rowNum -1, colOffset, fillDrainReportColumnNames.length -1 + colOffset);
 						//RegionUtil.setBorderTop(CellStyle.BORDER_THIN, rangeAddress, (XSSFSheet)sheet, workbook);
 						RegionUtil.setBorderLeft(CellStyle.BORDER_THIN, rangeAddress, (XSSFSheet)sheet, workbook);
 						RegionUtil.setBorderRight(CellStyle.BORDER_THIN, rangeAddress, (XSSFSheet)sheet, workbook);
 						RegionUtil.setBorderBottom(CellStyle.BORDER_THIN, rangeAddress, (XSSFSheet)sheet, workbook);
 						sheet.addMergedRegion(rangeAddress);
 					}
-					for(FillDrainStatistics stat : fillingList) {
+					for(int idx = 0; idx < fillingList.size(); idx++) {
+						FillDrainStatistics stat = fillingList.get(idx);
+						if(stat.getVolume() < sectionStat.getPercentMin()) continue;
 						row = sheet.createRow(rowNum++);//create data row
 						font = workbook.createFont();
 						font.setFontName("monospaced");
@@ -225,7 +248,7 @@ public class FileExportService {
 						style.setBorderBottom(CellStyle.BORDER_THIN);
 						style.setFont(font);
 						cell.setCellStyle(style);
-						cell.setCellValue(stat.getMileageFrom());
+						cell.setCellValue(calculateMileageDiff(sectionStat, idx));//stat.getMileageFrom()
 					}
 				}
 				for(int i = 0; i < colCount; i++) {
@@ -241,6 +264,19 @@ public class FileExportService {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	private Double calculateMileageDiff(FillDrainStatSection sectionStat,int curIdx) {
+		Double diff = null;
+		List<FillDrainStatistics> fillingList = sectionStat.getFillingList();
+		FillDrainStatistics nextStat, curStat = fillingList.get(curIdx);
+		int size = fillingList.size();
+		for(int idx = curIdx + 1; idx < size; idx++) {
+			nextStat = fillingList.get(idx);
+			if(nextStat.getVolume() >= sectionStat.getPercentMin()) {
+				diff = nextStat.getMileageFrom() - curStat.getMileageFrom();
+			}
+		}
+		return (diff == null)? (fillingList.get(size -1).getMileageFrom() - curStat.getMileageFrom()) : diff;
 	}
 	private ByteArrayInputStream exportFuelEffRateSectionListToExcel(ExportableReport<FuelEffRateStatSection> report) {
 		Cell cell;

@@ -164,7 +164,7 @@ function buildStatTable(sectionStat) {
 			if(stat.volume < sectionStat.percentMin) {/*check against filling type event*/
 				$tr.addClass("hidden");
 			} else {
-				$statItem = $("<td class='right aligned collapsing'>"+ calculateMileageDiff(sectionStat, i)+"</td>");
+				$statItem = $("<td class='right aligned collapsing'>"+calculateMileageDiff(sectionStat, i)+"</td>");
 			}
 
 		$tr.append($statItem);
