@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  	<link rel="stylesheet" type="text/css" href="/css/jquery-ui.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/modules.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/scrolltabs.css">
+	<link rel="stylesheet" type="text/css" href="/css/report.css">
+	<title>Vehicle Tax Management</title>
+</head>
+<body>
+<div class="ui fixed main secondary small blue inverted menu" id="topMenu">
+	<div class="ui container">
+		<a class="tracking enabled item"><i class="road icon"></i> 운행관제</a>
+		<a class="fuel report enabled item"><i class="olive bar chart outline icon"></i> 연비 분석</a>
+		<a class="filling report enabled item"><i class="chart line icon"></i> 주유 분석</a>
+		<a class="draining report item"><i class="chart line icon"></i> 누유 분석</a>
+		<a class="vehicle tax active item"><i class="tasks icon"></i> Vehicle Tax Management</a>
+		<div class="right menu">
+			<a class="ui logout item" href="/" title="로그아웃"><i class="sign-out icon"></i></a>
+		</div>
+	</div>
+</div>
+
+<div class="main-container">
+	<div class="left-column">
+		<div class="ui raised segment">
+			<div class="ui blue top attached label"><i class="bar chart icon"></i>연비분석 보고서</div>	
+				<div class="ui relaxed divided tiny selection list" id="genReportList"></div>
+		</div>
+	</div>
+	<div class="right-column">
+		<div id="scrolltabsContainer">
+		</div>
+	</div><!--  end of right column -->
+</div><!-- end of main -->
+<script src="/js/jquery-3.1.1.min.js"></script>
+<script src="/js/jquery-ui.min.js"></script>
+<script src="/js/modules.min.js"></script>
+<script src="/js/common.js?v=1.1"></script>
+</body>
+</html>

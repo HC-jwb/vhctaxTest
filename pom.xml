@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>hc.fms.api</groupId>
-	<artifactId>handycar-fms-api-report</artifactId>
+	<groupId>hc.fms.addon.vhctax</groupId>
+	<artifactId>handycar-fms-addon-vhctax</artifactId>
 	<version>0.1</version>
 	<packaging>war</packaging>
 
 	<name>handycar-fms-api-report</name>
-	<description>Handycar FMS Report API</description>
+	<description>Handycar FMS AddOn for Vehicle Tax</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
