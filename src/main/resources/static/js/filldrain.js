@@ -253,7 +253,7 @@ $(function() {
 		ReportApi.exportReportInXls($genReportList.find(".processed.selected.item").data("report").id);
 	});
 	
-	ReportApi.validateSession(function(response) {
+	AuthApi.validateSession(function(response) {
 		if(response.success && response.payload) {
 			getReportGenList();
 		} else {

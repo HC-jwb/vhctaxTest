@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import hc.fms.api.addon.model.ResponseStatus;
 import hc.fms.api.addon.report.model.trip.Trip;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

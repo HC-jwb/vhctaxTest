@@ -1,4 +1,4 @@
-package hc.fms.api.addon.report.model;
+package hc.fms.api.addon.model;
 
 import lombok.Data;
 

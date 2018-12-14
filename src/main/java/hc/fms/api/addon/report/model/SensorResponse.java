@@ -2,6 +2,7 @@ package hc.fms.api.addon.report.model;
 
 import java.util.List;
 
+import hc.fms.api.addon.model.ResponseStatus;
 import hc.fms.api.addon.report.model.tracker.TrackerSensor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

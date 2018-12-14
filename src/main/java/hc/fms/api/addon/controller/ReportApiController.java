@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import hc.fms.api.addon.model.auth.AuthResponse;
+import hc.fms.api.addon.model.ResponseContainer;
+import hc.fms.api.addon.model.ResponseStatus;
 import hc.fms.api.addon.report.entity.FillDrainStatistics;
 import hc.fms.api.addon.report.entity.FuelStatResult;
 import hc.fms.api.addon.report.entity.GenSection;
@@ -31,8 +32,6 @@ import hc.fms.api.addon.report.model.GroupResponse;
 import hc.fms.api.addon.report.model.ReportGenFlatRequest;
 import hc.fms.api.addon.report.model.ReportGenResponse;
 import hc.fms.api.addon.report.model.ReportResponse;
-import hc.fms.api.addon.report.model.ResponseContainer;
-import hc.fms.api.addon.report.model.ResponseStatus;
 import hc.fms.api.addon.report.model.SensorResponse;
 import hc.fms.api.addon.report.model.TrackerResponse;
 import hc.fms.api.addon.report.model.fuel.FuelEffRateStatSection;
@@ -41,46 +40,22 @@ import hc.fms.api.addon.report.model.fuel.FuelStat;
 import hc.fms.api.addon.report.model.fuel.filldrain.FillDrainStatSection;
 import hc.fms.api.addon.report.model.tracker.Tracker;
 import hc.fms.api.addon.report.model.tracker.TrackerSensor;
-import hc.fms.api.addon.report.service.AuthService;
 import hc.fms.api.addon.report.service.FileExportService;
 import hc.fms.api.addon.report.service.TrackerService;
+import hc.fms.api.addon.report.util.HttpUtil;
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/report/api")
 public class ReportApiController {
 	@Autowired
-	private AuthService authService;
-	@Autowired
 	private TrackerService trackerService;
 	@Autowired
 	private FileExportService exportService;
 	private Logger logger = LoggerFactory.getLogger(ReportApiController.class);
-	@RequestMapping("/validate")
-	public ResponseContainer<Boolean> validateSession(HttpSession session) {
-		ResponseContainer<Boolean> response = new ResponseContainer<>();
-		if(hashKey(session)== null) {
-			ResponseStatus status = new ResponseStatus();
-			status.setDescription("session invalid or expired");
-		} else {
-			response.setSuccess(true);
-			response.setPayload(Boolean.TRUE);
-		}
-		return response;
-		
-	}
-	@PostMapping("/authenticate")
-	public AuthResponse initAuth(@RequestBody Map<String, String> authInfo, HttpSession session) {
-		AuthResponse response = authService.sendAuth(authInfo.get("login"), authInfo.get("password"));
-		if(response.getSuccess()) {
-			session.setAttribute("clientId", authInfo.get("login"));
-			session.setAttribute("password", authInfo.get("password"));
-			session.setAttribute("hash", response.getHash());
-		}
-		return response;
-	}
+
 	@RequestMapping("/tracker/list")
 	public TrackerResponse getTrackers(@RequestBody Long groupId,HttpSession session) {
-		TrackerResponse response = trackerService.getTrackerList(hashKey(session));
+		TrackerResponse response = trackerService.getTrackerList(HttpUtil.hashKey(session));
 		if(response.getSuccess()) {
 			List<Tracker> filteredList = response.getList().stream().filter(tracker -> tracker.getGroupId().equals(groupId)).collect(Collectors.toList());
 			response.setList(filteredList);
@@ -89,12 +64,12 @@ public class ReportApiController {
 	}
 	@RequestMapping("/tracker/group/list")
 	public GroupResponse getGroupList(HttpSession session) {
-		GroupResponse response = trackerService.getGroupList(hashKey(session));
+		GroupResponse response = trackerService.getGroupList(HttpUtil.hashKey(session));
 		return response;
 	}
 	@RequestMapping("/tracker/sensor/{trackerId}/list")
 	public SensorResponse getSensorList(@PathVariable("trackerId") int trackerId, HttpSession session) {
-		SensorResponse response = trackerService.getSensorList(hashKey(session), trackerId);
+		SensorResponse response = trackerService.getSensorList(HttpUtil.hashKey(session), trackerId);
 		return response;
 	}
 	@PostMapping("/generate")
@@ -109,7 +84,7 @@ public class ReportApiController {
 			"label": "01-레이벤-45하8608(2017) & 02-모닝-45하9940(2016) 누적운행거리"
 		}
 		*/
-		req.setHash(hashKey(session));
+		req.setHash(HttpUtil.hashKey(session));
 		req.setClientId(clientId(session));
 		logger.info(String.format("requestFuelEffRateReportGen:: session Key %s, clientId: %s",req.getHash(), req.getClientId()));
 		
@@ -121,9 +96,9 @@ public class ReportApiController {
 				String sensorName;
 				for(TrackerSensor sensor : sensorList) {
 					sensorName = sensor.getName().replaceAll(" ", "");
-					if(sensorName.equals("누적연료소모량")) {
+					if(sensorName.equalsIgnoreCase("fuel_consumption")) {
 						info.setFuelConsumptionSensorId(sensor.getId());
-					} else if(sensorName.equals("누적운행거리")) {
+					} else if(sensorName.equalsIgnoreCase("hardware_mileage")) {
 						info.setHardwareMileageSensorId(sensor.getId());
 					}
 				}
@@ -161,7 +136,7 @@ public class ReportApiController {
 			"label": "01-레이벤-45하8608(2017) & 02-모닝-45하9940(2016) 누적운행거리"
 		}
 		*/
-		req.setHash(hashKey(session));
+		req.setHash(HttpUtil.hashKey(session));
 		req.setClientId(clientId(session));
 		logger.info(String.format("requestFillDrainReportGen::session Key %s, clientId: %s",req.getHash(), req.getClientId()));
 		
@@ -310,7 +285,7 @@ public class ReportApiController {
 	/** retrieve original report not processed by this module, this is for testing use*/
 	@RequestMapping("/retrieve/source/{sourceId}")
 	public ReportResponse<FuelMileageSection> retrieveReportSource(HttpSession session, @PathVariable("sourceId")Long sourceId) {
-		return trackerService.retrieveFuelMileageReport(hashKey(session), sourceId);
+		return trackerService.retrieveFuelMileageReport(HttpUtil.hashKey(session), sourceId);
 	}
 	
 	@RequestMapping("/xlsdownload/{reportId}")
@@ -330,7 +305,7 @@ public class ReportApiController {
 	@RequestMapping("/fmsurl")
 	public ResponseContainer<String> getFmsUrl(HttpSession session) {
 		ResponseContainer <String> response = new ResponseContainer<>();
-		String hashKey = hashKey(session);
+		String hashKey = HttpUtil.hashKey(session);
 		if(hashKey != null) {
 			response.setPayload(String.format("http://new.black-box.id/pro/demo/?session_key=%s", hashKey));
 			response.setSuccess(true);
@@ -341,16 +316,7 @@ public class ReportApiController {
 		}
 		return response;
 	}
-	private String hashKey (HttpSession session) {
-		String hash = null;
-		Object attrHash = session.getAttribute("hash");
-		if(attrHash != null) {
-			hash = String.valueOf(attrHash);
-		} /*else {
-			throw new RuntimeException("no session hash");
-		}*/
-		return hash;
-	}
+	
 	private String clientId(HttpSession session) {
 		return (String)session.getAttribute("clientId");
 	}

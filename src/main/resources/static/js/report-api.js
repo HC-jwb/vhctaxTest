@@ -1,7 +1,5 @@
 var ReportApi = {
 	apiBase: '/report/api',
-	authUri: '/authenticate',
-	validateUri: '/validate',
 	groupListUri:'/tracker/group/list',
 	trackerListUri: '/tracker/list',
 	genRequestUri:'/generate',
@@ -15,14 +13,6 @@ var ReportApi = {
 	reportFillDrainSectionUri: '/filldrain/section',
 	reportExportXlsUri: '/xlsdownload',
 	progressTimerId: null,
-	authenticate: function (authJson, callback) {
-		Api.postJson(this.apiBase + this.authUri, authJson, callback, function(data) {
-			alert("시스템 접속에 실패하였습니다.\n잠시후 다시 시도해 주십시요.");
-		});
-	}, 
-	validateSession: function(callback) {
-		Api.sendGet(this.apiBase + this.validateUri, callback);
-	},
 	getGroupList: function(callback) {
 		Api.sendGet(this.apiBase + this.groupListUri, callback);
 	},

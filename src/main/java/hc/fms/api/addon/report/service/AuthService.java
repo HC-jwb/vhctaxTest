@@ -14,8 +14,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import hc.fms.api.addon.model.auth.AuthRequest;
-import hc.fms.api.addon.model.auth.AuthResponse;
+import hc.fms.api.addon.model.AuthRequest;
+import hc.fms.api.addon.model.AuthResponse;
 import hc.fms.api.addon.properties.FmsProperties;
 import hc.fms.api.addon.report.util.HttpUtil;
 

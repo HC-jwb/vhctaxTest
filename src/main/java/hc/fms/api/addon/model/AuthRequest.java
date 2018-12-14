@@ -1,4 +1,4 @@
-package hc.fms.api.addon.model.auth;
+package hc.fms.api.addon.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

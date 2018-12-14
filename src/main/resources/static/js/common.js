@@ -41,6 +41,19 @@ var Api = {
 	}
 };
 Api.init();
+var AuthApi = {
+	apiBase: '',
+	authUri: '/authenticate',
+	validateUri: '/validate',
+	authenticate: function (authJson, callback) {
+		Api.postJson(this.apiBase + this.authUri, authJson, callback, function(data) {
+			alert("Failed to connect the system.\nPlease try again later.");
+		});
+	}, 
+	validateSession: function(callback) {
+		Api.sendGet(this.apiBase + this.validateUri, callback);
+	}
+};
 var FormUI = {
 	errMsgDiv: '<div class="ui error message"><i class="close icon"></i><span class="msg" style="padding: 1em;"></span></div>'
 	, displayMsgIn: function ($frm, msg) {
@@ -60,6 +73,8 @@ $(function () {
 			window.location.replace("/fms.html");
 		} else if($this.hasClass("filling")) {
 			window.location.replace("/filling.html")
+		} else if($this.hasClass("vehicle tax")) {
+			window.location.replace("/vhcregist.html");
 		}
 	});
 	$('.error.field').on('click','.close', function() {

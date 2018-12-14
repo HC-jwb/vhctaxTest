@@ -1,9 +1,8 @@
-package hc.fms.api.addon.model.auth;
+package hc.fms.api.addon.model;
 
 import java.util.List;
 
 import hc.fms.api.addon.report.model.ResponseError;
-import hc.fms.api.addon.report.model.ResponseStatus;
 import lombok.Data;
 
 @Data

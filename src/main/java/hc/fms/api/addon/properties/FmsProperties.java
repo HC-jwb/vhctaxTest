@@ -10,7 +10,6 @@ public class FmsProperties {
 	private String siteAddress;
 	private String baseUrl;
 	private Api api;
-	
 	@Data
 	public static class Api {
 		private String userAuth;
@@ -20,5 +19,6 @@ public class FmsProperties {
 		private String trip;
 		private String reportGen;
 		private String reportRetrieve;
+		private String vehicleList;
 	}
 }

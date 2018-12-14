@@ -59,7 +59,7 @@ $(function() {
 function tryLogin (event, fields) {
 	event.preventDefault();
 	//userAuth({login: fields.login, password: fields.password}, procRedirect);
-	Api.postJson('/report/api/authenticate', {login: fields.login, password: fields.password}, function(response){
+	AuthApi.authenticate({login: fields.login, password: fields.password}, function(response){
 		if(response.success) {
 			window.location.replace('/fuel.html');
 		} else {
@@ -67,6 +67,6 @@ function tryLogin (event, fields) {
 			window.location.replace("/login.html");
 		}
 	}, function(data) {
-		alert("시스템 접속에 실패하였습니다.\n잠시후 다시 시도해 주십시요.");
+		alert("Failed to connect the system.\nPlease try again later.");
 	});
 }
