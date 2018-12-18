@@ -80,4 +80,11 @@ $(function () {
 	$('.error.field').on('click','.close', function() {
 		$(this).closest('.message').transition('fade');
 	});
+	AuthApi.validateSession(function(response) {
+		if(response.success && response.payload) {
+			if(typeof(getReportGenList) !== 'undefined') getReportGenList();
+		} else {
+			window.location.replace('/login.html');
+		}
+	});
 });

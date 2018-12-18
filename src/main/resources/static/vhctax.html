@@ -31,23 +31,56 @@
 	<div class="left-column">
 		<div class="ui raised segment">
 			<div class="ui blue top attached label"><i class="rupee sign icon"></i>Vehicle Tax Management</div>	
-			<div class="ui vertical fluid secondary pointing small menu">
-				<a class="active item">Tax Info Management</a>
-				<a class="item">Tax Payment Task</a>
+			<div class="ui red vertical fluid secondary pointing small menu">
+				<a class="active item"><i class="copy icon"></i>Payment Task Templates</a>
+				<a class="item"><i class="bell icon"></i>Vehicle Tax Payment Task</a>
    			</div>
 		</div>
 	</div>
 	<div class="right-column">
-		<table class="ui celled teal striped compact small sortable table" id="vhcListTable">
+		<div class="ui divider"></div>
+		<div class="ui small form">
+			<div class="inline fields">
+				<div class="field">
+					<label>Group By:</label>
+					<div class="ui selection dropdown">
+						<i class="dropdown icon"></i>
+						<div class="default text">Group By</div>
+						<div class="ui menu">
+							<div class="item" data-value="a">Group A</div>
+							<div class="item" data-value="b">Group B</div>
+						</div>
+					</div>
+				</div>
+				<div class="field">
+					<label>Payment Type:</label>
+					<div class="ui selection dropdown">
+						<i class="dropdown icon"></i>
+						<div class="default text">All</div>
+						<div class="ui menu">
+							<div class="item" data-value="a">Type A</div>
+							<div class="item" data-value="b">Type B</div>
+						</div>
+					</div>
+				</div>
+				<div class="field">
+					<label>By Status:</label>
+					<div class="ui checkbox"><input type="checkbox" checked><label>Overdue</label></div>
+					<div class="ui checkbox"><input type="checkbox" checked><label>Paid</label></div>
+				</div>
+			</div>
+		</div>
+		<table class="ui celled teal striped compact small sortable table" id="vhcListTable" style="margin-top: 0.2em;">
 			<thead>
 			<tr>
-			<th class="center aligned">Label</th>
-			<th class="center aligned">Model</th>
-			<th class="center aligned">Device ID</th>
-			<th class="center aligned">License Plate No.</th>
-			<th class="center aligned">Type</th>
-			<th class="center aligned">Payload Cap'</th>
-			<th class="center aligned">Fuel Type</th>
+				<th class="center aligned">Label</th>
+				<th class="center aligned">Model</th>
+				<!-- <th class="center aligned">Device ID</th> -->
+				<th class="center aligned">License Plate No.</th>
+				<th class="center aligned">Payment Type</th>
+				<th class="center aligned">Cost</th>
+				<th class="center aligned">Due Date</th>
+				<th class="center aligned">Status</th>
 			</tr>
 			</thead>
 			<tbody></tbody>
@@ -60,7 +93,11 @@
 <script src="/js/modules.min.js"></script>
 <script src="/js/common.js?v=1.1"></script>
 <script>
+	var VehicleTaxService = {
+			
+	};
 	$(function() {
+		$(".ui.dropdown").dropdown();
 		$(".ui.sortable.table").tablesort();
 	});
 </script>

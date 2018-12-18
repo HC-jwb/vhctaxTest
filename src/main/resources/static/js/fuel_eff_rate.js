@@ -215,14 +215,5 @@ $(function() {
 	$scrolltabsContainer.find(".excel-download.button").click(function() {
 		ReportApi.exportReportInXls($genReportList.find(".processed.selected.item").data("report").id);
 	});
-	
-	AuthApi.validateSession(function(response) {
-		if(response.success && response.payload) {
-			getReportGenList();
-		} else {
-			window.location.replace('/login.html');
-		}
-	});
-
 /*getGroupList();*/
 });

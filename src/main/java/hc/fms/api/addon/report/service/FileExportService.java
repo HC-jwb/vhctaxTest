@@ -25,7 +25,7 @@ import hc.fms.api.addon.report.model.fuel.filldrain.FillDrainStatSection;
 @Service
 public class FileExportService {
 	private static String [] fuelReportColumnNames = {"일자", "연료소비량(L)", "운행거리(KM)", "연비(KM/L)"};
-	private static String [] fillDrainReportColumnNames = {"ID", "일자", "유형", "시작 연료량(%)", "종료 연료량(%)", "주유/누유량(%)", "주유/누유 위치", "운행거리(KM)"};
+	private static String [] fillDrainReportColumnNames = {"ID", "일자", "유형", "시작 연료량(%)", "종료 연료량(%)", "주유/누유량(%)", "주유/누유 위치", "연료 사용량(%)", "운행거리(KM)"};
 	@SuppressWarnings("unchecked")
 	public ByteArrayInputStream exportToExcel(ExportableReport<?> report) {
 		if(report.getReportGen().getFillDrainReportId() != null) {
@@ -248,6 +248,18 @@ public class FileExportService {
 						style.setBorderBottom(CellStyle.BORDER_THIN);
 						style.setFont(font);
 						cell.setCellStyle(style);
+						cell.setCellValue(calculateFuelPctDiff(sectionStat, idx));//stat.getMileageFrom()
+						
+						cell = row.createCell(8 + colOffset);
+						style = workbook.createCellStyle();
+						style.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+						style.setAlignment(CellStyle.ALIGN_RIGHT);
+						style.setBorderLeft(CellStyle.BORDER_THIN);
+						style.setBorderRight(CellStyle.BORDER_THIN);
+						style.setBorderTop(CellStyle.BORDER_THIN);
+						style.setBorderBottom(CellStyle.BORDER_THIN);
+						style.setFont(font);
+						cell.setCellStyle(style);
 						cell.setCellValue(calculateMileageDiff(sectionStat, idx));//stat.getMileageFrom()
 					}
 				}
@@ -265,6 +277,20 @@ public class FileExportService {
 			return null;
 		}
 	}
+	private Double calculateFuelPctDiff(FillDrainStatSection sectionStat,int curIdx) {
+		Double diff = null;
+		List<FillDrainStatistics> fillingList = sectionStat.getFillingList();
+		FillDrainStatistics nextStat, curStat = fillingList.get(curIdx);
+		int size = fillingList.size();
+		for(int idx = curIdx + 1; idx < size; idx++) {
+			nextStat = fillingList.get(idx);
+			if(nextStat.getVolume() >= sectionStat.getPercentMin()) {
+				diff = curStat.getEndVolume() - nextStat.getStartVolume();
+				break;
+			}
+		}
+		return (diff == null)? (curStat.getEndVolume() - fillingList.get(size -1).getStartVolume()) : diff;
+	}
 	private Double calculateMileageDiff(FillDrainStatSection sectionStat,int curIdx) {
 		Double diff = null;
 		List<FillDrainStatistics> fillingList = sectionStat.getFillingList();
@@ -274,6 +300,7 @@ public class FileExportService {
 			nextStat = fillingList.get(idx);
 			if(nextStat.getVolume() >= sectionStat.getPercentMin()) {
 				diff = nextStat.getMileageFrom() - curStat.getMileageFrom();
+				break;
 			}
 		}
 		return (diff == null)? (fillingList.get(size -1).getMileageFrom() - curStat.getMileageFrom()) : diff;
@@ -472,4 +499,3 @@ public class FileExportService {
 		}
 	}
 }
-

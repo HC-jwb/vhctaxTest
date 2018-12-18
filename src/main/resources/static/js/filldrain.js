@@ -142,6 +142,7 @@ function buildStatTable(sectionStat) {
 	var statList = sectionStat.fillingList;
 	for(var i = 0; i < statList.length; i++) {
 		stat = statList[i];
+		if(stat.volume < sectionStat.percentMin) continue;/*check against filling type event*/
 		$tr = $("<tr></tr>");
 
 		$statItem = $("<td class='right aligned'>" +stat.eventId+"</td>");
@@ -161,20 +162,36 @@ function buildStatTable(sectionStat) {
 		$tr.append($statItem);
 		$statItem = $("<td class=''>"+stat.address+"</td>");
 		$tr.append($statItem);
-			if(stat.volume < sectionStat.percentMin) {/*check against filling type event*/
-				$tr.addClass("hidden");
-			} else {
-				$statItem = $("<td class='right aligned collapsing'>"+calculateMileageDiff(sectionStat, i)+"</td>");
-			}
-
+		
+		$statItem = $("<td class='right aligned collapsing'>"+calculateFuelPctDiff(sectionStat, i)+"</td>");
+		$tr.append($statItem);
+		$statItem = $("<td class='right aligned collapsing'>"+calculateMileageDiff(sectionStat, i)+"</td>");
 		$tr.append($statItem);
 		$statTableBody.append($tr);
 	}
 	if(statList.length == 0) {
-		$statTableBody.append("<tr class='positive'><td class='center aligned' colspan='8'>가져올 데이터가 없습니다.</tr>");
+		$statTableBody.append("<tr class='positive'><td class='center aligned' colspan='9'>가져올 데이터가 없습니다.</tr>");
 	} else {
 		/*$statTableBody.append("<tr class='positive'><td class='center aligned'>합계</td><td class='right aligned'>"+sectionStat.+"</td><td class='right aligned'>"+sectionStat.+"</td><td class='right aligned'>"+sectionStat.+"</td></tr>");*/
 	}
+}
+function calculateFuelPctDiff(sectionStat, curIdx) {
+	var statList = sectionStat.fillingList;
+	var percentMin = sectionStat.percentMin;
+	var curStat = statList[curIdx];
+	
+	if(curIdx == (statList.length -1)) {
+		return '';
+	}
+	var diff = null;
+	for(var idx = curIdx + 1; idx < statList.length; idx++) {
+		var nextStat = statList[idx];
+		if(nextStat.volume >= percentMin) {
+			diff = curStat.endVolume - nextStat.startVolume;
+			break; 
+		}
+	}
+	return (diff == null)?  (curStat.endVolume - statList[statList.length-1].startVolume).toFixed(1) : diff.toFixed(1);
 }
 function calculateMileageDiff(sectionStat, curIdx) {
 	var statList = sectionStat.fillingList;
@@ -253,13 +270,6 @@ $(function() {
 		ReportApi.exportReportInXls($genReportList.find(".processed.selected.item").data("report").id);
 	});
 	
-	AuthApi.validateSession(function(response) {
-		if(response.success && response.payload) {
-			getReportGenList();
-		} else {
-			window.location.replace('/login.html');
-		}
-	});
 	$(".ui.radio.checkbox").checkbox();
 	$(".ui.radio.checkbox").click(function() { 
 		rebuildTableByVolumeDiff($(this).find("input[type='radio']").val()); 
