@@ -74,7 +74,7 @@ $(function () {
 		} else if($this.hasClass("filling")) {
 			window.location.replace("/filling.html")
 		} else if($this.hasClass("vehicle tax")) {
-			window.location.replace("/vhcregist.html");
+			window.location.replace("/vhctax.html");
 		}
 	});
 	$('.error.field').on('click','.close', function() {

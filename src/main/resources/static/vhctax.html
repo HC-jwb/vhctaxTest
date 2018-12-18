@@ -8,6 +8,9 @@
 	<link rel="stylesheet" type="text/css" href="/css/modules.min.css">
 	<link rel="stylesheet" type="text/css" href="/css/scrolltabs.css">
 	<link rel="stylesheet" type="text/css" href="/css/report.css">
+<style>
+	#vhcListTable.ui.sortable.table {min-width: 550px;}
+</style>
 	<title>Vehicle Tax Management</title>
 </head>
 <body>
@@ -27,18 +30,39 @@
 <div class="main-container">
 	<div class="left-column">
 		<div class="ui raised segment">
-			<div class="ui blue top attached label"><i class="bar chart icon"></i>연비분석 보고서</div>	
-				<div class="ui relaxed divided tiny selection list" id="genReportList"></div>
+			<div class="ui blue top attached label"><i class="rupee sign icon"></i>Vehicle Tax Management</div>	
+			<div class="ui vertical fluid secondary pointing small menu">
+				<a class="active item">Tax Info Management</a>
+				<a class="item">Tax Payment Task</a>
+   			</div>
 		</div>
 	</div>
 	<div class="right-column">
-		<div id="scrolltabsContainer">
-		</div>
+		<table class="ui celled teal striped compact small sortable table" id="vhcListTable">
+			<thead>
+			<tr>
+			<th class="center aligned">Label</th>
+			<th class="center aligned">Model</th>
+			<th class="center aligned">Device ID</th>
+			<th class="center aligned">License Plate No.</th>
+			<th class="center aligned">Type</th>
+			<th class="center aligned">Payload Cap'</th>
+			<th class="center aligned">Fuel Type</th>
+			</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
 	</div><!--  end of right column -->
 </div><!-- end of main -->
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/jquery-ui.min.js"></script>
+<script src="/js/jquery.tablesort.min.js"></script>
 <script src="/js/modules.min.js"></script>
 <script src="/js/common.js?v=1.1"></script>
+<script>
+	$(function() {
+		$(".ui.sortable.table").tablesort();
+	});
+</script>
 </body>
 </html>
