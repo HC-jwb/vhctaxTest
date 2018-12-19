@@ -10,8 +10,9 @@ html,body, .main-container, .left-column, .left-column > .ui.segment, .right-col
 .ui.list .description {font-size: 0.95em;}
 .ui.list .item{font-family: sans-serif;}
 .ui.list .content .active-header{font-weight: 600; color: #415059;}
-.main-container div.left-column {width: 370px; padding:0; float:left; overflow: auto;}
+.main-container div.left-column {width: 370px; padding:0; float:left; overflow-x: auto; overflow-y:hidden;}
 .main-container div.right-column{width: calc(100% - 380px); padding: 0 0.5em; float:right; overflow-y: auto;}
+.left-column-content-container {overflow-y: auto; height: calc(100% - 2em);}
 #genReportList > .selected.item {background:#d87636;border-radius: 3px;}
 #genReportList > .selected.item div.active-header, #genReportList > .selected.item .description {color: white;}
 #reportGenFrm {min-width: 850px;}
