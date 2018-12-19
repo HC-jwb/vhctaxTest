@@ -9,9 +9,10 @@
 	<link rel="stylesheet" type="text/css" href="/css/scrolltabs.css">
 	<link rel="stylesheet" type="text/css" href="/css/report.css">
 <style>
-	#vhcListTable.ui.sortable.table {min-width: 550px;}
+	.right-column-content-container {min-width: 1000px;}
+	
 </style>
-	<title>Vehicle Tax Management</title>
+	<title>Next Generation Smart FMS Platform</title>
 </head>
 <body>
 <div class="ui fixed main secondary small blue inverted menu" id="topMenu">
@@ -30,75 +31,105 @@
 <div class="main-container">
 	<div class="left-column">
 		<div class="ui raised segment">
-			<div class="ui blue top attached label"><i class="rupee sign icon"></i>Vehicle Tax Management</div>	
-			<div class="ui red vertical fluid secondary pointing small menu">
-				<a class="active item"><i class="copy icon"></i>Payment Task Templates</a>
-				<a class="item"><i class="bell icon"></i>Vehicle Tax Payment Task</a>
-   			</div>
+			<div class="ui blue top attached label"><i class="rupee sign icon"></i>Vehicle Tax Management</div>
+			<div class="left-column-content-container">	
+				<div class="ui blue vertical fluid secondary pointing small menu">
+					<a class="active item"><i class="bell icon"></i>Vehicle Tax Payment Task</a>
+					<a class="item"><i class="copy icon"></i>Payment Task Templates</a>
+	   			</div>
+	   		</div>
 		</div>
 	</div>
 	<div class="right-column">
-		<div class="ui divider"></div>
-		<div class="ui small form">
-			<div class="inline fields">
-				<div class="field">
-					<label>Group By:</label>
-					<div class="ui selection dropdown">
-						<i class="dropdown icon"></i>
-						<div class="default text">Group By</div>
-						<div class="ui menu">
-							<div class="item" data-value="a">Group A</div>
-							<div class="item" data-value="b">Group B</div>
+		<div class="right-column-content-container">
+			<div class="ui divider"></div>
+			<div class="ui small form" id="searchFrm">
+				<div class="inline fields">
+					<div class="four wide field">
+						<label>Group by:</label>
+						<div class="ui selection dropdown" style="min-width: 11em;">
+							<i class="dropdown icon"></i>
+							<div class="default text">Group By</div>
+							<div class="ui menu">
+								<div class="item" data-value="a">Group A</div>
+								<div class="item" data-value="b">Group B</div>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="field">
-					<label>Payment Type:</label>
-					<div class="ui selection dropdown">
-						<i class="dropdown icon"></i>
-						<div class="default text">All</div>
-						<div class="ui menu">
-							<div class="item" data-value="a">Type A</div>
-							<div class="item" data-value="b">Type B</div>
+					<div class="four wide field">
+						<label>Payment type:</label>
+						<div class="ui selection dropdown" style="min-width: 11em;">
+							<i class="dropdown icon"></i>
+							<div class="default text">All</div>
+							<div class="ui menu">
+								<div class="item" data-value="a">Type A</div>
+								<div class="item" data-value="b">Type B</div>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="field">
-					<label>By Status:</label>
-					<div class="ui checkbox"><input type="checkbox" checked><label>Overdue</label></div>
-					<div class="ui checkbox"><input type="checkbox" checked><label>Paid</label></div>
+					<div class="six wide inline field">
+						<label>Period:</label>
+						<div class="ui small left icon input">
+							<input type="text" placeholder="Date from" id="fromDate" name="fromDate"><i class="calendar alternate outline icon"></i>
+						</div>
+						&nbsp;~&nbsp;
+						<div class="ui small right icon input">
+							<input type="text" placeholder="Date to" id="toDate" name="toDate"><i class="calendar alternate outline icon"></i>
+						</div>
+					</div>
+					<div class="three wide field">
+						<div class="ui blue small compact icon basic button"><i class="edit icon"></i></div>
+						<div class="ui blue small compact icon basic button"><i class="check icon"></i></div>
+						<div class="ui blue small compact icon basic button"><i class="print icon"></i></div>
+					</div>
 				</div>
 			</div>
-		</div>
-		<table class="ui celled teal striped compact small sortable table" id="vhcListTable" style="margin-top: 0.2em;">
-			<thead>
-			<tr>
-				<th class="center aligned">Label</th>
-				<th class="center aligned">Model</th>
-				<!-- <th class="center aligned">Device ID</th> -->
-				<th class="center aligned">License Plate No.</th>
-				<th class="center aligned">Payment Type</th>
-				<th class="center aligned">Cost</th>
-				<th class="center aligned">Due Date</th>
-				<th class="center aligned">Status</th>
-			</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
+			<table class="ui celled teal striped compact small sortable table" id="vhcListTable" style="margin-top: 0.2em;">
+				<thead>
+				<tr>
+					<th class="center aligned">Label</th>
+					<th class="center aligned">Model</th>
+					<!-- <th class="center aligned">Device ID</th> -->
+					<th class="center aligned">Plate No.</th>
+					<th class="center aligned">Payment Type</th>
+					<th class="center aligned">Cost</th>
+					<th class="center aligned">Due Date</th>
+					<th class="center aligned">Status</th>
+				</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div><!-- end of right column content container -->
 	</div><!--  end of right column -->
 </div><!-- end of main -->
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/jquery-ui.min.js"></script>
 <script src="/js/jquery.tablesort.min.js"></script>
 <script src="/js/modules.min.js"></script>
+<script src="/js/common.api.js"></script>
 <script src="/js/common.js?v=1.1"></script>
 <script>
 	var VehicleTaxService = {
 			
 	};
+	function getDate(element) {
+		var date;
+		try {
+			date = $.datepicker.parseDate("yy-mm-dd", element.value );
+		} catch(error) { date = null; }
+		return date;
+	}
 	$(function() {
 		$(".ui.dropdown").dropdown();
 		$(".ui.sortable.table").tablesort();
+		from = $("#fromDate").datepicker({dateFormat:'yy-mm-dd', defaultDate: "0d", numberOfMonths:2, changeMonth: true})
+		.on("change", function() {
+			to.datepicker("option", "minDate", getDate(this));
+		}),
+		to = $("#toDate" ).datepicker({dateFormat:'yy-mm-dd', defaultDate: "+4w", numberOfMonths:2, changeMonth: true})
+		.on("change", function() {
+			from.datepicker( "option", "maxDate", getDate(this));
+		});
 	});
 </script>
 </body>

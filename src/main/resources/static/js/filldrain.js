@@ -14,7 +14,7 @@ function getTrackerList(groupId) {
 		if(response.success) {
 			var list = response.list;
 			if(list.length > 0) {
-				$menu.append("<div class='item' data-value='0'>차량 전체</div>");
+				$menu.append("<div class='item' data-value='0'>All</div>");
 			}
 			for(var i = 0; i < list.length; i++) {
 				$menu.append("<div class='tracker item' data-value='" + list[i].id + "'>" + list[i].label + "</div>");
@@ -151,7 +151,7 @@ function buildStatTable(sectionStat) {
 		$statItem = $("<td class='collapsing'>" +stat.eventDate+"</td>");
 		$tr.append($statItem);
 		
-		$statItem = $("<td class='collapsing'>"+(stat.type == "F" ? "주유": "<span style='color:red'>누유</span>")+"</td>");
+		$statItem = $("<td class='collapsing'>"+(stat.type == "F" ? "Filling": "<span style='color:red'>Draining</span>")+"</td>");
 		$tr.append($statItem);
 		
 		$statItem = $("<td class='right aligned'>"+stat.startVolume+"</td>");
@@ -170,7 +170,7 @@ function buildStatTable(sectionStat) {
 		$statTableBody.append($tr);
 	}
 	if(statList.length == 0) {
-		$statTableBody.append("<tr class='positive'><td class='center aligned' colspan='9'>가져올 데이터가 없습니다.</tr>");
+		$statTableBody.append("<tr class='positive'><td class='center aligned' colspan='9'>No data found.</tr>");
 	} else {
 		/*$statTableBody.append("<tr class='positive'><td class='center aligned'>합계</td><td class='right aligned'>"+sectionStat.+"</td><td class='right aligned'>"+sectionStat.+"</td><td class='right aligned'>"+sectionStat.+"</td></tr>");*/
 	}
@@ -238,7 +238,7 @@ $(function() {
 		fields: {description: 'empty', trackerGroup: 'empty', trackerList: 'empty', fromDate:'empty', toDate: 'empty'}
 	});
 	$reportGenFrm.find(".generate.button").click(generateReport);
-	from = $( "#fromDate").datepicker({dateFormat:'yy-mm-dd',defaultDate: "-28d",changeMonth: true,numberOfMonths: 1})
+	from = $("#fromDate").datepicker({dateFormat:'yy-mm-dd',defaultDate: "-28d",changeMonth: true,numberOfMonths: 1})
 	.on("change", function() {
 		to.datepicker("option", "minDate", getDate(this));
 	}),

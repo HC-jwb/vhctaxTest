@@ -14,7 +14,7 @@ function getTrackerList(groupId) {
 		if(response.success) {
 			var list = response.list;
 			if(list.length > 0) {
-				$menu.append("<div class='item' data-value='0'>차량 전체</div>");
+				$menu.append("<div class='item' data-value='0'>All</div>");
 			}
 			for(var i = 0; i < list.length; i++) {
 				$menu.append("<div class='tracker item' data-value='" + list[i].id + "'>" + list[i].label + "</div>");
@@ -156,10 +156,10 @@ function buildStatTable(sectionStat) {
 		$statTableBody.append($tr);
 	}
 	if(statList.length == 0) {
-		$statTableBody.append("<tr class='positive'><td class='center aligned' colspan='4'>가져올 데이터가 없습니다.</tr>");
+		$statTableBody.append("<tr class='positive'><td class='center aligned' colspan='4'>No data found.</tr>");
 		/*$scrolltabsContainer.find(".excel-download.button").addClass("disabled");*/
 	} else {
-		$statTableBody.append("<tr class='positive'><td class='center aligned'>합계</td><td class='right aligned'>"+sectionStat.totalFuelUsed+"</td><td class='right aligned'>"+sectionStat.totalDistanceTravelled+"</td><td class='right aligned'>"+sectionStat.totalFuelEffRate+"</td></tr>");
+		$statTableBody.append("<tr class='positive'><td class='center aligned'>Sum</td><td class='right aligned'>"+sectionStat.totalFuelUsed+"</td><td class='right aligned'>"+sectionStat.totalDistanceTravelled+"</td><td class='right aligned'>"+sectionStat.totalFuelEffRate+"</td></tr>");
 		/*$scrolltabsContainer.find(".excel-download.button").removeClass("disabled");*/
 	}
 	
@@ -184,7 +184,7 @@ $(function() {
 		fields: {description: 'empty', trackerGroup: 'empty', trackerList: 'empty', fromDate:'empty', toDate: 'empty'}
 	});
 	$reportGenFrm.find(".generate.button").click(generateReport);
-	from = $( "#fromDate").datepicker({dateFormat:'yy-mm-dd',defaultDate: "-28d",changeMonth: true,numberOfMonths: 1})
+	from = $("#fromDate").datepicker({dateFormat:'yy-mm-dd',defaultDate: "-28d",changeMonth: true,numberOfMonths: 1})
 	.on("change", function() {
 		to.datepicker("option", "minDate", getDate(this));
 	}),
