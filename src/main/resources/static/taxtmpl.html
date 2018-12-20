@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  	<link rel="stylesheet" type="text/css" href="/css/jquery-ui.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/modules.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/scrolltabs.css">
+	<link rel="stylesheet" type="text/css" href="/css/report.css">
+<style>
+	.right-column-content-container {min-width: 1000px;}
+	.ui.small.form .field input {padding: 0.5em;}
+</style>
+	<title>Next Generation Smart FMS Platform</title>
+</head>
+<body>
+<div class="ui fixed main secondary small blue inverted menu" id="topMenu">
+	<div class="ui container">
+		<a class="tracking enabled item"><i class="road icon"></i> Vehicle Tracking</a>
+		<a class="fuel report enabled item"><i class="bar chart icon"></i> Fuel Efficiency</a>
+		<a class="filling report enabled item"><i class="chart line icon"></i> Filling</a>
+		<a class="draining report item"><i class="chart line icon"></i> Draining</a>
+		<a class="vehicle tax active enabled item"><i class="yellow tasks icon"></i> Vehicle Tax</a>
+		<div class="right menu">
+			<a class="ui logout item" href="/login.html" title="Sign out"><i class="sign-out icon"></i></a>
+		</div>
+	</div>
+</div>
+
+<div class="main-container">
+	<div class="left-column">
+		<div class="ui raised segment">
+			<div class="ui blue top attached label"><i class="rupee sign icon"></i>Vehicle Tax Management</div>
+			<div class="left-column-content-container">	
+				<div class="ui blue vertical fluid secondary pointing small menu" id="taxSubMenu">
+					<a class="payment task item"><i class="bell icon"></i>Vehicle Tax Payment Task</a>
+					<a class="active tax template item"><i class="copy icon"></i>Payment Task Templates</a>
+	   			</div>
+	   		</div>
+		</div>
+	</div>
+	<div class="right-column">
+		<div class="right-column-content-container">
+		</div><!-- end of right column content container -->
+	</div><!--  end of right column -->
+</div><!-- end of main -->
+<div class="ui segment modal" id="templateModal">
+	<div class="ui form">
+		<div class="fields">
+			<div class="five wide field">
+				<label>Service Title</label>
+				<input type="text" name="serviceTitle" placeHolder="Enter service title">
+			</div>
+							
+			<div class="eleven wide field">	
+				<label>Description</label>
+				<input type="text" name="serviceDesc" placeHolder="Enter service description">
+			</div>
+		</div>
+		<div class="fields">
+			<div class="eight wide field">
+				<div class="ui segment">
+					<div class="ui blue top attached label"><i class="car icon"></i> Vehicle Certificate</div>
+					<div class="ui form">
+						<div class="inline fields">
+							<label for="schCertEndsOn">Schedule ends on Every :</label>
+							<div class="field"><input type="radio" name="schCertEndsOn" value="1"><label>1 year</label></div>
+							<div class="field"><input type="radio" name="schCertEndsOn" checked value="5"><label>5 years</label></div>
+						</div>
+						<div class="inline fields">
+							<label>Payment &nbsp;Cost:</label>
+							<div class="field">
+								<input type="text" name="cost" placeholder="0.00" style="text-align: right;">
+							</div>
+						</div>
+						<div class="inline fields">
+							<label>Remind Before:</label>
+							<div class="field">
+								<input type="number" name="remindBefore" placeholder="0" style="text-align: right;"> days
+							</div>
+						</div>
+						<div class="ui small tag label"><i class="alarm icon"></i>Notification</div>
+						<div class="ui message" style="padding: 0.5em 1em;">By default, notification messages will be displayed</div>
+						<div class="fields">
+							<div class="eight wide field"><label>SMS notification</label><input type="text" name="smsNotification"></div>
+							<div class="eight wide field"><label>Email notification</label><input type="text" name="emailNotification"></div>
+						</div>
+					</div>
+				</div>
+			</div><!--  end of vehicle certification segment containing field-->
+			<div class="eight wide field">
+				<div class="ui segment">
+					<div class="ui blue top attached label"><i class="money bill alternate outline icon"></i> Vehicle Tax</div>
+					<div class="ui form">
+						<div class="inline fields">
+							<label for="schTaxEndsOn">Schedule ends on Every :</label>
+							<div class="field"><input type="radio" name="schTaxEndsOn" checked value="1"><label>1 year</label></div>
+							<div class="field"><input type="radio" name="schTaxEndsOn" value="5"><label>5 years</label></div>
+						</div>
+						<div class="inline fields">
+							<label>Payment &nbsp;Cost:</label>
+							<div class="field"><input type="text" name="cost" placeholder="0.00" style="text-align: right;"></div>
+						</div>
+						<div class="inline fields">
+							<label>Remind Before:</label>
+							<div class="field"><input type="number" name="remindBefore" placeholder="0" style="text-align: right;"> days</div>
+						</div>
+						<div class="ui small tag label"><i class="alarm icon"></i>Notification</div>
+						<div class="ui message" style="padding: 0.5em 1em;">By default, notification messages will be displayed</div>
+						<div class="fields">
+							<div class="eight wide field"><label>SMS notification</label><input type="text" name="smsNotification"></div>
+							<div class="eight wide field"><label>Email notification</label><input type="text" name="emailNotification"></div>
+						</div>
+					</div>
+				</div>
+			</div><!--  end of vehicle tax segment containing field-->
+		</div>
+		<div class="field">
+			<div style="text-align: center;">
+				<div class="ui teal right labeled icon small basic button">Save <i class="save icon"></i></div>
+				<div class="ui right labeled icon small basic close button">Close <i class="x icon"></i></div>
+			</div>	
+		</div>
+	</div>
+</div>
+<script src="/js/jquery-3.1.1.min.js"></script>
+<script src="/js/jquery-ui.min.js"></script>
+<script src="/js/jquery.tablesort.min.js"></script>
+<script src="/js/modules.min.js"></script>
+<script src="/js/common.api.js"></script>
+<script src="/js/common.js?v=1.1"></script>
+<script>
+	$(function() {
+		var $templateModal = $("#templateModal");
+		$templateModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false}).modal('show');
+		$templateModal.find(".close.button").click(function() {
+			$templateModal.modal('hide');
+		});
+	});
+</script>
+</body>
+</html>

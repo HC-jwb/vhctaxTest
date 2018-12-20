@@ -21,6 +21,16 @@ $(function () {
 			window.location.replace("/vhctax.html");
 		}
 	});
+	$("#taxSubMenu .item").click(function() {
+		var $this = $(this);
+		if($this.hasClass("payment task")) {
+			window.location.replace("/vhctax.html");
+		} else if($this.hasClass("tax template")) {
+			window.location.replace("/taxtmpl.html");
+		} else {
+			console.log("invalid sub menu", $this.attr("class"));
+		}
+	});
 	$('.error.field').on('click','.close', function() {
 		$(this).closest('.message').transition('fade');
 	});

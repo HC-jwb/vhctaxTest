@@ -33,9 +33,9 @@
 		<div class="ui raised segment">
 			<div class="ui blue top attached label"><i class="rupee sign icon"></i>Vehicle Tax Management</div>
 			<div class="left-column-content-container">	
-				<div class="ui blue vertical fluid secondary pointing small menu">
-					<a class="active item"><i class="bell icon"></i>Vehicle Tax Payment Task</a>
-					<a class="item"><i class="copy icon"></i>Payment Task Templates</a>
+				<div class="ui blue vertical fluid secondary pointing small menu" id="taxSubMenu">
+					<a class="active payment task item"><i class="bell icon"></i>Vehicle Tax Payment Task</a>
+					<a class="tax template item"><i class="copy icon"></i>Payment Task Templates</a>
 	   			</div>
 	   		</div>
 		</div>
@@ -110,7 +110,7 @@
 <script src="/js/common.js?v=1.1"></script>
 <script>
 	var VehicleTaxService = {
-			
+
 	};
 	function getDate(element) {
 		var date;
