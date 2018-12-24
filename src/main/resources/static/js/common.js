@@ -9,6 +9,8 @@ var FormUI = {
 	}
 };
 $(function () {
+	NProgress.configure({showSpinner: false});
+	NProgress.start();	NProgress.inc();
 	$("#topMenu .enabled.item").click(function() {
 		var $this = $(this);
 		if($this.hasClass("fuel report")) {
@@ -40,5 +42,6 @@ $(function () {
 		} else {
 			window.location.replace('/login.html');
 		}
+		NProgress.done();
 	});
 });

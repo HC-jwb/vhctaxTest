@@ -1,4 +1,4 @@
-$(document).ready( function () {
+$(function() {
 	$('.ui.hc-fms.login.form').form({
 		fields: {
 			login: {
@@ -22,9 +22,7 @@ $(document).ready( function () {
 		},
 		on: 'submit',
 		onSuccess: tryLogin
-	});
-});
-$(function() {
+	});	
 	if(credRemeberAvl = typeof(Storage) !== "undefined") {	
 		var $credlgn = $("#credlgn");
 		var $credpwd= $("#credpwd");
@@ -58,7 +56,7 @@ $(function() {
 
 function tryLogin (event, fields) {
 	event.preventDefault();
-	//userAuth({login: fields.login, password: fields.password}, procRedirect);
+	/*userAuth({login: fields.login, password: fields.password}, procRedirect);*/
 	AuthApi.authenticate({login: fields.login, password: fields.password}, function(response){
 		if(response.success) {
 			window.location.replace('/fuel.html');

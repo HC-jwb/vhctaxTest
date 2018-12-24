@@ -210,8 +210,8 @@ public class ReportProcessor {
 			fuelDetailRepository.save(detail);
 		}
 */
-		fuelDetailRepository.saveAll(statDetailList.stream().filter(fuelDetail -> {
-			return (fuelDetail != null);
+		fuelDetailRepository.saveAll(statDetailList.stream().filter((fuelDetail) -> {
+			return fuelDetail != null;
 		}).collect(Collectors.toList()));
 	}
 	@Transactional
