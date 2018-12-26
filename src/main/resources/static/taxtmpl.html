@@ -11,7 +11,7 @@
 	<link rel="stylesheet" type="text/css" href="/css/report.css">
 <style>
 	.right-column-content-container {min-width: 1000px;}
-	.ui.small.form .field input {padding: 0.5em;}
+	.ui.form .field input {padding: 0.5em;}
 	.plain-text {font-weight: normal; font-size: 0.9em;}
 </style>
 	<title>Next Generation Smart FMS Platform</title>
@@ -33,7 +33,7 @@
 <div class="main-container">
 	<div class="left-column">
 		<div class="ui raised segment">
-			<div class="ui blue top attached label"><i class="rupee sign icon"></i>Vehicle Tax Management</div>
+			<div class="ui blue top attached label">Vehicle Tax Management</div>
 			<div class="left-column-content-container">
 				<div class="ui blue vertical fluid secondary pointing small menu" id="taxSubMenu">
 					<a class="payment task item"><i class="bell icon"></i>Vehicle Tax Payment Task</a>
@@ -65,73 +65,68 @@
 		<div class="fields">
 			<div class="five wide field">
 				<label>Service Title</label>
-				<input type="text" name="serviceTitle" placeHolder="Enter service title">
+				<input type="text" name="title" placeHolder="Enter service title">
 			</div>
 							
 			<div class="eleven wide field">	
 				<label>Description</label>
-				<input type="text" name="serviceDesc" placeHolder="Enter service description">
+				<input type="text" name="description" placeHolder="Enter service description">
 			</div>
 		</div>
 		<div class="fields">
 			<div class="eight wide field">
-				<div class="ui segment">
+				<div class="ui vhc-cert segment">
 					<div class="ui blue top attached label"><i class="car icon"></i> Vehicle Certificate</div>
-					<div class="ui small form">
-						<div class="inline fields">
-							<label for="schCertEndsOn">Schedule ends on Every :</label>
-							<div class="field"><input type="radio" name="schCertEndsOn" value="1"><label>1 year</label></div>
-							<div class="field"><input type="radio" name="schCertEndsOn" checked value="5"><label>5 years</label></div>
-						</div>
-						<div class="inline fields">
-							<label>Payment &nbsp;Cost:</label>
-							<div class="field">
-								<input type="text" name="cost" placeholder="0.00" style="text-align: right;">
-							</div>
-						</div>
-						<div class="inline fields">
-							<label>Remind Before:</label>
-							<div class="field">
-								<input type="number" name="remindBefore" placeholder="0" style="text-align: right;"> days
-							</div>
-						</div>
-						<div class="ui horizontal divider"><i class="alarm icon"></i> <span class="plain-text">Notification</span></div>
-						<div class="fields">
-							<div class="eight wide field"><label>SMS notification</label><input type="text" name="smsNotification"></div>
-							<div class="eight wide field"><label>Email notification</label><input type="text" name="emailNotification"></div>
-						</div>
+					<div class="inline fields">
+						<label>Schedule ends on Every :</label>
+						<div class="field"><div class="ui radio checkbox"><input type="radio" name="certificationInterval" value="1"><label>1 year</label></div></div>
+						<div class="field"><div class="ui radio checked checkbox"><input type="radio" name="certificationInterval" value="5"><label>5 years</label></div></div>
+					</div>
+					<div class="inline fields">
+						<label>Payment &nbsp;Cost:</label>
+						<div class="field"><input type="text" name="certificationCost" placeholder="0.00" style="text-align: right;"> RP</div>
+					</div>
+					<div class="inline fields">
+						<label>Remind Before:</label>
+						<div class="field"><input type="number" name="certificationRemindBeforeDays" placeholder="0" style="text-align: right;"> days</div>
+					</div>
+					<div class="ui horizontal divider"><i class="alarm icon"></i> <span class="plain-text"> Notification</span></div>
+					<div class="fields">
+						<div class="eight wide field"><label><i class="comments alternate icon"></i>SMS notification</label><input type="text" name="certNotificationSms"></div>
+						<div class="eight wide field"><label><i class="envelope icon"></i>Email notification</label><input type="text" name="certNotificationEmail"></div>
 					</div>
 				</div>
 			</div><!--  end of vehicle certification segment containing field-->
 			<div class="eight wide field">
-				<div class="ui segment">
+				<div class="ui vhc-tax segment">
 					<div class="ui blue top attached label"><i class="money bill alternate outline icon"></i> Vehicle Tax</div>
-					<div class="ui small form">
-						<div class="inline fields">
-							<label for="schTaxEndsOn">Schedule ends on Every :</label>
-							<div class="field"><input type="radio" name="schTaxEndsOn" checked value="1"><label>1 year</label></div>
-							<div class="field"><input type="radio" name="schTaxEndsOn" value="5"><label>5 years</label></div>
-						</div>
-						<div class="inline fields">
-							<label>Payment &nbsp;Cost:</label>
-							<div class="field"><input type="text" name="cost" placeholder="0.00" style="text-align: right;"></div>
-						</div>
-						<div class="inline fields">
-							<label>Remind Before:</label>
-							<div class="field"><input type="number" name="remindBefore" placeholder="0" style="text-align: right;"> days</div>
-						</div>
-						<div class="ui horizontal divider"><i class="alarm icon"></i><span class="plain-text">Notification</span></div>
-						<div class="fields">
-							<div class="eight wide field"><label>SMS notification</label><input type="text" name="smsNotification"></div>
-							<div class="eight wide field"><label>Email notification</label><input type="text" name="emailNotification"></div>
-						</div>
+					<div class="inline fields">
+						<label>Schedule ends on Every :</label>
+						<div class="field"><div class="ui radio checked checkbox"><input type="radio" name="taxInterval" value="1"><label>1 year</label></div></div>
+						<div class="field"><div class="ui radio checkbox"><input type="radio" name="taxInterval" value="5"><label>5 years</label></div></div>
+					</div>
+					<div class="inline fields">
+						<label>Payment &nbsp;Cost:</label>
+						<div class="field"><input type="text" name="taxCost" placeholder="0.00" style="text-align: right;"> RP</div>
+					</div>
+					<div class="inline fields">
+						<label>Remind Before:</label>
+						<div class="field"><input type="number" name="taxRemindBeforeDays" placeholder="0" style="text-align: right;"> days</div>
+					</div>
+					<div class="ui horizontal divider"><i class="alarm icon"></i><span class="plain-text"> Notification</span></div>
+					<div class="fields">
+						<div class="eight wide field"><label><i class="comments alternate icon"></i>SMS notification</label><input type="text" name="taxNotificationSms"></div>
+						<div class="eight wide field"><label><i class="envelope icon"></i>Email notification</label><input type="text" name="taxNotificationEmail"></div>
 					</div>
 				</div>
 			</div><!--  end of vehicle tax segment containing field-->
 		</div>
 		<div class="field">
+			<div class="ui small message"><i class="hand point right outline icon"></i>Notifications will always be available on web interface UI</div>
+		</div>
+		<div class="field">
 			<div style="text-align: center;">
-				<div class="ui teal right labeled icon small basic compact button">Save<i class="save icon"></i></div>
+				<div class="ui blue right labeled icon small basic save compact button">Save<i class="save icon"></i></div>
 				<div class="ui right labeled icon small basic close compact button">Close <i class="x icon"></i></div>
 			</div>	
 		</div>
@@ -145,16 +140,52 @@
 <script src="/js/common.api.js"></script>
 <script src="/js/common.js?v=1.1"></script>
 <script>
-	$(function() {
-		var $templateModal = $("#templateModal");
-		$templateModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
-		$templateModal.find(".close.button").click(function() {
-			$templateModal.modal('hide');
+var TaxServiceApi = {
+	apiBase:'/vhctax/api',
+	createTemplateUri: '/tmpl/create',
+	createPaymentTemplate: function(tmplJson, callback) {
+		Api.postJson(this.apiBase + this.createTemplateUri, tmplJson, callback, function(response) {
+			FormUI.displayMsgIn($form, 'Failed due to communication error!');
 		});
-		$(".ui.add.button").click(function() {
-			$templateModal.modal("show");
-		});
+	}
+};
+function saveTemplate() {
+	$form.form("validate form");
+	if(!$form.form('is valid')) return;
+	var svcTmpl = $form.form('get values');
+	TaxServiceApi.createPaymentTemplate(svcTmpl, function(response) {
+		if(!response.success) {
+			FormUI.displayMsgIn($form, response.status.description);
+		} else {
+			console.log(response.payload);
+		}
 	});
+}
+function showModal() {
+	$form.form('clear');
+	$('.ui.radio.checked.checkbox').checkbox('set checked');
+	$templateModal.modal("show");
+}
+var $templateModal, $form;
+$(function() {
+	$(".ui.radio.checkbox").checkbox();
+	$templateModal = $("#templateModal");
+	$templateModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
+	$form = $templateModal.find(".ui.form");
+	$form.form({fields: {title:'empty', description:'empty'}});
+	
+	$form.find(".ui.button").click(function() {
+		var $this = $(this);
+		if($this.hasClass("close")) {
+			$templateModal.modal('hide');
+		} else if($this.hasClass("save")) {
+			saveTemplate();
+		}
+	});
+	$(".ui.add.button").click(showModal);
+	
+	
+});
 </script>
 </body>
 </html>

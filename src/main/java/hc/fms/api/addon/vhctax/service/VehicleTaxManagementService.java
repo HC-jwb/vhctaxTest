@@ -53,4 +53,7 @@ public class VehicleTaxManagementService {
 		List<ServiceTemplate> tmplList = serviceTemplateRepository.findAllByOrderById();
 		return tmplList;
 	}
+	public ServiceTemplate createServiceTemplate(ServiceTemplate svcTmpl) {
+		return serviceTemplateRepository.save(svcTmpl);
+	}
 }

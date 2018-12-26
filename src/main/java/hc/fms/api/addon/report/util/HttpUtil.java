@@ -32,4 +32,11 @@ public class HttpUtil {
 		}*/
 		return hash;
 	}
+	public static String validateSession(HttpSession session) {
+		String hashKey = null;
+		if((hashKey = hashKey(session)) == null) {
+			throw new RuntimeException("No session hash key!!");
+		}
+		return hashKey;
+	}
 }
