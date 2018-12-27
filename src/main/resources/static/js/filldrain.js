@@ -98,6 +98,7 @@ function refreshStatus(pendingReportGenIds) {
 	});
 }
 function closeAccordion() {
+	FormUI.resetMsgIn($reportGenFrm);
 	$reportGenAccordion.accordion('close', 0);
 }
 function buildReportTab(sectionList) {

@@ -2,11 +2,15 @@ var FormUI = {
 	errMsgDiv: '<div class="ui error message"><i class="close icon"></i><span class="msg" style="padding: 1em;"></span></div>'
 	, displayMsgIn: function ($frm, msg) {
 		setTimeout(function() {
-			$frm.find(".error.field").empty().append(FormUI.errMsgDiv);
-			$frm.find(".error.field .error.message .msg").text(msg);
+			$frm.find(".error-description.field").empty().append(FormUI.errMsgDiv);
+			$frm.find(".error-description.field .error.message .msg").text(msg);
 			$frm.removeClass("success").addClass("error");
 		}, 100);
+	},
+	resetMsgIn: function($frm) {
+		$frm.find(".error-description.field").empty();
 	}
+	
 };
 $(function () {
 	NProgress.configure({showSpinner: false});
@@ -33,7 +37,7 @@ $(function () {
 			console.log("invalid sub menu", $this.attr("class"));
 		}
 	});
-	$('.error.field').on('click','.close', function() {
+	$('.error-description.field').on('click','.close', function() {
 		$(this).closest('.message').transition('fade');
 	});
 	AuthApi.validateSession(function(response) {

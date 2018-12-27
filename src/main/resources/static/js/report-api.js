@@ -77,6 +77,7 @@ var ReportApi = {
 		}
 	}
 };
+/*
 $.datepicker.setDefaults({
 	dateFormat: 'yy-mm-dd',
 	prevText: '이전 달',
@@ -88,7 +89,7 @@ $.datepicker.setDefaults({
 	dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
 	showMonthAfterYear: true,
 	yearSuffix: '년'
-});
+});*/
 Date.prototype.yyyyMMdd = function() {
 	var yyyy = this.getFullYear();
 	var MM = this.getMonth() + 1;

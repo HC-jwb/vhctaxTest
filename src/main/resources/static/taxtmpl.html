@@ -84,11 +84,11 @@
 					</div>
 					<div class="inline fields">
 						<label>Payment &nbsp;Cost:</label>
-						<div class="field"><input type="text" name="certificationCost" placeholder="0.00" style="text-align: right;"> RP</div>
+						<div class="field"><input type="text" name="certificationCost" class="certcost-input" placeholder="0.00" style="text-align: right;"> RP</div>
 					</div>
 					<div class="inline fields">
 						<label>Remind Before:</label>
-						<div class="field"><input type="number" name="certificationRemindBeforeDays" placeholder="0" style="text-align: right;"> days</div>
+						<div class="field"><input type="number" name="certificationRemindBeforeDays" placeholder="0" min="0" style="text-align: right;"> days</div>
 					</div>
 					<div class="ui horizontal divider"><i class="alarm icon"></i> <span class="plain-text"> Notification</span></div>
 					<div class="fields">
@@ -107,11 +107,11 @@
 					</div>
 					<div class="inline fields">
 						<label>Payment &nbsp;Cost:</label>
-						<div class="field"><input type="text" name="taxCost" placeholder="0.00" style="text-align: right;"> RP</div>
+						<div class="field"><input type="text" name="taxCost" class="taxcost-input" placeholder="0.00" style="text-align: right;"> RP</div>
 					</div>
 					<div class="inline fields">
 						<label>Remind Before:</label>
-						<div class="field"><input type="number" name="taxRemindBeforeDays" placeholder="0" style="text-align: right;"> days</div>
+						<div class="field"><input type="number" name="taxRemindBeforeDays" placeholder="0" min="0" style="text-align: right;"> days</div>
 					</div>
 					<div class="ui horizontal divider"><i class="alarm icon"></i><span class="plain-text"> Notification</span></div>
 					<div class="fields">
@@ -124,6 +124,7 @@
 		<div class="field">
 			<div class="ui small message"><i class="hand point right outline icon"></i>Notifications will always be available on web interface UI</div>
 		</div>
+		<div class="error-description field"></div>
 		<div class="field">
 			<div style="text-align: center;">
 				<div class="ui blue right labeled icon small basic save compact button">Save<i class="save icon"></i></div>
@@ -137,6 +138,7 @@
 <script src="/js/jquery-ui.min.js"></script>
 <script src="/js/jquery.tablesort.min.js"></script>
 <script src="/js/modules.min.js"></script>
+<script src="/js/cleave.min.js"></script>
 <script src="/js/common.api.js"></script>
 <script src="/js/common.js?v=1.1"></script>
 <script>
@@ -154,10 +156,11 @@ function saveTemplate() {
 	if(!$form.form('is valid')) return;
 	var svcTmpl = $form.form('get values');
 	TaxServiceApi.createPaymentTemplate(svcTmpl, function(response) {
-		if(!response.success) {
-			FormUI.displayMsgIn($form, response.status.description);
-		} else {
+		if(response.success) {
 			console.log(response.payload);
+			hideModal();
+		} else {
+			FormUI.displayMsgIn($form, response.status.description);
 		}
 	});
 }
@@ -166,13 +169,17 @@ function showModal() {
 	$('.ui.radio.checked.checkbox').checkbox('set checked');
 	$templateModal.modal("show");
 }
+function hideModal() {
+	$templateModal.modal("hide");
+	FormUI.resetMsgIn($form);
+}
 var $templateModal, $form;
 $(function() {
 	$(".ui.radio.checkbox").checkbox();
 	$templateModal = $("#templateModal");
 	$templateModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
 	$form = $templateModal.find(".ui.form");
-	$form.form({fields: {title:'empty', description:'empty'}});
+	$form.form({fields: {title:'empty', description:'empty', certificationCost:'number', certificationCost:'empty', taxCost:'empty'}});
 	
 	$form.find(".ui.button").click(function() {
 		var $this = $(this);
@@ -183,7 +190,14 @@ $(function() {
 		}
 	});
 	$(".ui.add.button").click(showModal);
-	
+	var cleave = new Cleave('.taxcost-input', {
+	    numeral: true,
+	    numeralThousandsGroupStyle: 'thousand'
+	});
+	cleave = new Cleave('.certcost-input', {
+	    numeral: true,
+	    numeralThousandsGroupStyle: 'thousand'
+	});
 	
 });
 </script>
