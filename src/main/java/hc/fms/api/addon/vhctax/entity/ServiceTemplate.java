@@ -32,10 +32,6 @@ public class ServiceTemplate {
 	private Double certificationCost;
 	@Column(name="cert_remind")
 	private Integer certificationRemindBeforeDays;
-	@Column(name="cert_noti_sms")
-	private String certNotificationSms;
-	@Column(name="cert_noti_email")
-	private String certNotificationEmail;
 	
 	@Column(name="tax_interval")
 	private Integer taxInterval;//year
@@ -43,8 +39,9 @@ public class ServiceTemplate {
 	private Double taxCost;
 	@Column(name="tax_remind")
 	private Integer taxRemindBeforeDays;
-	@Column(name="tax_noti_sms")
-	private String taxNotificationSms;
-	@Column(name="tax_noti_email")
-	private String taxNotificationEmail;
+
+	@Column(name="noti_sms")
+	private String notificationSms;
+	@Column(name="noti_email")
+	private String notificationEmail;
 }

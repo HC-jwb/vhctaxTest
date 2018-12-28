@@ -47,16 +47,22 @@
 			<div class="ui right aligned basic segment" style="padding-bottom: 0; margin: 0;">
 				<div class="ui basic tiny buttons">
 					<div class="ui compact icon add button" title="Add new template"><i class="orange plus squre icon"></i></div>
-					<div class="ui compact icon remove button" title="Remove selected template"><i class="red minus squre icon"></i></div>
 				</div>
 			</div>
-			<table class="ui celled teal striped compact small table" id="tmplListTable" style="margin-top: 0.5em;">
-				<thead>
-				<tr><th class="center aligned">Service Title</th><th class="center aligned">Description</th><th class="center aligned">View Detail(Edit)</th></tr>
-				</thead>
-				<tbody></tbody>
-			</table>		
-		
+			<div class="ui basic segment" style="padding-top: 0;">
+				<div class="ui loader"  id="tableLoader"></div>
+				<table class="ui celled teal striped compact small table" id="tmplListTable" style="margin-top: 0.5em;">
+					<thead>
+					<tr>
+						<th class="center aligned">No.</th>
+						<th class="center aligned">Service Title</th><th class="center aligned">Description</th>
+						<th class="center aligned">Email</th><th class="center aligned">SMS</th>
+						<th class="center aligned collapsing">Edit/Remove</th>
+					</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>		
 		</div><!-- end of right column content container -->
 	</div><!--  end of right column -->
 </div><!-- end of main -->
@@ -67,7 +73,7 @@
 				<label>Service Title</label>
 				<input type="text" name="title" placeHolder="Enter service title">
 			</div>
-							
+
 			<div class="eleven wide field">	
 				<label>Description</label>
 				<input type="text" name="description" placeHolder="Enter service description">
@@ -90,11 +96,6 @@
 						<label>Remind Before:</label>
 						<div class="field"><input type="number" name="certificationRemindBeforeDays" placeholder="0" min="0" style="text-align: right;"> days</div>
 					</div>
-					<div class="ui horizontal divider"><i class="alarm icon"></i> <span class="plain-text"> Notification</span></div>
-					<div class="fields">
-						<div class="eight wide field"><label><i class="comments alternate icon"></i>SMS notification</label><input type="text" name="certNotificationSms"></div>
-						<div class="eight wide field"><label><i class="envelope icon"></i>Email notification</label><input type="text" name="certNotificationEmail"></div>
-					</div>
 				</div>
 			</div><!--  end of vehicle certification segment containing field-->
 			<div class="eight wide field">
@@ -113,14 +114,14 @@
 						<label>Remind Before:</label>
 						<div class="field"><input type="number" name="taxRemindBeforeDays" placeholder="0" min="0" style="text-align: right;"> days</div>
 					</div>
-					<div class="ui horizontal divider"><i class="alarm icon"></i><span class="plain-text"> Notification</span></div>
-					<div class="fields">
-						<div class="eight wide field"><label><i class="comments alternate icon"></i>SMS notification</label><input type="text" name="taxNotificationSms"></div>
-						<div class="eight wide field"><label><i class="envelope icon"></i>Email notification</label><input type="text" name="taxNotificationEmail"></div>
-					</div>
 				</div>
 			</div><!--  end of vehicle tax segment containing field-->
 		</div>
+		<div class="ui horizontal divider"><i class="alarm icon"></i><span class="plain-text"> Notification</span></div>
+					<div class="fields">
+						<div class="eight wide field"><label><i class="comments alternate icon"></i>SMS notification</label><input type="text" name="notificationSms"></div>
+						<div class="eight wide email field"><label><i class="envelope icon"></i>Email notification</label><input type="text" name="notificationEmail"></div>
+					</div>
 		<div class="field">
 			<div class="ui small message"><i class="hand point right outline icon"></i>Notifications will always be available on web interface UI</div>
 		</div>
@@ -143,10 +144,22 @@
 <script src="/js/common.js?v=1.1"></script>
 <script>
 var TaxServiceApi = {
-	apiBase:'/vhctax/api',
-	createTemplateUri: '/tmpl/create',
+	apiBase:'/vhctax/api/',
+	createTemplateUri: 'tmpl/create',
+	removeTemplateUri:'tmpl/remove',
+	listTemplateUri:'tmpl/list',
 	createPaymentTemplate: function(tmplJson, callback) {
 		Api.postJson(this.apiBase + this.createTemplateUri, tmplJson, callback, function(response) {
+			FormUI.displayMsgIn($form, 'Failed due to communication error!');
+		});
+	},
+	removePaymentTemplate: function(id, callback) {
+		Api.sendGet(this.apiBase + this.removeTemplateUri + '/' + id, callback, function(res) {
+			FormUI.displayMsgIn($form, 'Failed due to communication error!');
+		});
+	},
+	listPaymentTemplate: function(callback) {
+		Api.sendGet(this.apiBase + this.listTemplateUri, callback, function(res) {
 			FormUI.displayMsgIn($form, 'Failed due to communication error!');
 		});
 	}
@@ -155,14 +168,55 @@ function saveTemplate() {
 	$form.form("validate form");
 	if(!$form.form('is valid')) return;
 	var svcTmpl = $form.form('get values');
+	svcTmpl.notificationEmail = $.trim(svcTmpl.notificationEmail);
+	if(svcTmpl.notificationEmail && !validateEmail(svcTmpl.notificationEmail)) {
+		$form.find(".email.field").addClass("error");
+		return;
+	}
+	svcTmpl.certificationCost = svcTmpl.certificationCost.replace(/\,/g,"");
+	svcTmpl.taxCost = svcTmpl.taxCost.replace(/\,/g,"");
 	TaxServiceApi.createPaymentTemplate(svcTmpl, function(response) {
 		if(response.success) {
 			console.log(response.payload);
-			hideModal();
+			listServiceTemplate();
 		} else {
 			FormUI.displayMsgIn($form, response.status.description);
 		}
 	});
+}
+function listServiceTemplate() {
+	$tableLoader.addClass("active");
+	TaxServiceApi.listPaymentTemplate(function(response) {
+		if(response.success) {
+			buildTemplateListTable(response.payload);
+			hideModal();
+		} else {
+			alert(response.status.description);
+		}
+		setTimeout(function() {$tableLoader.removeClass("active")}, 200);
+	});
+}
+function buildTemplateListTable(tmplList) {
+	var $TBODY = $tmplListTable.find("tbody");
+	$TBODY.empty();
+	var len = tmplList.length;
+	if(len) {
+		var $TR = $("<tr></tr>");
+		var $clone;
+		for(var i = 0; i < len; i++) {
+			$clone = $TR.clone(false);
+			$clone.data('tmplid', tmplList[i].id);
+			$clone.append("<td class='right aligned collapsing'>" +(i+1) + "</td>");
+			$clone.append("<td>" +tmplList[i].title+"</td>");
+			$clone.append("<td>" +tmplList[i].description+"</td>");
+			$clone.append("<td class='collapsing'>" +tmplList[i].notificationEmail+"</td>");
+			$clone.append("<td class='collapsing'>" +tmplList[i].notificationSms+"</td>");
+			$clone.append("<td class='center aligned'><div class='ui mini compact icon blue edit basic button' title='view and edit template'><i class='edit icon'></i></div><div class='ui mini compact icon red basic delete button' title='remove template'><i class='x icon'></i></div></td>");
+			$TBODY.append($clone);
+		}
+	} else {
+		$TBODY.append("<tr><td colspan='6' class='center aligned'>No template found.</td></tr>");
+	}
 }
 function showModal() {
 	$form.form('clear');
@@ -173,10 +227,12 @@ function hideModal() {
 	$templateModal.modal("hide");
 	FormUI.resetMsgIn($form);
 }
-var $templateModal, $form;
+var $templateModal, $form, $tmplListTable, $loadingSegment;
 $(function() {
 	$(".ui.radio.checkbox").checkbox();
+	$tmplListTable = $("#tmplListTable");
 	$templateModal = $("#templateModal");
+	$tableLoader = $("#tableLoader");
 	$templateModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
 	$form = $templateModal.find(".ui.form");
 	$form.form({fields: {title:'empty', description:'empty', certificationCost:'number', certificationCost:'empty', taxCost:'empty'}});
@@ -184,7 +240,7 @@ $(function() {
 	$form.find(".ui.button").click(function() {
 		var $this = $(this);
 		if($this.hasClass("close")) {
-			$templateModal.modal('hide');
+			hideModal();
 		} else if($this.hasClass("save")) {
 			saveTemplate();
 		}
@@ -198,7 +254,7 @@ $(function() {
 	    numeral: true,
 	    numeralThousandsGroupStyle: 'thousand'
 	});
-	
+	listServiceTemplate();
 });
 </script>
 </body>

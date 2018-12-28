@@ -28,7 +28,7 @@ var Api = {
 		});
 	}, sendGet: function(url, callback) {
 		$.getJSON(url, callback).fail(function(res) {
-			console.log("$.getJson failed ");
+			callback({success: false, status: {description: "$.getJson failed "}});
 		});
 	}, sendAuth:function (authObj, callback) {
 		$.ajax(ApiURL.auth,{type:'POST', data: authObj, 

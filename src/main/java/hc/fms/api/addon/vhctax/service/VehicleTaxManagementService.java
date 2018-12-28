@@ -56,4 +56,8 @@ public class VehicleTaxManagementService {
 	public ServiceTemplate createServiceTemplate(ServiceTemplate svcTmpl) {
 		return serviceTemplateRepository.save(svcTmpl);
 	}
+
+	public void deleteServiceTemplate(Long id) {
+		serviceTemplateRepository.deleteById(id);
+	}
 }

@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,6 +67,19 @@ public class VehicleTaxManagementController {
 			HttpUtil.validateSession(session);
 			ServiceTemplate savedTmpl = vhcTaxManagementService.createServiceTemplate(svcTmpl);
 			response.setPayload(savedTmpl);
+			response.setSuccess(true);
+		} catch(Exception e) {
+			response.setStatus(new ResponseStatus(e.getMessage()));
+		}
+		return response;
+	}
+	@RequestMapping("tmpl/remove/{id}")
+	public ResponseContainer<Long> removeServiceTemplate(@PathVariable("id") Long id, HttpSession session) {
+		ResponseContainer<Long> response = new ResponseContainer<>();
+		try {
+			HttpUtil.validateSession(session);
+			vhcTaxManagementService.deleteServiceTemplate(id);
+			response.setPayload(id);
 			response.setSuccess(true);
 		} catch(Exception e) {
 			response.setStatus(new ResponseStatus(e.getMessage()));
