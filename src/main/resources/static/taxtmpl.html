@@ -146,9 +146,10 @@
 var TaxServiceApi = {
 	apiBase:'/vhctax/api/',
 	createTemplateUri: 'tmpl/create',
+	getPaymentTemplateUri: 'tmpl/get',
 	removeTemplateUri:'tmpl/remove',
 	listTemplateUri:'tmpl/list',
-	createPaymentTemplate: function(tmplJson, callback) {
+	savePaymentTemplate: function(tmplJson, callback) {
 		Api.postJson(this.apiBase + this.createTemplateUri, tmplJson, callback, function(response) {
 			FormUI.displayMsgIn($form, 'Failed due to communication error!');
 		});
@@ -162,12 +163,18 @@ var TaxServiceApi = {
 		Api.sendGet(this.apiBase + this.listTemplateUri, callback, function(res) {
 			FormUI.displayMsgIn($form, 'Failed due to communication error!');
 		});
+	},
+	getPaymentTemplate: function(id, callback) {
+		Api.sendGet(this.apiBase + this.getPaymentTemplateUri + '/' + id, callback, function(res) {
+			FormUI.displayMsgIn($form, 'Failed due to communication error!');
+		});
 	}
 };
 function saveTemplate() {
 	$form.form("validate form");
 	if(!$form.form('is valid')) return;
 	var svcTmpl = $form.form('get values');
+	svcTmpl.id = $form.data("id");/*if id is not null, it means updating existing template*/
 	svcTmpl.notificationEmail = $.trim(svcTmpl.notificationEmail);
 	if(svcTmpl.notificationEmail && !validateEmail(svcTmpl.notificationEmail)) {
 		$form.find(".email.field").addClass("error");
@@ -175,7 +182,7 @@ function saveTemplate() {
 	}
 	svcTmpl.certificationCost = svcTmpl.certificationCost.replace(/\,/g,"");
 	svcTmpl.taxCost = svcTmpl.taxCost.replace(/\,/g,"");
-	TaxServiceApi.createPaymentTemplate(svcTmpl, function(response) {
+	TaxServiceApi.savePaymentTemplate(svcTmpl, function(response) {
 		if(response.success) {
 			console.log(response.payload);
 			listServiceTemplate();
@@ -218,9 +225,38 @@ function buildTemplateListTable(tmplList) {
 		$TBODY.append("<tr><td colspan='6' class='center aligned'>No template found.</td></tr>");
 	}
 }
-function showModal() {
+
+function loadPaymentTemplateForEdit(id) {
+	TaxServiceApi.getPaymentTemplate(id, function(response) {
+		if(response.success) {
+			showModal(response.payload);
+		} else {
+			alert(response.status.description);
+		}
+	});
+}
+function removePaymentTemplate(id) {
+	$tableLoader.addClass("active");
+	TaxServiceApi.removePaymentTemplate(id, function(response) {
+		if(response.success) {
+			listServiceTemplate();
+		} else {
+			alert(response.status.description);
+		}
+	});
+}
+function showModal(tmpl) {
+	$form.data('id', null);
 	$form.form('clear');
-	$('.ui.radio.checked.checkbox').checkbox('set checked');
+	if(typeof(tmpl) === 'undefined' ) {
+		$('.ui.radio.checked.checkbox').checkbox('set checked');
+	} else {
+		$form.data('id', tmpl.id);
+		tmpl.certificationCost = addCommas(tmpl.certificationCost);
+		tmpl.taxCost = addCommas(tmpl.taxCost);
+		$form.form('set values', tmpl);
+	}
+	
 	$templateModal.modal("show");
 }
 function hideModal() {
@@ -237,6 +273,15 @@ $(function() {
 	$form = $templateModal.find(".ui.form");
 	$form.form({fields: {title:'empty', description:'empty', certificationCost:'number', certificationCost:'empty', taxCost:'empty'}});
 	
+	$tmplListTable.on("click", "tbody > tr > td > .ui.button", function() {
+		var $this = $(this);
+		var id = $this.parent().parent().data("tmplid");
+		if($this.hasClass("edit")) {
+			loadPaymentTemplateForEdit(id);
+		} else if($this.hasClass("delete")) {
+			removePaymentTemplate(id);
+		}
+	});
 	$form.find(".ui.button").click(function() {
 		var $this = $(this);
 		if($this.hasClass("close")) {
@@ -245,7 +290,7 @@ $(function() {
 			saveTemplate();
 		}
 	});
-	$(".ui.add.button").click(showModal);
+	$(".ui.add.button").click(function() {showModal(); });
 	var cleave = new Cleave('.taxcost-input', {
 	    numeral: true,
 	    numeralThousandsGroupStyle: 'thousand'

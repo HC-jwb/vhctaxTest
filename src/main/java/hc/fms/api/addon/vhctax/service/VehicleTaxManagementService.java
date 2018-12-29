@@ -1,6 +1,7 @@
 package hc.fms.api.addon.vhctax.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -53,11 +54,16 @@ public class VehicleTaxManagementService {
 		List<ServiceTemplate> tmplList = serviceTemplateRepository.findAllByOrderById();
 		return tmplList;
 	}
-	public ServiceTemplate createServiceTemplate(ServiceTemplate svcTmpl) {
+	public ServiceTemplate createUpdateServiceTemplate(ServiceTemplate svcTmpl) {
 		return serviceTemplateRepository.save(svcTmpl);
 	}
 
 	public void deleteServiceTemplate(Long id) {
 		serviceTemplateRepository.deleteById(id);
+	}
+
+	public Optional<ServiceTemplate> getServiceTemplate(Long id) {
+		Optional<ServiceTemplate> opt = serviceTemplateRepository.findById(id);
+		return opt;
 	}
 }
