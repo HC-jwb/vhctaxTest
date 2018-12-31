@@ -11,7 +11,7 @@
 	<link rel="stylesheet" type="text/css" href="/css/report.css">
 <style>
 	.right-column-content-container {min-width: 1000px;}
-	
+	.ui.checkbox.no-label {font-size: 0;}
 </style>
 	<title>Next Generation Smart FMS Platform</title>
 </head>
@@ -44,7 +44,7 @@
 	<div class="right-column">
 		<div class="right-column-content-container">
 			<div class="ui divider"></div>
-			<div class="ui small form" id="searchFrm">
+			<div class="ui small form" id="actionFrm">
 				<div class="inline fields">
 					<div class="four wide field">
 						<label>Group by:</label>
@@ -79,18 +79,19 @@
 						</div>
 					</div>
 					<div class="three wide field">
-						<div class="ui blue small compact icon basic button"><i class="edit icon"></i></div>
-						<div class="ui blue small compact icon basic button"><i class="check icon"></i></div>
-						<div class="ui blue small compact icon basic button"><i class="print icon"></i></div>
+						<div class="ui orange tiny compact icon basic add button" title="add new tax payment task"><i class="plus icon"></i></div>
+						<div class="ui tiny compact icon basic button"><i class="check icon"></i></div>
+						<div class="ui tiny compact icon basic button"><i class="print icon"></i></div>
+						<div class="ui tiny compact icon basic button"><i class="trash alternate icon"></i></div>
 					</div>
 				</div>
 			</div>
 			<table class="ui celled teal striped compact small sortable table" id="vhcListTable" style="margin-top: 0.2em;">
 				<thead>
 				<tr>
+					<th class="center aligned collapsing"><div class="ui checkbox no-label"><input type="checkbox" name="chkAll"></div></th>
 					<th class="center aligned">Label</th>
 					<th class="center aligned">Model</th>
-					<!-- <th class="center aligned">Device ID</th> -->
 					<th class="center aligned">Plate No.</th>
 					<th class="center aligned">Payment Type</th>
 					<th class="center aligned">Cost</th>
@@ -103,6 +104,10 @@
 		</div><!-- end of right column content container -->
 	</div><!--  end of right column -->
 </div><!-- end of main -->
+<div class="ui segment modal" id="vhcPaymentTaskModal">
+	<div class="ui small form">
+	</div>
+</div>
 <script src="/js/nprogress.js"></script>
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/jquery-ui.min.js"></script>
@@ -111,9 +116,33 @@
 <script src="/js/common.api.js"></script>
 <script src="/js/common.js?v=1.1"></script>
 <script>
-	var VehicleTaxService = {
-
-	};
+var TaxServiceApi = {
+	apiBase:'/vhctax/api/',
+	createTemplateUri: 'tmpl/create',
+	getPaymentTemplateUri: 'tmpl/get',
+	removeTemplateUri:'tmpl/remove',
+	listTemplateUri:'tmpl/list',
+	savePaymentTemplate: function(tmplJson, callback) {
+		Api.postJson(this.apiBase + this.createTemplateUri, tmplJson, callback, function(response) {
+			callback({success:false, status: {description: 'Failed due to communication error!'}});
+		});
+	},
+	removePaymentTemplate: function(id, callback) {
+		Api.sendGet(this.apiBase + this.removeTemplateUri + '/' + id, callback, function(res) {
+			callback({success:false, status: {description: 'Failed due to communication error!'}});
+		});
+	},
+	listPaymentTemplate: function(callback) {
+		Api.sendGet(this.apiBase + this.listTemplateUri, callback, function(res) {
+			callback({success:false, status: {description: 'Failed due to communication error!'}});
+		});
+	},
+	getPaymentTemplate: function(id, callback) {
+		Api.sendGet(this.apiBase + this.getPaymentTemplateUri + '/' + id, callback, function(res) {
+			callback({success:false, status: {description: 'Failed due to communication error!'}});
+		});
+	}
+};
 	function getDate(element) {
 		var date;
 		try {
@@ -121,7 +150,12 @@
 		} catch(error) { date = null; }
 		return date;
 	}
+	var $vhcPaymentTaskModal, $actionFrm;
 	$(function() {
+		$actionFrm = $("#actionFrm");
+		$vhcPaymentTaskModal = $("#vhcPaymentTaskModal");
+		$vhcPaymentTaskModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:true});
+		$(".ui.checkbox").checkbox();
 		$(".ui.dropdown").dropdown();
 		$(".ui.sortable.table").tablesort();
 		from = $("#fromDate").datepicker({dateFormat:'yy-mm-dd', defaultDate: "0d", numberOfMonths:2, changeMonth: true})
@@ -131,6 +165,9 @@
 		to = $("#toDate" ).datepicker({dateFormat:'yy-mm-dd', defaultDate: "+4w", numberOfMonths:2, changeMonth: true})
 		.on("change", function() {
 			from.datepicker( "option", "maxDate", getDate(this));
+		});
+		$actionFrm.find(".ui.add.button").click(function() {
+			$vhcPaymentTaskModal.modal("show");
 		});
 	});
 </script>

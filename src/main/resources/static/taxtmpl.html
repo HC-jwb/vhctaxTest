@@ -44,12 +44,13 @@
 	</div>
 	<div class="right-column">
 		<div class="right-column-content-container">
-			<div class="ui right aligned basic segment" style="padding-bottom: 0; margin: 0;">
-				<div class="ui basic tiny buttons">
-					<div class="ui compact icon add button" title="Add new template"><i class="orange plus squre icon"></i></div>
+			<div class="ui basic segment" style="padding-bottom: 0; margin: 0;">
+				<div class="ui grid">
+					<div class="ten wide column"><div class="ui tag label">Templates for tax payment task</div></div>
+					<div class="six wide right aligned column"><div class="ui compact icon add tiny basic button" title="Add new template"><i class="orange plus squre icon"></i></div></div>
 				</div>
 			</div>
-			<div class="ui basic segment" style="padding-top: 0;">
+			<div class="ui basic segment" style="padding-top: 0;margin-top: 0;">
 				<div class="ui loader"  id="tableLoader"></div>
 				<table class="ui celled teal striped compact small table" id="tmplListTable" style="margin-top: 0.5em;">
 					<thead>
@@ -151,22 +152,22 @@ var TaxServiceApi = {
 	listTemplateUri:'tmpl/list',
 	savePaymentTemplate: function(tmplJson, callback) {
 		Api.postJson(this.apiBase + this.createTemplateUri, tmplJson, callback, function(response) {
-			FormUI.displayMsgIn($form, 'Failed due to communication error!');
+			callback({success:false, status: {description: 'Failed due to communication error!'}});
 		});
 	},
 	removePaymentTemplate: function(id, callback) {
 		Api.sendGet(this.apiBase + this.removeTemplateUri + '/' + id, callback, function(res) {
-			FormUI.displayMsgIn($form, 'Failed due to communication error!');
+			callback({success:false, status: {description: 'Failed due to communication error!'}});
 		});
 	},
 	listPaymentTemplate: function(callback) {
 		Api.sendGet(this.apiBase + this.listTemplateUri, callback, function(res) {
-			FormUI.displayMsgIn($form, 'Failed due to communication error!');
+			callback({success:false, status: {description: 'Failed due to communication error!'}});
 		});
 	},
 	getPaymentTemplate: function(id, callback) {
 		Api.sendGet(this.apiBase + this.getPaymentTemplateUri + '/' + id, callback, function(res) {
-			FormUI.displayMsgIn($form, 'Failed due to communication error!');
+			callback({success:false, status: {description: 'Failed due to communication error!'}});
 		});
 	}
 };
@@ -218,7 +219,7 @@ function buildTemplateListTable(tmplList) {
 			$clone.append("<td>" +tmplList[i].description+"</td>");
 			$clone.append("<td class='collapsing'>" +tmplList[i].notificationEmail+"</td>");
 			$clone.append("<td class='collapsing'>" +tmplList[i].notificationSms+"</td>");
-			$clone.append("<td class='center aligned'><div class='ui mini compact icon blue edit basic button' title='view and edit template'><i class='edit icon'></i></div><div class='ui mini compact icon red basic delete button' title='remove template'><i class='x icon'></i></div></td>");
+			$clone.append("<td class='center aligned'><div class='ui mini compact icon blue edit basic button' title='view and edit template'><i class='edit icon'></i></div><div class='ui mini compact icon red basic delete button' title='remove template'><i class='trash alternate icon'></i></div></td>");
 			$TBODY.append($clone);
 		}
 	} else {
