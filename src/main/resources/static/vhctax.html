@@ -43,17 +43,17 @@
 	</div>
 	<div class="right-column">
 		<div class="right-column-content-container">
-			<div class="ui divider"></div>
-			<div class="ui small form" id="actionFrm">
+			<div class="ui small form" id="actionFrm" style="padding-top: 0.5em;">
 				<div class="inline fields">
 					<div class="four wide field">
 						<label>Group by:</label>
 						<div class="ui selection dropdown" style="min-width: 11em;">
 							<i class="dropdown icon"></i>
-							<div class="default text">Group By</div>
+							<div class="default text">Do not Group By</div>
 							<div class="ui menu">
-								<div class="item" data-value="a">Group A</div>
-								<div class="item" data-value="b">Group B</div>
+								<div class="item" data-value="garage">Garage</div>
+								<div class="item" data-value="fuel">Fuel Type</div>
+								<div class="item" data-value="vtype">Vehicle Type</div>
 							</div>
 						</div>
 					</div>
@@ -63,8 +63,8 @@
 							<i class="dropdown icon"></i>
 							<div class="default text">All</div>
 							<div class="ui menu">
-								<div class="item" data-value="a">Type A</div>
-								<div class="item" data-value="b">Type B</div>
+								<div class="item" data-value="x">Certification No.</div>
+								<div class="item" data-value="a">Tax No.</div>
 							</div>
 						</div>
 					</div>
@@ -104,10 +104,29 @@
 		</div><!-- end of right column content container -->
 	</div><!--  end of right column -->
 </div><!-- end of main -->
-<div class="ui segment modal" id="vhcPaymentTaskModal">
+<div class="ui segment modal" id="registModal">
 	<div class="ui small form">
-		 
+		<div class="fields">
+			<div class="four wide field">
+				<div class="ui small tag label"><i class="car icon"></i> Vehicle List</div>
+				<div class="ui divider" style="margin: 0.5em 0;"></div>
+				<div style="overflow: auto; max-height: 300px;"><table class="ui small striped small basic selectable table"><tbody></tbody></table></div>
+				
+			</div>
+			<div class="twelve wide field">
+				<div class="ui basic segment">
+				</div>
+			</div>
+		</div>
+		<div class="error-description field"></div>
+		<div class="field">
+			<div style="text-align: center;">
+				<div class="ui blue right labeled icon small basic save compact button">Save<i class="save icon"></i></div>
+				<div class="ui right labeled icon small basic close compact button">Close <i class="x icon"></i></div>
+			</div>	
+		</div>
 	</div>
+	
 </div>
 <script src="/js/nprogress.js"></script>
 <script src="/js/jquery-3.1.1.min.js"></script>
@@ -123,6 +142,7 @@ var TaxServiceApi = {
 	getPaymentTemplateUri: 'tmpl/get',
 	removeTemplateUri:'tmpl/remove',
 	listTemplateUri:'tmpl/list',
+	vehicleListUri:'vehicle/list',
 	savePaymentTemplate: function(tmplJson, callback) {
 		Api.postJson(this.apiBase + this.createTemplateUri, tmplJson, callback, function(response) {
 			callback({success:false, status: {description: 'Failed due to communication error!'}});
@@ -142,23 +162,62 @@ var TaxServiceApi = {
 		Api.sendGet(this.apiBase + this.getPaymentTemplateUri + '/' + id, callback, function(res) {
 			callback({success:false, status: {description: 'Failed due to communication error!'}});
 		});
+	},
+	getVehicleList: function(callback) {
+		Api.sendGet(this.apiBase + this.vehicleListUri, callback, function(res) {
+			callback({success:false, status: {description: 'Failed due to communication error!'}});
+		});
 	}
 };
-	function getDate(element) {
-		var date;
-		try {
-			date = $.datepicker.parseDate("yy-mm-dd", element.value );
-		} catch(error) { date = null; }
-		return date;
+
+function buildVhcList(vhcList) {
+	var $tbody = $registFrm.find(".ui.table > tbody:first");
+	var $item = $("<tr></tr>");
+	var $cloned;
+	$tbody.empty();
+	for(var i = 0; i < vhcList.length; i++) {
+		$cloned = $item.clone(false);
+		$cloned.append("<td>" + vhcList[i].label + "</td>");
+		$tbody.append($cloned);
 	}
-	var $vhcPaymentTaskModal, $actionFrm;
+}
+function showRegistModal(addButton) {
+	$addButton = $(addButton);
+	$addButton.addClass("loading");
+	TaxServiceApi.getVehicleList(function(response) {
+		if(response.success) {
+			buildVhcList(response.payload);
+			$registModal.modal("show");
+		} else {
+			alert(response.status.description);
+		}
+		$addButton.removeClass("loading");
+	});
+}
+function saveRegistration() {
+	
+}
+function hideRegistModal() {
+	$registModal.modal("hide");
+}
+	var $registModal, $actionFrm, $registFrm;
 	$(function() {
 		$actionFrm = $("#actionFrm");
-		$vhcPaymentTaskModal = $("#vhcPaymentTaskModal");
-		$vhcPaymentTaskModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:true});
+		$registModal = $("#registModal");
+		$registFrm = $registModal.find(">.form");
+		
+		$registModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
 		$(".ui.checkbox").checkbox();
 		$(".ui.dropdown").dropdown();
 		$(".ui.sortable.table").tablesort();
+		
+		function getDate(element) {
+			var date;
+			try {
+				date = $.datepicker.parseDate("yy-mm-dd", element.value );
+			} catch(error) { date = null; }
+			return date;
+		}
 		from = $("#fromDate").datepicker({dateFormat:'yy-mm-dd', defaultDate: "0d", numberOfMonths:2, changeMonth: true})
 		.on("change", function() {
 			to.datepicker("option", "minDate", getDate(this));
@@ -167,9 +226,19 @@ var TaxServiceApi = {
 		.on("change", function() {
 			from.datepicker( "option", "maxDate", getDate(this));
 		});
-		$actionFrm.find(".ui.add.button").click(function() {
-			$vhcPaymentTaskModal.modal("show");
+		$actionFrm.find(".ui.add.button:first").click(function() {
+			showRegistModal(this);
 		});
+		
+		$registFrm.find(".ui.button").click(function() {
+			var $this = $(this);
+			if($this.hasClass("close")) {
+				hideRegistModal();
+			} else if($this.hasClass("save")) {
+				saveRegistration();
+			}
+		});
+		/*getVehicleList();*/
 	});
 </script>
 </body>
