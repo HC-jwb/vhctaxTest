@@ -18,14 +18,19 @@ import org.springframework.web.client.RestTemplate;
 import hc.fms.api.addon.properties.FmsProperties;
 import hc.fms.api.addon.report.util.HttpUtil;
 import hc.fms.api.addon.vhctax.entity.ServiceTemplate;
+import hc.fms.api.addon.vhctax.entity.VehicleTaxPaymentTask;
 import hc.fms.api.addon.vhctax.model.VehicleListResponse;
 import hc.fms.api.addon.vhctax.repository.ServiceTemplateRepository;
+import hc.fms.api.addon.vhctax.repository.VehicleTaxPaymentTaskRepository;
 
 @Service
 public class VehicleTaxManagementService {
 	private RestTemplate restTemplate = new RestTemplate();
 	@Autowired
 	private ServiceTemplateRepository serviceTemplateRepository;
+	@Autowired
+	private VehicleTaxPaymentTaskRepository taxPaymentTaskRepository; 
+	
 	@Autowired
 	private FmsProperties fmsProps;
 	@Autowired
@@ -65,5 +70,9 @@ public class VehicleTaxManagementService {
 	public Optional<ServiceTemplate> getServiceTemplate(Long id) {
 		Optional<ServiceTemplate> opt = serviceTemplateRepository.findById(id);
 		return opt;
+	}
+	public VehicleTaxPaymentTask createUpdateTaxPaymentTask(VehicleTaxPaymentTask paymentTaskObj) {
+		paymentTaskObj = taxPaymentTaskRepository.save(paymentTaskObj);
+		return paymentTaskObj;
 	}
 }

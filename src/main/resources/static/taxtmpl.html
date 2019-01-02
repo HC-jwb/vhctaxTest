@@ -12,7 +12,7 @@
 <style>
 	.right-column-content-container {min-width: 1000px;}
 	.ui.form .field input {padding: 0.5em;}
-	.plain-text {font-weight: normal; font-size: 0.9em;}
+	.plain-text {font-weight: normal; font-size: 0.85em;}
 </style>
 	<title>Next Generation Smart FMS Platform</title>
 </head>
@@ -146,12 +146,12 @@
 <script>
 var TaxServiceApi = {
 	apiBase:'/vhctax/api/',
-	createTemplateUri: 'tmpl/create',
+	saveTemplateUri: 'tmpl/save',
 	getPaymentTemplateUri: 'tmpl/get',
 	removeTemplateUri:'tmpl/remove',
 	listTemplateUri:'tmpl/list',
 	savePaymentTemplate: function(tmplJson, callback) {
-		Api.postJson(this.apiBase + this.createTemplateUri, tmplJson, callback, function(response) {
+		Api.postJson(this.apiBase + this.saveTemplateUri, tmplJson, callback, function(response) {
 			callback({success:false, status: {description: 'Failed due to communication error!'}});
 		});
 	},

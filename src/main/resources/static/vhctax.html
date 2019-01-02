@@ -11,7 +11,13 @@
 	<link rel="stylesheet" type="text/css" href="/css/report.css">
 <style>
 	.right-column-content-container {min-width: 1000px;}
+	.ui.form .field input {padding: 0.5em;}
+	.plain-text {font-weight: normal !important; font-size: 0.9em !important;}
 	.ui.checkbox.no-label {font-size: 0;}
+	.ui.small.tax.form .fields {margin-bottom: 0.35em;}
+	.tax-reg-photo {width: 100px; height: 80px;}
+	.ui.table > tbody > tr.selected {background-color: #4085e5; color: white;}
+	img.tax-reg-photo:hover {cursor: pointer;}
 </style>
 	<title>Next Generation Smart FMS Platform</title>
 </head>
@@ -45,6 +51,7 @@
 		<div class="right-column-content-container">
 			<div class="ui small form" id="actionFrm" style="padding-top: 0.5em;">
 				<div class="inline fields">
+<!--				
 					<div class="four wide field">
 						<label>Group by:</label>
 						<div class="ui selection dropdown" style="min-width: 11em;">
@@ -57,6 +64,7 @@
 							</div>
 						</div>
 					</div>
+--> 
 					<div class="four wide field">
 						<label>Payment type:</label>
 						<div class="ui selection dropdown" style="min-width: 11em;">
@@ -68,7 +76,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="six wide inline field">
+					<div class="seven wide inline field">
 						<label>Period:</label>
 						<div class="ui small left icon input">
 							<input type="text" placeholder="Date from" id="fromDate" name="fromDate"><i class="calendar alternate outline icon"></i>
@@ -78,11 +86,14 @@
 							<input type="text" placeholder="Date to" id="toDate" name="toDate"><i class="calendar alternate outline icon"></i>
 						</div>
 					</div>
-					<div class="three wide field">
+					<div class="four wide field">
 						<div class="ui orange tiny compact icon basic add button" title="add new tax payment task"><i class="plus icon"></i></div>
 						<div class="ui tiny compact icon basic button"><i class="check icon"></i></div>
 						<div class="ui tiny compact icon basic button"><i class="print icon"></i></div>
 						<div class="ui tiny compact icon basic button"><i class="trash alternate icon"></i></div>
+					</div>
+					<div class="one wide field">
+						<div class="ui compact blue search icon button"><i class="search icon"></i></div>
 					</div>
 				</div>
 			</div>
@@ -105,20 +116,77 @@
 	</div><!--  end of right column -->
 </div><!-- end of main -->
 <div class="ui segment modal" id="registModal">
-	<div class="ui small form">
+	<div class="ui small form tax">
 		<div class="fields">
 			<div class="four wide field">
-				<div class="ui small tag label"><i class="car icon"></i> Vehicle List</div>
-				<div class="ui divider" style="margin: 0.5em 0;"></div>
-				<div style="overflow: auto; max-height: 300px;"><table class="ui small striped small basic selectable table"><tbody></tbody></table></div>
-				
+				<div class="ui segment" style="padding-left: 0.3em; padding-right: 0.3em;">
+					<div class="ui top attached blue label"><i class="car icon"></i> Vehicle List</div>
+					<div style="overflow: auto; max-height: 430px;"><table class="ui small small basic table"><tbody></tbody></table></div>
+				</div>
 			</div>
 			<div class="twelve wide field">
-				<div class="ui basic segment">
+				<div class="ui segment">
+					<div class="ui top attached blue label">Tax Payment Task</div>
+					<div class="fields">
+						<div class="twelve wide field">
+							<label class="plain-text"><i class="copy outline icon"></i>Apply Template</label>
+							<div class="ui fluid search selection dropdown" id="templateDropdown">
+								<i class="dropdown icon"></i>
+								<input type="hidden" name="tmplId">
+								<div class="default text">Select Template to apply</div>
+								<div class="ui menu"></div>
+							</div>
+						</div>
+					</div>
+					<div class="ui horizontal divider"><i class="car grey icon"></i>&nbsp;<span class="plain-text">Vehicle Certification</span></div>
+					<div class="fields">
+						<div class="twelve wide field">
+							<div class="fields">
+								<div class="eight wide field"><label class="plain-text">Certification No.</label><div class="ui small input"><input type="text" name="certificationNo"></div></div>
+								<div class="eight wide field"><label class="plain-text">Valid Till</label><div class="ui small right icon input"><input type="text" name="certificationBaseDate" id="certValidTill"><i class="calendar alternate outline icon"></i></div></div>
+							</div>
+							<div class="fields">
+								<div class="eight wide field"><label class="plain-text">Cost</label><div class="ui small right icon input"><input type="text" class="certcost-input" name="certificationCost" style="text-align: right;"><i class="rupee icon"></i></div></div>
+								<div class="eight wide field"><label class="plain-text">Remind Before</label><div class="ui small input"><input type="number" name="certificationRemindBeforeDays" style="text-align: right;"></div></div>
+							</div>
+						</div>
+						<div class="four wide field">
+							<label class="plain-text">Certification Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png">
+						</div>
+					</div>
+					<div class="ui horizontal divider"><span class="plain-text"><i class="car grey icon"></i>&nbsp;Vehicle Tax</span></div>
+					<div class="fields">
+						<div class="twelve wide field">		
+							<div class="fields">
+								<div class="eight wide field"><label class="plain-text">Tax No.</label><div class="ui small input"><input type="text" name="taxNo"></div></div>
+								<div class="eight wide field"><label class="plain-text">Valid Till</label><div class="ui small right icon input"><input type="text" name="taxBaseDate" id="taxValidTill"><i class="calendar alternate outline icon"></i></div></div>
+							</div>
+							<div class="fields">
+								<div class="eight wide field"><label class="plain-text">Cost</label><div class="ui small right icon input"><input type="text" class="taxcost-input" name="taxCost" style="text-align: right;"><i class="rupee icon"></i></div></div>
+								<div class="eight wide field"><label class="plain-text">Remind Before</label><div class="ui small input"><input type="number" name="taxRemindBeforeDays" style="text-align: right;"></div></div>
+							</div>
+						</div>
+						<div class="four wide field">
+							<label class="plain-text">Tax Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png">
+						</div>
+					</div>
+					<div class="ui horizontal divider"><i class="grey bell icon"></i>&nbsp;<span class="plain-text">Notification</span></div>
+					<div class="fields">
+						<div class="eight wide field"><label class="plain-text">SMS Notification</label><div class="ui small left icon input"><input type="text" name="notificationSms"><i class="comments alternate icon"></i></div></div>
+						<div class="eight wide field"><label class="plain-text">Email Notification</label><div class="ui small left icon input"><input type="text" name="notificationEmail"><i class="envelope icon"></i></div></div>
+					</div>
 				</div>
 			</div>
 		</div>
+		<div class="fields">
+			<div class="field"><input type="hidden" name="vehicleId"></div>
+			<div class="field"><input type="hidden" name="label"></div>
+			<div class="field"><input type="hidden" name="model"></div>
+			<div class="field"><input type="hidden" name="regNumber"></div>
+			<div class="field"><input type="hidden" name="vin"></div>
+		</div>
 		<div class="error-description field"></div>
+		<div class="ui divider"></div>
 		<div class="field">
 			<div style="text-align: center;">
 				<div class="ui blue right labeled icon small basic save compact button">Save<i class="save icon"></i></div>
@@ -126,25 +194,26 @@
 			</div>	
 		</div>
 	</div>
-	
 </div>
 <script src="/js/nprogress.js"></script>
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/jquery-ui.min.js"></script>
 <script src="/js/jquery.tablesort.min.js"></script>
 <script src="/js/modules.min.js"></script>
+<script src="/js/cleave.min.js"></script>
 <script src="/js/common.api.js"></script>
 <script src="/js/common.js?v=1.1"></script>
 <script>
 var TaxServiceApi = {
 	apiBase:'/vhctax/api/',
-	createTemplateUri: 'tmpl/create',
+	saveTemplateUri: 'tmpl/save',
 	getPaymentTemplateUri: 'tmpl/get',
 	removeTemplateUri:'tmpl/remove',
 	listTemplateUri:'tmpl/list',
 	vehicleListUri:'vehicle/list',
+	saveTaxPaymentTaskUri: 'task/save',
 	savePaymentTemplate: function(tmplJson, callback) {
-		Api.postJson(this.apiBase + this.createTemplateUri, tmplJson, callback, function(response) {
+		Api.postJson(this.apiBase + this.saveTemplateUri, tmplJson, callback, function(response) {
 			callback({success:false, status: {description: 'Failed due to communication error!'}});
 		});
 	},
@@ -167,6 +236,11 @@ var TaxServiceApi = {
 		Api.sendGet(this.apiBase + this.vehicleListUri, callback, function(res) {
 			callback({success:false, status: {description: 'Failed due to communication error!'}});
 		});
+	},
+	saveTaxPaymentTask: function(taxPaymentObj, callback) {
+		Api.postJson(this.apiBase + this.saveTaxPaymentTaskUri, taxPaymentObj, callback, function(response) {
+			callback({success:false, status: {description: 'Failed due to communication error!'}});
+		});
 	}
 };
 
@@ -178,16 +252,61 @@ function buildVhcList(vhcList) {
 	for(var i = 0; i < vhcList.length; i++) {
 		$cloned = $item.clone(false);
 		$cloned.append("<td>" + vhcList[i].label + "</td>");
+		$cloned.data("vhc", vhcList[i]);
 		$tbody.append($cloned);
 	}
+}
+function buildTmplDropdown(tmplList) {
+	var $item = $("<div class='item'></div>");
+	var $clone;
+	var $templateDropdown = $("#templateDropdown");
+	var $dropdownContainer = $templateDropdown.find(".ui.menu:first");
+	$dropdownContainer.empty();
+	for(var i = 0; i < tmplList.length; i++) {
+		$clone = $item.clone(false);
+		$clone.data('value', tmplList[i].id);
+		$clone.data("tmpl", tmplList[i]);
+		$clone.append(tmplList[i].title);
+		$dropdownContainer.append($clone);
+	}
+}
+function applyTemplate(text, value, $item) {
+	var tmpl = $item.data("tmpl");
+	tmpl.certificationCost = addCommas(tmpl.certificationCost);
+	tmpl.taxCost = addCommas(tmpl.taxCost);
+	$registModal.find(".ui.form:first").form("set values", tmpl);
+	certValidTill.datepicker( "option", "defaultDate", "+" + tmpl.certificationInterval + "y");
+	taxValidTill.datepicker( "option", "defaultDate", "+" + tmpl.taxInterval + "y");
+}
+function applyVehicle(vhc) {
+	$registFrm.form('set value', 'vehicleId', vhc.id);
+	$registFrm.form('set value', 'label', vhc.label);
+	$registFrm.form('set value', 'model', vhc.model);
+	$registFrm.form('set value', 'regNumber', vhc.reg_number);
+	$registFrm.form('set value', 'vin', vhc.vin);
+	/*
+	$registFrm.form('set value', '', vhc.garage_id);
+	$registFrm.form('set value', '', vhc.fuel_type);
+	$registFrm.form('set value', '', vhc.type);
+	console.log(vhc);
+	*/
+	
 }
 function showRegistModal(addButton) {
 	$addButton = $(addButton);
 	$addButton.addClass("loading");
 	TaxServiceApi.getVehicleList(function(response) {
 		if(response.success) {
-			buildVhcList(response.payload);
-			$registModal.modal("show");
+			TaxServiceApi.listPaymentTemplate(function(tmplResponse) {
+				if(tmplResponse.success) {
+					buildVhcList(response.payload);
+					buildTmplDropdown(tmplResponse.payload);
+					$registFrm.form('clear');
+					$registModal.modal("show");
+				} else {
+					alert(tmplResponse.status.description);
+				}
+			});
 		} else {
 			alert(response.status.description);
 		}
@@ -195,51 +314,97 @@ function showRegistModal(addButton) {
 	});
 }
 function saveRegistration() {
-	
+	if(!$registFrm.form('validate form')) return;
+	var valueMap = $registFrm.form('get values');
+	if(!valueMap.vehicleId) {
+		FormUI.displayMsgIn($registFrm, 'Vehicle has to be selected!!');
+		return;
+	}
+	valueMap.certificationCost = valueMap.certificationCost.replace(/\,/g,"");
+	valueMap.taxCost = valueMap.taxCost.replace(/\,/g,"");
+	console.log(valueMap);
+	TaxServiceApi.saveTaxPaymentTask(valueMap, function(response) {
+		if(response.success) {
+			hideRegistModal();
+		} else {
+			alert(response.status.description);
+		}
+	});
 }
 function hideRegistModal() {
 	$registModal.modal("hide");
+	FormUI.resetMsgIn($registFrm);
 }
-	var $registModal, $actionFrm, $registFrm;
-	$(function() {
-		$actionFrm = $("#actionFrm");
-		$registModal = $("#registModal");
-		$registFrm = $registModal.find(">.form");
-		
-		$registModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
-		$(".ui.checkbox").checkbox();
-		$(".ui.dropdown").dropdown();
-		$(".ui.sortable.table").tablesort();
-		
-		function getDate(element) {
-			var date;
-			try {
-				date = $.datepicker.parseDate("yy-mm-dd", element.value );
-			} catch(error) { date = null; }
-			return date;
-		}
-		from = $("#fromDate").datepicker({dateFormat:'yy-mm-dd', defaultDate: "0d", numberOfMonths:2, changeMonth: true})
-		.on("change", function() {
-			to.datepicker("option", "minDate", getDate(this));
-		}),
-		to = $("#toDate" ).datepicker({dateFormat:'yy-mm-dd', defaultDate: "+4w", numberOfMonths:2, changeMonth: true})
-		.on("change", function() {
-			from.datepicker( "option", "maxDate", getDate(this));
-		});
-		$actionFrm.find(".ui.add.button:first").click(function() {
-			showRegistModal(this);
-		});
-		
-		$registFrm.find(".ui.button").click(function() {
-			var $this = $(this);
-			if($this.hasClass("close")) {
-				hideRegistModal();
-			} else if($this.hasClass("save")) {
-				saveRegistration();
-			}
-		});
-		/*getVehicleList();*/
+
+function listTaxPaymentTask() {
+	
+}
+var $registModal, $actionFrm, $registFrm, $templateDropdown, certValidTill, taxValidTill;
+$(function() {
+	$actionFrm = $("#actionFrm");
+	$registModal = $("#registModal");
+	$registFrm = $registModal.find(">.form");
+	$templateDropdown = $("#templateDropdown");
+	$registModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
+	$(".ui.checkbox").checkbox();
+	$(".ui.dropdown").dropdown();
+	$(".ui.sortable.table").tablesort();
+	
+	function getDate(element) {
+		var date;
+		try {
+			date = $.datepicker.parseDate("yy-mm-dd", element.value );
+		} catch(error) { date = null; }
+		return date;
+	}
+	from = $("#fromDate").datepicker({dateFormat:'yy-mm-dd', defaultDate: "0d", numberOfMonths:2, changeMonth: true})
+	.on("change", function() {
+		to.datepicker("option", "minDate", getDate(this));
+	}),
+	to = $("#toDate" ).datepicker({dateFormat:'yy-mm-dd', defaultDate: "+4w", numberOfMonths:2, changeMonth: true})
+	.on("change", function() {
+		from.datepicker( "option", "maxDate", getDate(this));
 	});
+	from.datepicker('setDate', '0d');
+	to.datepicker('setDate', '+4w');
+	certValidTill = $("#certValidTill").datepicker({dateFormat: 'yy-mm-dd', numberOfMonths: 1, changeMonth: true});
+	taxValidTill = $("#taxValidTill").datepicker({dateFormat: 'yy-mm-dd', numberOfMonths: 1, changeMonth: true});
+	$registModal.find(".ui.table:first > tbody").on("click", "> tr", function() {
+		var $this = $(this);
+		$this.parent().find("tr").removeClass("selected");
+		$this.addClass("selected");
+		applyVehicle($this.data("vhc"));
+	});
+	$actionFrm.find(".ui.add.button:first").click(function() {
+		showRegistModal(this);
+	});
+	
+	$templateDropdown.dropdown({onChange: applyTemplate});
+	$registFrm.form({fields: 
+		{
+			certificationNo: 'empty', certificationBaseDate: 'empty', certificationCost:'empty', certificationRemindBeforeDays: 'empty',
+			taxNo: 'empty', taxBaseDate: 'empty', taxCost:'empty', taxRemindBeforeDays: 'empty'
+		}
+	});
+	$registFrm.find(".ui.button").click(function() {
+		var $this = $(this);
+		if($this.hasClass("close")) {
+			hideRegistModal();
+		} else if($this.hasClass("save")) {
+			saveRegistration();
+		}
+	});
+	var cleave = new Cleave('.taxcost-input', {
+	    numeral: true,
+	    numeralThousandsGroupStyle: 'thousand'
+	});
+	cleave = new Cleave('.certcost-input', {
+	    numeral: true,
+	    numeralThousandsGroupStyle: 'thousand'
+	});
+	
+	listTaxPaymentTask();
+});
 </script>
 </body>
 </html>

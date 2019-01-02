@@ -1,6 +1,7 @@
 package hc.fms.api.addon.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -17,6 +18,7 @@ import hc.fms.api.addon.model.ResponseContainer;
 import hc.fms.api.addon.model.ResponseStatus;
 import hc.fms.api.addon.report.util.HttpUtil;
 import hc.fms.api.addon.vhctax.entity.ServiceTemplate;
+import hc.fms.api.addon.vhctax.entity.VehicleTaxPaymentTask;
 import hc.fms.api.addon.vhctax.model.Vehicle;
 import hc.fms.api.addon.vhctax.model.VehicleListResponse;
 import hc.fms.api.addon.vhctax.service.VehicleTaxManagementService;
@@ -61,7 +63,8 @@ public class VehicleTaxManagementController {
 		}
 		return response;
 	}
-	@PostMapping("tmpl/create")
+
+	@PostMapping("tmpl/save")
 	public ResponseContainer<ServiceTemplate> createUpdateServiceTemplate(@RequestBody ServiceTemplate svcTmpl, HttpSession session) {
 		ResponseContainer<ServiceTemplate> response = new ResponseContainer<>();
 		try {
@@ -93,6 +96,17 @@ public class VehicleTaxManagementController {
 		try {
 			ServiceTemplate tmpl = vhcTaxManagementService.getServiceTemplate(id).get();
 			response.setPayload(tmpl);
+			response.setSuccess(true);
+		} catch(Exception e) {
+			response.setStatus(new ResponseStatus(e.getMessage()));
+		}
+		return response;
+	}
+	@PostMapping("task/save")
+	public ResponseContainer<VehicleTaxPaymentTask> createUpdatePaymentTask(@RequestBody VehicleTaxPaymentTask taskObj) {
+		ResponseContainer<VehicleTaxPaymentTask> response = new ResponseContainer<>();
+		try {
+			response.setPayload(vhcTaxManagementService.createUpdateTaxPaymentTask(taskObj));
 			response.setSuccess(true);
 		} catch(Exception e) {
 			response.setStatus(new ResponseStatus(e.getMessage()));
