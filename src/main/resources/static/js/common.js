@@ -12,6 +12,26 @@ var FormUI = {
 	}
 	
 };
+var DialogUI = {
+	init: function() {
+		this.$modal = $("<div class='ui mini modal'><div class='ui segment'><div class='ui top attached blue label'><i class='info circle icon'></i>Confirmation</div><div class='ui basic center aligned segment'><h4 class='ui header'><div class='content'>Are you sure?<div class='sub header'></div></div></h4><div class='ui small button primary compact ok'>Yes</div><div class='ui small button negative compact cancel'>Cancel</div></div></div></div>");
+		this.$modal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
+		this.$modal.find(".button").click(function() {
+			var $this = $(this);
+			var ok = $this.hasClass("ok");
+			DialogUI.$modal.modal('hide');
+			if(DialogUI.callback) {
+				DialogUI.callback(ok);
+			}
+			DialogUI.callback = null;
+		});
+	},
+	confirmOk: function(msg, callback) {
+		this.$modal.find(".sub.header:first").text(msg);
+		this.callback = callback;
+		this.$modal.modal('show');		
+	}		
+};
 $(function () {
 	NProgress.configure({showSpinner: false});
 	NProgress.start();	NProgress.inc();

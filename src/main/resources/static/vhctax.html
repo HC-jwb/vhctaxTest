@@ -204,6 +204,16 @@
 		</div>
 	</div>
 </div>
+<div class="ui mini modal" id="confirmModal">
+	<div class="ui segment">
+		<div class="ui top attached blue label"><i class="info circle icon"></i>Confirmation</div>
+		<div class="ui basic center aligned segment">
+			<h4 class="ui header"><div class="content">Are you sure?<div class="sub header"></div></div></h4>
+			<div class="ui small button primary compact ok">Yes</div>
+			<div class="ui small button negative compact cancel">Cancel</div>
+		</div>
+	</div>
+</div>
 <script src="/js/nprogress.js"></script>
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/jquery-ui.min.js"></script>
@@ -444,9 +454,37 @@ function buildTaskTable(taskList) {
 		}
 	}});
 }
-var $registModal, $actionFrm, $taskListTable, $tableLoader, $registFrm, $certRegistFrm, $taxRegistFrm, $templateDropdown, certValidTill, taxValidTill;
+function getAllCheckTaskIds() {
+	var chkIdList = [];
+	$taskListTable.find(">tbody > tr> td> .ui.task.checkbox").each(function() {
+		var $this = $(this);
+		if($this.checkbox('is checked')) chkIdList.push($this.closest('tr').data('taskid'));
+	});
+	return chkIdList;
+}
+function removeCheckedTask(actionButton) {
+	var chkIdList = getAllCheckTaskIds();
+	if(chkIdList.length == 0) return;
+	var $actionButton = $(actionButton);
+	DialogUI.confirmOk("Delete (" + chkIdList.length + ") payment task(s)", function(result) {
+		if(result) {
+			$actionButton.addClass("loading");
+			TaxServiceApi.removePaymentTask(chkIdList, function(response) {
+				if(response.success) {
+					listTaxPaymentTask();
+				} else {
+					alert(response.status.description);
+				}
+				setTimeout(function() {$actionButton.removeClass("loading"); }, 300);
+			});
+		}
+	});
+	
+}
+var $registModal, $actionFrm, $taskListTable, $tableLoader, $actionButtons, $registFrm, $certRegistFrm, $taxRegistFrm, $templateDropdown, certValidTill, taxValidTill;
 $(function() {
 	$actionFrm = $("#actionFrm");
+	$actionButtons = $("#actionButtons");
 	$taskListTable = $("#taskListTable");
 	$tableLoader = $("#taskTableLoader");
 	$registModal = $("#registModal");
@@ -484,21 +522,12 @@ $(function() {
 	$actionFrm.find(".ui.add.button:first").click(function() {showRegistModal(this);});
 	$actionFrm.find(".ui.search.button:first").click(listTaxPaymentTask);
 	$taskListTable.find(">thead>tr>th>.ui.chkAll.checkbox:first").click(function() {
-		var chkIdList = [];
 		var allChk = $(this).checkbox('is checked');
 		$taskListTable.find(">tbody > tr> td> .ui.task.checkbox").each(function() {
 			var $this = $(this);
 			$this.checkbox(allChk? 'check': 'uncheck');/*set checked or set unchecked won't fire onChange event callback*/
-			if($this.checkbox('is checked')) chkIdList.push($this.parent().parent().data('taskid'));
 		});
-		console.log('checked ids', chkIdList);
-	});
-/*	
-	$taskListTable.on("click", ">tbody>tr>td>.ui.task.checkbox", function() {
-		var $chk = $(this);
-		console.log($chk.checkbox('is checked'), $chk.parent().parent().data('taskid'));
-	});
-*/	
+	});	
 	
 	$templateDropdown.dropdown({onChange: applyTemplate});
 	$certRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
@@ -535,6 +564,9 @@ $(function() {
 	    numeralThousandsGroupStyle: 'thousand'
 	});
 	listTaxPaymentTask();
+	
+	$actionButtons.find(".remove.button").click(function() {removeCheckedTask(this); });
+	DialogUI.init();/*call only when I want to use dialog ui*/
 });
 </script>
 </body>
