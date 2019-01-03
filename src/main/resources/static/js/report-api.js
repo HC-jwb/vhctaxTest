@@ -1,5 +1,5 @@
 var ReportApi = {
-	apiBase: '/report/api',
+	apiBase: '/addon/report/api',
 	groupListUri:'/tracker/group/list',
 	trackerListUri: '/tracker/list',
 	genRequestUri:'/generate',

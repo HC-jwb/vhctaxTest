@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,15 +20,16 @@ import hc.fms.api.addon.model.ResponseContainer;
 import hc.fms.api.addon.model.ResponseStatus;
 import hc.fms.api.addon.report.util.HttpUtil;
 import hc.fms.api.addon.vhctax.entity.ServiceTemplate;
-import hc.fms.api.addon.vhctax.entity.VehicleTaxPaymentTask;
+import hc.fms.api.addon.vhctax.entity.VehicleTaxTask;
 import hc.fms.api.addon.vhctax.model.Vehicle;
 import hc.fms.api.addon.vhctax.model.VehicleListResponse;
 import hc.fms.api.addon.vhctax.service.VehicleTaxManagementService;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/vhctax/api/*")
+@RequestMapping("/addon/vhctax/api/*")
 public class VehicleTaxManagementController {
+	private Logger logger = LoggerFactory.getLogger(VehicleTaxManagementController.class);
 	@Autowired
 	private VehicleTaxManagementService vhcTaxManagementService;
 	@RequestMapping("vehicle/list")
@@ -103,10 +106,36 @@ public class VehicleTaxManagementController {
 		return response;
 	}
 	@PostMapping("task/save")
-	public ResponseContainer<VehicleTaxPaymentTask> createUpdatePaymentTask(@RequestBody VehicleTaxPaymentTask taskObj) {
-		ResponseContainer<VehicleTaxPaymentTask> response = new ResponseContainer<>();
+	public ResponseContainer<List<VehicleTaxTask>> createUpdatePaymentTask(@RequestBody List<VehicleTaxTask> taskList) {
+		ResponseContainer<List<VehicleTaxTask>> response = new ResponseContainer<>();
 		try {
-			response.setPayload(vhcTaxManagementService.createUpdateTaxPaymentTask(taskObj));
+			response.setPayload(vhcTaxManagementService.createUpdateTaxTaskList(taskList));
+			response.setSuccess(true);
+		} catch(Exception e) {
+			response.setStatus(new ResponseStatus(e.getMessage()));
+		}
+		return response;
+	}
+	@RequestMapping("task/list")
+	public ResponseContainer<List<VehicleTaxTask>> listVehicleTaxTask(@RequestBody Map<String, String> searchCond) {
+		ResponseContainer<List<VehicleTaxTask>> response = new ResponseContainer<>();
+		//logger.info(searchCond.toString());
+		String taskType = searchCond.get("taskType");
+		String fromDate = searchCond.get("fromDate");
+		String toDate = searchCond.get("toDate");
+		try {
+			response.setPayload(vhcTaxManagementService.listTaxTaskList(taskType, fromDate, toDate));
+			response.setSuccess(true);
+		} catch(Exception e) {
+			response.setStatus(new ResponseStatus(e.getMessage()));
+		}
+		return response;
+	}
+	@PostMapping("task/remove")
+	public ResponseContainer<Integer> removePaymentTaskList(@RequestBody List<Long> taskIdList) {
+		ResponseContainer<Integer> response = new ResponseContainer<>();
+		try {
+			vhcTaxManagementService.removePaymentTaskListByIdList(taskIdList);
 			response.setSuccess(true);
 		} catch(Exception e) {
 			response.setStatus(new ResponseStatus(e.getMessage()));

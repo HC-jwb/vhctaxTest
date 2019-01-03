@@ -18,6 +18,7 @@ import hc.fms.api.addon.report.service.AuthService;
 
 @RestController
 @CrossOrigin("*")
+@RequestMapping("/addon")
 public class AuthController {
 	@Autowired
 	private AuthService authService;

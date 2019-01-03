@@ -1,5 +1,6 @@
 package hc.fms.api.addon.vhctax.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -18,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import hc.fms.api.addon.properties.FmsProperties;
 import hc.fms.api.addon.report.util.HttpUtil;
 import hc.fms.api.addon.vhctax.entity.ServiceTemplate;
-import hc.fms.api.addon.vhctax.entity.VehicleTaxPaymentTask;
+import hc.fms.api.addon.vhctax.entity.VehicleTaxTask;
 import hc.fms.api.addon.vhctax.model.VehicleListResponse;
 import hc.fms.api.addon.vhctax.repository.ServiceTemplateRepository;
 import hc.fms.api.addon.vhctax.repository.VehicleTaxPaymentTaskRepository;
@@ -71,8 +73,25 @@ public class VehicleTaxManagementService {
 		Optional<ServiceTemplate> opt = serviceTemplateRepository.findById(id);
 		return opt;
 	}
-	public VehicleTaxPaymentTask createUpdateTaxPaymentTask(VehicleTaxPaymentTask paymentTaskObj) {
+	public VehicleTaxTask createUpdateTaxTask(VehicleTaxTask paymentTaskObj) {
 		paymentTaskObj = taxPaymentTaskRepository.save(paymentTaskObj);
 		return paymentTaskObj;
+	}
+	public List<VehicleTaxTask> createUpdateTaxTaskList(List<VehicleTaxTask> taskList) {
+		return taxPaymentTaskRepository.saveAll(taskList);
+	}
+
+	public List<VehicleTaxTask> listTaxTaskList(String taskType, String fromDate, String toDate) {
+		List<String> typeList = null;
+		if("".equals(taskType)) {
+			typeList = Arrays.asList("T", "C");
+		} else {
+			typeList = Arrays.asList(taskType);
+		}
+		return taxPaymentTaskRepository.listTaxTaskList(typeList, fromDate, toDate);
+	}
+	@Transactional
+	public void removePaymentTaskListByIdList(List<Long> taskIdList) {
+		for(Long id : taskIdList) taxPaymentTaskRepository.deleteById(id);
 	}
 }

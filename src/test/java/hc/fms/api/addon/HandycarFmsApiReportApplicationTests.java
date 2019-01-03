@@ -1,4 +1,4 @@
-package hc.fms.api.report;
+package hc.fms.api.addon;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -42,7 +42,7 @@ var Api = {
 };
 Api.init();
 var AuthApi = {
-	apiBase: '',
+	apiBase: '/addon',
 	authUri: '/authenticate',
 	validateUri: '/validate',
 	authenticate: function (authJson, callback) {

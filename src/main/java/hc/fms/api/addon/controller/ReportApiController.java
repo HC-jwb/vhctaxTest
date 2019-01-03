@@ -45,7 +45,7 @@ import hc.fms.api.addon.report.service.TrackerService;
 import hc.fms.api.addon.report.util.HttpUtil;
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/report/api")
+@RequestMapping("/addon/report/api")
 public class ReportApiController {
 	@Autowired
 	private TrackerService trackerService;
