@@ -94,4 +94,8 @@ public class VehicleTaxManagementService {
 	public void removePaymentTaskListByIdList(List<Long> taskIdList) {
 		for(Long id : taskIdList) taxPaymentTaskRepository.deleteById(id);
 	}
+	@Transactional
+	public void makePaymentTaskListPaid(List<Long> taskIdList) {
+		for(Long id : taskIdList) taxPaymentTaskRepository.updatePaymentTaskPaid(id);
+	}
 }

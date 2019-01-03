@@ -132,10 +132,21 @@ public class VehicleTaxManagementController {
 		return response;
 	}
 	@PostMapping("task/remove")
-	public ResponseContainer<Integer> removePaymentTaskList(@RequestBody List<Long> taskIdList) {
-		ResponseContainer<Integer> response = new ResponseContainer<>();
+	public ResponseContainer<Void> removePaymentTaskList(@RequestBody List<Long> taskIdList) {
+		ResponseContainer<Void> response = new ResponseContainer<>();
 		try {
 			vhcTaxManagementService.removePaymentTaskListByIdList(taskIdList);
+			response.setSuccess(true);
+		} catch(Exception e) {
+			response.setStatus(new ResponseStatus(e.getMessage()));
+		}
+		return response;
+	}
+	@PostMapping("task/complete")
+	public ResponseContainer<Void> makePaymentTaskListPaid(@RequestBody List<Long> taskIdList) {
+		ResponseContainer<Void> response = new ResponseContainer<>();
+		try {
+			vhcTaxManagementService.makePaymentTaskListPaid(taskIdList);
 			response.setSuccess(true);
 		} catch(Exception e) {
 			response.setStatus(new ResponseStatus(e.getMessage()));
