@@ -241,6 +241,7 @@ $(function() {
 	$taxRegistFrm = $registFrm.find("#taxRegistFrm");
 	$templateDropdown = $("#templateDropdown");
 	$registModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
+	$registModal.find(".ui.radio.checkbox").checkbox();
 	$taskListTable.find(".ui.checkbox.chkAll:first").checkbox();
 	$(".ui.dropdown").dropdown();
 	
