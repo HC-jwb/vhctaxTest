@@ -39,8 +39,9 @@ function applyTemplate(text, value, $item) {
 	$certRegistFrm.form('set values', certMap);
 	$taxRegistFrm.form('set values', taxMap);
 	
-	certValidTill.datepicker( "option", "defaultDate", "+" + tmpl.certificationInterval + "y");
-	taxValidTill.datepicker( "option", "defaultDate", "+" + tmpl.taxInterval + "y");
+	certValidTill.datepicker("option", "defaultDate", "+" + tmpl.certificationInterval + "y");
+	taxValidTill.datepicker("option", "defaultDate", "+" + tmpl.taxInterval + "y");
+	kirValidTill.datepicker("option", "defaultDate", "+6M");
 }
 function applyVehicle(vhc) {
 	$registFrm.form('set value', 'vehicleId', vhc.id);
@@ -59,11 +60,11 @@ function showRegistModal(addButton) {
 					buildVhcList(response.payload);
 					buildTmplDropdown(tmplResponse.payload);
 					$registFrm.form('clear');
+					/*$registFrm.find(".ui.radio.checkbox:first").checkbox("set checked");*//*When rquired to reset to all mode*/
 					$registFrm.find(".ui.checked.radio.checkbox:first").checkbox("set checked");
-					$certRegistFrm.find(".field").removeClass("disabled");
-					$taxRegistFrm.find(".field").removeClass("disabled");
 					$certRegistFrm.form('set value', 'taskType', 'C');
 					$taxRegistFrm.form('set value', 'taskType', 'T');
+					$kirRegistFrm.form('set value', 'taskType', 'K');
 					$registModal.modal("show");
 				} else {
 					alert(tmplResponse.status.description);
@@ -87,17 +88,20 @@ function saveRegistration() {
 	if(taskType == 'all') {
 		var certFrmValid = $certRegistFrm.form('validate form');
 		var taxFrmValid = $taxRegistFrm.form('validate form');
-		if(!certFrmValid  || !taxFrmValid) return;
+		var kirFrmValid = $kirRegistFrm.form('validate form');
+		if(!certFrmValid  || !taxFrmValid || !kirFrmValid) return;
 		taskList.push(getFrmValueMap($certRegistFrm));
 		taskList.push(getFrmValueMap($taxRegistFrm));
-		
+		taskList.push(getFrmValueMap($kirRegistFrm));
 	} else if(taskType == 'cert') {
 		if(!$certRegistFrm.form('validate form')) return;
 		taskList.push(getFrmValueMap($certRegistFrm));
-		
 	} else if(taskType == 'tax') {
 		if(!$taxRegistFrm.form('validate form')) return;
 		taskList.push(getFrmValueMap($taxRegistFrm));
+	} else if(taskType == 'kir') {
+		if(!$kirRegistFrm.form('validate form')) return;
+		taskList.push(getFrmValueMap($kirRegistFrm));
 	} else {
 		console.log('unknown registration');
 		return;
@@ -162,8 +166,16 @@ function buildTaskTable(taskList) {
 		$clonedTR.append("<td>" + taskList[i].label + "</td>");
 		$clonedTR.append("<td>" + taskList[i].model + "</td>");
 		$clonedTR.append("<td>" + taskList[i].plateNo + "</td>");
-		$clonedTR.append("<td>" + (taskList[i].taskType == 'C' ? 'Certification' : 'Tax') + "</td>");
-		$clonedTR.append("<td class='right aligned'>" + addCommas(taskList[i].cost) + "</td>");
+		if(taskList[i].taskType == 'C') {
+			$clonedTR.append("<td>Certification</td>");
+		} else if(taskList[i].taskType == 'T') {
+			$clonedTR.append("<td>Tax</td>");
+		} else if(taskList[i].taskType == 'K') {
+			$clonedTR.append("<td>KIR</td>");
+		} else {
+			$clonedTR.append("<td>Unknown Type</td>");
+		}
+		$clonedTR.append("<td class='right aligned'>" + addCommas(taskList[i].cost == null ? '': taskList[i].cost) + "</td>");
 		$clonedTR.append("<td>" + taskList[i].dateValidTill + "</td>");
 		$clonedTR.append("<td>" + (taskList[i].paid ? 'Paid': 'Unpaid') + "</td>");
 		$clonedTR.data('task', taskList[i]);
@@ -229,7 +241,7 @@ function updateTaskCompletePaid(actionButton) {
 		});
 	});
 }
-var $registModal, $actionFrm, $taskListTable, $tableLoader, $actionButtons, $registFrm, $certRegistFrm, $taxRegistFrm, $templateDropdown, certValidTill, taxValidTill;
+var $registModal, $actionFrm, $taskListTable, $tableLoader, $actionButtons, $registFrm, $certRegistFrm, $taxRegistFrm, $kirRegistFrm, $templateDropdown, certValidTill, taxValidTill, kirValidTill;
 $(function() {
 	$actionFrm = $("#actionFrm");
 	$actionButtons = $("#actionButtons");
@@ -239,6 +251,7 @@ $(function() {
 	$registFrm = $registModal.find(">.form");
 	$certRegistFrm = $registFrm.find("#certRegistFrm");
 	$taxRegistFrm = $registFrm.find("#taxRegistFrm");
+	$kirRegistFrm = $registFrm.find("#kirRegistFrm");
 	$templateDropdown = $("#templateDropdown");
 	$registModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
 	$registModal.find(".ui.radio.checkbox").checkbox();
@@ -262,6 +275,7 @@ $(function() {
 	to.datepicker('setDate', '+4w');
 	certValidTill = $("#certValidTill").datepicker({dateFormat: 'yy-mm-dd', numberOfMonths: 1, changeMonth: true, changeYear: true});
 	taxValidTill = $("#taxValidTill").datepicker({dateFormat: 'yy-mm-dd', numberOfMonths: 1, changeMonth: true, changeYear: true});
+	kirValidTill = $("#kirValidTill").datepicker({dateFormat: 'yy-mm-dd', numberOfMonths: 1, changeMonth: true, changeYear: true});
 	$registModal.find(".ui.table:first > tbody").on("click", "> tr", function() {
 		var $this = $(this);
 		$this.parent().find("tr").removeClass("selected");
@@ -279,17 +293,19 @@ $(function() {
 	$templateDropdown.dropdown({onChange: applyTemplate});
 	$certRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
 	$taxRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
+	$kirRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', remindBeforeDays: 'empty'}});
 	$registFrm.find(".ui.checkbox.radio.applyTo").click(function() {
 		var $this = $(this);
+		var $fields = $registModal.find("#certRegistFrm  .field, #taxRegistFrm .field, #kirRegistFrm .field");
+		$fields.addClass("disabled");
 		if($this.hasClass('all')) {
-			$certRegistFrm.find(".field").removeClass("disabled");
-			$taxRegistFrm.find(".field").removeClass("disabled");
+			$fields.removeClass("disabled");
 		} else if($this.hasClass('cert')) {
-			$taxRegistFrm.find(".field").addClass("disabled");
 			$certRegistFrm.find(".field").removeClass("disabled");
 		} else if($this.hasClass('tax')) {
-			$certRegistFrm.find(".field").addClass("disabled");
 			$taxRegistFrm.find(".field").removeClass("disabled");
+		} else if($this.hasClass("kir")) {
+			$kirRegistFrm.find(".field").removeClass("disabled");
 		} else {
 			console.log('unkown radio checkbox state', $this.attr('class'));
 		}

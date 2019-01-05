@@ -84,7 +84,6 @@ function showModal(tmpl) {
 		tmpl.taxCost = addCommas(tmpl.taxCost);
 		$form.form('set values', tmpl);
 	}
-	
 	$templateModal.modal("show");
 }
 function hideModal() {

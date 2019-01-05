@@ -13,6 +13,7 @@
 	.right-column-content-container {min-width: 1000px;}
 	.ui.form .field input {padding: 0.5em;}
 	.plain-text {font-weight: normal; font-size: 0.85em;}
+	.ui.tax.segment {padding-bottom: 0;}
 </style>
 	<title>Next Generation Smart FMS Platform</title>
 </head>
@@ -82,7 +83,7 @@
 		</div>
 		<div class="fields">
 			<div class="eight wide field">
-				<div class="ui vhc-cert segment">
+				<div class="ui tax segment">
 					<div class="ui blue top attached label"><i class="car icon"></i> Vehicle Certificate</div>
 					<div class="inline fields">
 						<label>Schedule ends on Every :</label>
@@ -100,7 +101,7 @@
 				</div>
 			</div><!--  end of vehicle certification segment containing field-->
 			<div class="eight wide field">
-				<div class="ui vhc-tax segment">
+				<div class="ui tax segment">
 					<div class="ui blue top attached label"><i class="money bill alternate outline icon"></i> Vehicle Tax</div>
 					<div class="inline fields">
 						<label>Schedule ends on Every :</label>
@@ -118,14 +119,31 @@
 				</div>
 			</div><!--  end of vehicle tax segment containing field-->
 		</div>
-		<div class="ui horizontal divider"><i class="alarm icon"></i><span class="plain-text"> Notification</span></div>
-					<div class="fields">
-						<div class="eight wide field"><label><i class="comments alternate icon"></i>SMS notification</label><input type="text" name="notificationSms"></div>
-						<div class="eight wide email field"><label><i class="envelope icon"></i>Email notification</label><input type="text" name="notificationEmail"></div>
-					</div>
 		<div class="field">
-			<div class="ui small message"><i class="hand point right outline icon"></i>Notifications will always be available on web interface UI</div>
+			<div class="ui tax segment">
+				<div class="ui blue top attached label"><i class="truck icon"></i> KIR</div>
+				<div class="fields">
+					<div class="eight wide field">
+						<div class="inline fields" style="margin-bottom: 0;">
+							<label>Schedule ends on Every :</label>
+							<div class="field"><div class="ui radio checked checkbox"><input type="radio" name="kirInterval" value="6"><label>6 months</label></div></div>
+						</div>
+					</div>
+					<div class="eight wide field">	
+						<div class="inline fields" style="margin-bottom: 0;">
+							<label>Remind Before:</label>
+							<div class="field"><input type="number" name="kirRemindBeforeDays" placeholder="0" min="0" style="text-align: right;"> days</div>
+						</div>
+					</div>
+				</div>
+			</div>	
 		</div>
+		<div class="ui horizontal divider"><i class="alarm icon"></i><span class="plain-text"> Notification</span></div>
+			<div class="fields">
+				<div class="eight wide field"><label><i class="comments alternate icon"></i>SMS notification</label><input type="text" name="notificationSms"></div>
+				<div class="eight wide email field"><label><i class="envelope icon"></i>Email notification</label><input type="text" name="notificationEmail"></div>
+			</div>
+		<div class="field"><div class="ui small message"><i class="hand point right outline icon"></i>Notifications will always be available on web interface UI</div></div>
 		<div class="error-description field"></div>
 		<div class="field">
 			<div style="text-align: center;">

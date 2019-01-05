@@ -40,6 +40,10 @@ public class ServiceTemplate {
 	@Column(name="tax_remind")
 	private Integer taxRemindBeforeDays;
 
+	private Integer kirInterval;
+	@Column(name="kir_remind")
+	private Integer kirRemindBeforeDays;
+	
 	@Column(name="noti_sms")
 	private String notificationSms;
 	@Column(name="noti_email")

@@ -61,6 +61,7 @@
 								<div class="item" data-value="">All</div>
 								<div class="item" data-value="C">Certification No.</div>
 								<div class="item" data-value="T">Tax No.</div>
+								<div class="item" data-value="K">KIR No.</div>
 							</div>
 						</div>
 					</div>
@@ -119,7 +120,7 @@
 				<div class="ui segment">
 					<div class="ui top attached blue label">Tax Payment Task</div>
 					<div class="fields">
-						<div class="ten wide field">
+						<div class="eight wide field">
 							<label class="plain-text"><i class="copy outline icon"></i>Apply Template</label>
 							<div class="ui fluid search selection dropdown" id="templateDropdown">
 								<i class="dropdown icon"></i>
@@ -128,12 +129,13 @@
 								<div class="ui menu"></div>
 							</div>
 						</div>
-						<div class="six wide field">
+						<div class="eight wide field">
 							<label class="plain-text"><i class="grey clone icon"></i>Apply Task To</label>
 							<div class="inline fields" style="padding-top: 0.5em;">
 								<div class="field"><div class="ui radio checked checkbox applyTo all"><label>All</label><input type="radio" name="applyTo" value="all"></div></div>
 								<div class="field"><div class="ui radio checkbox applyTo cert"><label>Certification</label><input type="radio" name="applyTo" value="cert"></div></div>
 								<div class="field"><div class="ui radio checkbox applyTo tax"><label>Tax</label><input type="radio" name="applyTo" value="tax"></div></div>
+								<div class="field"><div class="ui radio checkbox applyTo kir"><label>KIR</label><input type="radio" name="applyTo" value="kir"></div></div>
 							</div>
 						</div>
 					</div>
@@ -148,7 +150,7 @@
 								</div>
 								<div class="fields">
 									<div class="eight wide field"><label class="plain-text">Cost</label><div class="ui small right icon input"><input type="text" class="certcost-input" name="cost" style="text-align: right;"><i class="rupee icon"></i></div></div>
-									<div class="eight wide field"><label class="plain-text">Remind Before</label><div class="ui small input"><input type="number" name="remindBeforeDays" style="text-align: right;"></div></div>
+									<div class="eight wide field"><label class="plain-text">Remind Before</label><div class="ui small input"><input type="number" name="remindBeforeDays" min="0" style="text-align: right;"></div></div>
 								</div>
 							</div>
 							<div class="four wide field">
@@ -169,7 +171,7 @@
 								</div>
 								<div class="fields">
 									<div class="eight wide field"><label class="plain-text">Cost</label><div class="ui small right icon input"><input type="text" class="taxcost-input" name="cost" style="text-align: right;"><i class="rupee icon"></i></div></div>
-									<div class="eight wide field"><label class="plain-text">Remind Before</label><div class="ui small input"><input type="number" name="remindBeforeDays" style="text-align: right;"></div></div>
+									<div class="eight wide field"><label class="plain-text">Remind Before</label><div class="ui small input"><input type="number" name="remindBeforeDays" min="0" style="text-align: right;"></div></div>
 								</div>
 							</div>
 							<div class="four wide field">
@@ -177,8 +179,26 @@
 							</div>
 						</div>
 						<div class="field"><input type='hidden' name='taskType'></div>
-					</div>	
-						
+					</div>
+					<div class="ui horizontal divider"><span class="plain-text"><i class="truck grey icon"></i>&nbsp;KIR</span></div>
+					<div class="ui form" id="kirRegistFrm">
+						<div class="fields">
+							<div class="twelve wide field">		
+								<div class="fields">
+									<div class="eight wide field"><label class="plain-text">KIR No.</label><div class="ui small input"><input type="text" name="registrationNo"></div></div>
+									<div class="eight wide field"><label class="plain-text">Valid Till</label><div class="ui small right icon input"><input type="text" name="dateValidTill" id="kirValidTill"><i class="calendar alternate outline icon"></i></div></div>
+								</div>
+								<div class="fields">
+									<div class="eight wide field"><label class="plain-text">Cost</label><div class="ui small right icon input"><input type="text" name="cost" readonly="" style="text-align: right;"><i class="rupee icon"></i></div></div>
+									<div class="eight wide field"><label class="plain-text">Remind Before</label><div class="ui small input"><input type="number" name="remindBeforeDays" min="0" style="text-align: right;"></div></div>
+								</div>
+							</div>
+							<div class="four wide field">
+								<label class="plain-text">KIR No. Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png">
+							</div>
+						</div>
+						<div class="field"><input type='hidden' name='taskType'></div>
+					</div>
 					<div class="ui horizontal divider"><i class="grey bell icon"></i>&nbsp;<span class="plain-text">Notification</span></div>
 					<div class="fields">
 						<div class="eight wide field"><label class="plain-text">SMS Notification</label><div class="ui small left icon input"><input type="text" name="notificationSms"><i class="comments alternate icon"></i></div></div>

@@ -84,7 +84,7 @@ public class VehicleTaxManagementService {
 	public List<VehicleTaxTask> listTaxTaskList(String taskType, String fromDate, String toDate) {
 		List<String> typeList = null;
 		if("".equals(taskType)) {
-			typeList = Arrays.asList("T", "C");
+			typeList = Arrays.asList("T", "C", "K");
 		} else {
 			typeList = Arrays.asList(taskType);
 		}
