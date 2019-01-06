@@ -189,7 +189,7 @@
 									<div class="eight wide field"><label class="plain-text">Valid Till</label><div class="ui small right icon input"><input type="text" name="dateValidTill" id="kirValidTill"><i class="calendar alternate outline icon"></i></div></div>
 								</div>
 								<div class="fields">
-									<div class="eight wide field"><label class="plain-text">Cost</label><div class="ui small right icon input"><input type="text" name="cost" readonly="" style="text-align: right;"><i class="rupee icon"></i></div></div>
+									<div class="eight wide field"><label class="plain-text">Cost</label><div class="ui small right icon input"><input type="text" name="cost" readonly="readonly" style="text-align: right;"><i class="rupee icon"></i></div></div>
 									<div class="eight wide field"><label class="plain-text">Remind Before</label><div class="ui small input"><input type="number" name="remindBeforeDays" min="0" style="text-align: right;"></div></div>
 								</div>
 							</div>
@@ -233,5 +233,109 @@
 <script src="/js/common.js?v=1.2"></script>
 <script src="/js/tax.api.js"></script>
 <script src="/js/vhctax.js"></script>
+<script>
+/*
+ * fileElement:native Object
+ * $uploadButton: jquery object used to initial file upload dialog
+ * uploadURI: api uri
+ * dndOptions: {$dropZone: jqueryObject }
+ */
+function TaxPhotoUploader (fileElement, $uploadButton, uploadURI, dndOptions) {
+	var uploader = this;
+	if(!TaxPhotoUploader.init) {
+		window.addEventListener("dragover",function(e){	e = e || event; e.preventDefault(); },false);
+		window.addEventListener("drop",function(e){ e = e || event; e.preventDefault();},false);
+		TaxPhotoUploader.init = true;
+	}
+	this.fileElement = fileElement;
+	this.uploadURI = uploadURI;
+
+	$uploadButton.click(function() {
+		uploader.initUpload(); 
+		uploader.fileElement.click();
+	});
+	this.fileElement.addEventListener('change', function() {
+		var files = TaxPhotoUploader.filterImages(this.files);
+		if(files.length > 0) {
+			uploader.filesToUpload = files;
+		} else {
+			return false;
+		}
+	});
+	if(dndOptions) {
+		this.$dropZone = dndOptions.$dropZone;
+		dndOptions.$dropZone.on("dragenter", function() {dndOptions.$dropZone.addClass("raised";)});
+		dndOptions.$dropZone.on("dragleave", function() {dndOptions.$dropZone.removeClass("raised";)});
+		dndOptions.$dropZone.on("dragover", function() {return false;});
+	}
+}
+TaxPhotoUploader.prototype.initUpload = function() {
+	this.fileElement.value = "";
+	this.filesToUpload = null;
+};
+TaxPhotoUploader.prototype.dndAction = function (e) {
+	e.preventDefault();
+	if(this.$dropZone) this.$dropZone.removeClass("raised");
+	TaxPhotoUploader.filterImages(e.dataTransfer.files);
+};
+
+TaxPhotoUploader.filterImages = function(files) {
+	var validFiles = [];
+	if(files) {
+		for(var i = 0; i < files.length; i++) {
+			if((/\.(gif|jpe?g|tiff|png)$/i).test(files[i].name)) validFiles.push(files[i]);
+		}
+	}
+	return validFiles;
+};
+TaxPhotoUploader.prototype.uploadTaxPhoto = function() {
+	var file;
+	var formData = new FormData();
+	formData.append("rsvn.id", rsvn.id);
+	formData.append("result.memo", rsvn.result.memo);
+	formData.append("result.location", rsvn.result.location);
+	formData.append("result.fuelRemaining", rsvn.result.fuelRemaining);
+	formData.append("result.mileage", rsvn.result.mileage);
+	var total = 0;
+	var files = this.filesToUpload;
+	for(var i = 0; i < files.length; i++) {
+		file = files[i];
+		total +=  file.size;
+		formData.append("files", file);
+	}
+	if(total >= 20 * 1024 * 1024) {
+		alert('선택한 파일의 크기가 20MB를 초과하였습니다.');
+		return;
+	}
+	var completeHandler, errorHandler;
+	if(callback) {
+		completeHandler = function(event) {
+			callback(event.target.response);
+		};
+		errorHandler = function(event) {
+			console.log(event);
+			callback({success: false, status:{description: 'Error or abort occurred while uploading file'}});	
+		};
+	} else {
+		completeHandler = this.completeHandler;
+		errorHandler = this.errorHandler;
+	}
+	var ajax = new XMLHttpRequest();
+	ajax.responseType = 'json';
+	ajax.upload.addEventListener("progress", this.progressHandler, false);
+	ajax.addEventListener("load", completeHandler, false);
+	ajax.addEventListener("error", errorHandler, false);
+	ajax.addEventListener("abort", errorHandler, false);
+	ajax.open("POST", this.uploadURI);
+	ajax.send(formData);
+};
+TaxPhotoUploader.prototype.completeHandler = function(event) {
+	console.log('Upload complete', event.target.reponse);		
+};
+TaxPhotoUploader.prototype.errorHandler = function(event) {
+	console.log('Error or Abort during upload', event);		
+};
+</script>
+<input type="file" hidden="hidden" id="photoUploadFile">
 </body>
 </html>

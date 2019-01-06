@@ -48,4 +48,7 @@ public class VehicleTaxTask {
 	
 	@Column(name="task_type")
 	private String taskType;
+	
+	@Column(name="photo_id")
+	private Long photoId;
 }
