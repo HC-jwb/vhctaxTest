@@ -1,3 +1,137 @@
+function TaxPhotoUploader (fileElement, $uploadButton, uploadURI, options) {
+	var uploader = this;
+	if(!TaxPhotoUploader.init) {
+		window.addEventListener("dragover",function(e){	e = e || event; e.preventDefault(); },false);
+		window.addEventListener("drop",function(e){ e = e || event; e.preventDefault();},false);
+		TaxPhotoUploader.init = true;
+	}
+	this.fileElement = fileElement;
+	this.uploadURI = uploadURI;
+	this.filesToUpload = null;
+	$uploadButton.click(function() {
+		uploader.initUpload(); 
+		uploader.fileElement.click();
+		uploader.$clickedSource = $(this);
+	});
+	this.fileElement.addEventListener('change', function() {
+		uploader.filterImages(this.files);
+		if(!uploader.filesToUpload) {
+			uploader.$clickedSource = null;
+			return false;
+		} else {
+			uploader.uploadTaxPhoto(function(response) {
+				if(response.success) {
+					/*console.log(response.payload);*/
+					var photoObj = response.payload;
+					uploader.$clickedSource.closest(".field").find("input[name='photoId']").val(photoObj.id);
+					uploader.$clickedSource.attr("src", photoObj.imageURL);
+				} else {
+					alert(response.status.description);
+				}
+			});			
+		}
+	});
+	this.options = options || {};
+	this.options.fileSizeMax = this.options.fileSizeMax || 10;/*10MB default upload limit*/
+	this.options.multipleUpload = this.options.multipleUpload || false;
+	if(this.options.multipleUpload) {
+		$(this.fileElement).attr("multiple", "multiple");
+	}
+	if(this.options.$dropZone) {
+		this.options.$dropZone = options.$dropZone;
+		this.options.$dropZone.on("dragenter", function() {$(this).addClass("dragover");});
+		this.options.$dropZone.on("dragleave", function() {$(this).removeClass("dragover");});
+		this.options.$dropZone.on("drop", function(e) {
+			e.preventDefault();
+			var $this = $(this);
+			$this.removeClass("dragover");
+			uploader.filterImages(e.originalEvent.dataTransfer.files);
+			uploader.uploadTaxPhoto(function(response) {
+				if(response.success) {
+					console.log(response.payload);
+					var photoObj = response.payload;
+					$this.closest(".field").find("input[name='photoId']").val(photoObj.id);
+					$this.attr("src", photoObj.imageURL);
+				} else {
+					alert(response.status.description);
+				}
+			});
+		});
+		this.options.$dropZone.on("dragover", function() {return false;});
+	}
+}
+TaxPhotoUploader.prototype.initUpload = function() {
+	this.fileElement.value = "";
+	this.filesToUpload = null;
+};
+TaxPhotoUploader.prototype.filterImages = function(files) {
+	var validFiles = [];
+	if(files) {
+		for(var i = 0; i < files.length; i++) {
+			if((/\.(gif|jpe?g|tiff|png)$/i).test(files[i].name)) validFiles.push(files[i]);
+		}
+	}
+	if(validFiles.length > 0) {
+		this.filesToUpload = files;
+	} else {
+		alert("Invalid image file!");
+		this.filesToUpload = null;
+	}
+};
+TaxPhotoUploader.prototype.uploadTaxPhoto = function(callback, paramMap) {
+	var file;
+	var formData = new FormData();
+	for(param in paramMap) {
+		formData.append(param, paramMap[param]);
+	}
+	var total = 0;
+	var files = this.filesToUpload;
+	
+	for(var i = 0; i < files.length; i++) {
+		file = files[i];
+		total +=  file.size;
+		formData.append(this.options.mutipleUpload? "files" : "file", file);
+		if(!this.options.multipleUpload) {
+			break;
+		}
+	}
+	if(total >= this.fileSizeMax * 1024 * 1024) {
+		alert('File size limit :(' +this.fileSizeMax+ '[MB] exceeded.');
+		return;
+	}
+	var completeHandler, errorHandler;
+	if(callback) {
+		completeHandler = function(event) {
+			callback(event.target.response);
+		};
+		errorHandler = function(event) {
+			console.log(event);
+			callback({success: false, status:{description: 'Error or abort occurred while uploading file'}});	
+		};
+	} else {
+		completeHandler = this.completeHandler;
+		errorHandler = this.errorHandler;
+	}
+	var ajax = new XMLHttpRequest();
+	ajax.responseType = 'json';
+	ajax.upload.addEventListener("progress", this.progressHandler, false);
+	ajax.addEventListener("load", completeHandler, false);
+	ajax.addEventListener("error", errorHandler, false);
+	ajax.addEventListener("abort", errorHandler, false);
+	ajax.open("POST", this.uploadURI);
+	ajax.send(formData);
+};
+TaxPhotoUploader.prototype.completeHandler = function(event) {
+	console.log('Upload complete', event.target.reponse);		
+};
+TaxPhotoUploader.prototype.progressHandler = function(event) {
+	var percent = (event.loaded / event.total) * 100;
+	console.log("uploading progress", percent);
+};
+TaxPhotoUploader.prototype.errorHandler = function(event) {
+	console.log('Error or Abort during upload', event);		
+};
+
 function buildVhcList(vhcList) {
 	var $tbody = $registFrm.find(".ui.table > tbody:first");
 	var $item = $("<tr></tr>");
@@ -60,7 +194,8 @@ function showRegistModal(addButton) {
 					buildVhcList(response.payload);
 					buildTmplDropdown(tmplResponse.payload);
 					$registFrm.form('clear');
-					/*$registFrm.find(".ui.radio.checkbox:first").checkbox("set checked");*//*When rquired to reset to all mode*/
+					$registFrm.find(".tax-reg-photo").attr("src", "/images/dummy_photo.png");
+									/*$registFrm.find(".ui.radio.checkbox:first").checkbox("set checked");*//*When rquired to reset to all mode*/
 					$registFrm.find(".ui.checked.radio.checkbox:first").checkbox("set checked");
 					$certRegistFrm.form('set value', 'taskType', 'C');
 					$taxRegistFrm.form('set value', 'taskType', 'T');
@@ -156,28 +291,35 @@ function buildTaskTable(taskList) {
 	var $TR = $("<tr></tr>"), $clonedTR;
 	if(taskList.length == 0) {
 		$clonedTR = $TR.clone(false);
-		$clonedTR.append("<td class='center aligned' colspan='8'>No matched data found.</td>");
+		$clonedTR.append("<td class='center aligned' colspan='11'>No matched data found.</td>");
 		$TBODY.append($clonedTR);
 		return;
 	}
 	for(var i = 0; i < taskList.length; i++) {
 		$clonedTR = $TR.clone(false);
 		$clonedTR.append("<td class='collapsing'><div class='ui task checkbox no-label'><input type='checkbox'></div></td>");
-		$clonedTR.append("<td>" + taskList[i].label + "</td>");
-		$clonedTR.append("<td>" + taskList[i].model + "</td>");
-		$clonedTR.append("<td>" + taskList[i].plateNo + "</td>");
+		$clonedTR.append("<td class='collapsing'>" + taskList[i].label + "</td>");
+		$clonedTR.append("<td class='collapsing'>" + taskList[i].model + "</td>");
+		$clonedTR.append("<td class='collapsing'>" + taskList[i].plateNo + "</td>");
 		if(taskList[i].taskType == 'C') {
-			$clonedTR.append("<td>Certification</td>");
+			$clonedTR.append("<td class='collapsing'>Certification</td>");
 		} else if(taskList[i].taskType == 'T') {
-			$clonedTR.append("<td>Tax</td>");
+			$clonedTR.append("<td class='collapsing'>Tax</td>");
 		} else if(taskList[i].taskType == 'K') {
-			$clonedTR.append("<td>KIR</td>");
+			$clonedTR.append("<td class='collapsing'>KIR</td>");
 		} else {
-			$clonedTR.append("<td>Unknown Type</td>");
+			$clonedTR.append("<td class='collapsing'>Unknown Type</td>");
 		}
-		$clonedTR.append("<td class='right aligned'>" + addCommas(taskList[i].cost == null ? '': taskList[i].cost) + "</td>");
-		$clonedTR.append("<td>" + taskList[i].dateValidTill + "</td>");
+		$clonedTR.append("<td class='collapsing'>" +taskList[i].registrationNo+ "</td>");
+		$clonedTR.append("<td class='right aligned collapsing'>" + addCommas(taskList[i].cost == null ? '': taskList[i].cost) + "</td>");
+		$clonedTR.append("<td class='collapsing'>" + taskList[i].dateValidTill + "</td>");
 		$clonedTR.append("<td>" + (taskList[i].paid ? 'Paid': 'Unpaid') + "</td>");
+		$clonedTR.append("<td class='collapsing'>"+ (taskList[i].smsNotification? taskList[i].smsNotification: 'None,')+ (taskList[i].emailNotification? taskList[i].emailNotification: 'None')+"</td>")
+		if(taskList[i].photoId) {
+			$clonedTR.append("<td class='center aligned collapsing popup'><i class='eye grey icon photo-link'></i></td>");
+		} else {
+			$clonedTR.append("<td class='center aligned collapsing'></td>");
+		}
 		$clonedTR.data('task', taskList[i]);
 		$TBODY.append($clonedTR);
 	}
@@ -241,19 +383,27 @@ function updateTaskCompletePaid(actionButton) {
 		});
 	});
 }
-var $registModal, $actionFrm, $taskListTable, $tableLoader, $actionButtons, $registFrm, $certRegistFrm, $taxRegistFrm, $kirRegistFrm, $templateDropdown, certValidTill, taxValidTill, kirValidTill;
+function showTaxPhoto(taskObj) {
+	$photoPopupModal.find("img").attr("src", taskObj.imageURL);
+	$photoPopupModal.modal('show');
+}
+var $registModal, $photoPopupModal, $actionFrm, $taskListTable, $tableLoader, $actionButtons, $registFrm, 
+$certRegistFrm, $taxRegistFrm, $kirRegistFrm, $templateDropdown, certValidTill, taxValidTill, kirValidTill;
 $(function() {
 	$actionFrm = $("#actionFrm");
 	$actionButtons = $("#actionButtons");
 	$taskListTable = $("#taskListTable");
 	$tableLoader = $("#taskTableLoader");
 	$registModal = $("#registModal");
+	$photoPopupModal = $("#photoPopupModal");
 	$registFrm = $registModal.find(">.form");
 	$certRegistFrm = $registFrm.find("#certRegistFrm");
 	$taxRegistFrm = $registFrm.find("#taxRegistFrm");
 	$kirRegistFrm = $registFrm.find("#kirRegistFrm");
 	$templateDropdown = $("#templateDropdown");
 	$registModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
+	$photoPopupModal.modal({dimmerSettings:{opacity: 0.1}, autofocus:false, closable:true});
+	$photoPopupModal.find(".close.button").click(function() {$photoPopupModal.modal('hide');});
 	$registModal.find(".ui.radio.checkbox").checkbox();
 	$taskListTable.find(".ui.checkbox.chkAll:first").checkbox();
 	$(".ui.dropdown").dropdown();
@@ -289,7 +439,9 @@ $(function() {
 			$this.checkbox(allChk? 'check': 'uncheck');/*set checked or set unchecked won't fire onChange event callback*/
 		});
 	});	
-	
+	$taskListTable.on("click", ">tbody>tr>td>.photo-link", function() {
+		showTaxPhoto($(this).closest('tr').data('task'));
+	});
 	$templateDropdown.dropdown({onChange: applyTemplate});
 	$certRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
 	$taxRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
@@ -318,15 +470,8 @@ $(function() {
 			saveRegistration();
 		}
 	});
-	var cleave = new Cleave('.taxcost-input', {
-	    numeral: true,
-	    numeralThousandsGroupStyle: 'thousand'
-	});
-	cleave = new Cleave('.certcost-input', {
-	    numeral: true,
-	    numeralThousandsGroupStyle: 'thousand'
-	});
-	
+	var cleave = new Cleave('.taxcost-input', {numeral: true,numeralThousandsGroupStyle: 'thousand'});
+	cleave = new Cleave('.certcost-input', {numeral: true,numeralThousandsGroupStyle: 'thousand'});
 	listTaxPaymentTask();
 	
 	$actionFrm.find(".ui.search.button:first").click(listTaxPaymentTask);
@@ -334,4 +479,10 @@ $(function() {
 	$actionButtons.find(".remove.button").click(function() {removeCheckedTask(this); });
 	$actionButtons.find(".complete.button").click(function() {updateTaskCompletePaid(this);});
 	DialogUI.init();/*call only when I want to use dialog ui*/
+	uploader = new TaxPhotoUploader(
+		document.getElementById("photoUploadFile"),	
+		$(".tax-reg-photo"), 
+		"/addon/upload/photo", 
+		{$dropZone:$('.tax-reg-photo'), multipleUpload:true, fileSizeMax: 10}
+	);
 });

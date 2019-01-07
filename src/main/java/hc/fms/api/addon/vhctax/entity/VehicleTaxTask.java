@@ -51,4 +51,8 @@ public class VehicleTaxTask {
 	
 	@Column(name="photo_id")
 	private Long photoId;
+	
+	public String getImageURL() {
+		return String.format("/addon/vhctax/photoimg/%d", this.photoId);
+	}
 }

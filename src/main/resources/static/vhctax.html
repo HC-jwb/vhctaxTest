@@ -17,7 +17,8 @@
 	.ui.small.tax.form .fields {margin-bottom: 0.35em;}
 	.tax-reg-photo {width: 100px; height: 80px;}
 	.ui.table > tbody > tr.selected {background-color: #4085e5; color: white;}
-	img.tax-reg-photo:hover {cursor: pointer;}
+	img.tax-reg-photo:hover, i.photo-link.icon {cursor: pointer;}
+	img.tax-reg-photo.dragover {border: 1px dashed red;}
 </style>
 	<title>Next Generation Smart FMS Platform</title>
 </head>
@@ -88,17 +89,20 @@
 			</div>
 			<div class="ui basic segment" style="padding:0; margin: 0;">
 				<div class="ui loader" id="taskTableLoader"></div>
-				<table class="ui celled teal striped compact small unstackable table" id="taskListTable" style="margin-top: 0.2em;">
+				<table class="ui celled teal striped compact small unstackable selectable table" id="taskListTable" style="margin-top: 0.2em;">
 					<thead>
 					<tr>
 						<th class="center aligned collapsing"><div class="ui checkbox no-label chkAll"><input type="checkbox" name="chkAll"></div></th>
 						<th class="center aligned">Label</th>
 						<th class="center aligned">Model</th>
 						<th class="center aligned">Plate No.</th>
-						<th class="center aligned">Payment Type</th>
+						<th class="center aligned">Type</th>
+						<th class="center aligned collapsing">Payment No.</th>
 						<th class="center aligned">Cost</th>
 						<th class="center aligned">Due Date</th>
 						<th class="center aligned">Status</th>
+						<th class="center aligned">Notification</th>
+						<th class="collapsing">Photo</th>
 					</tr>
 					</thead>
 					<tbody></tbody>
@@ -154,7 +158,8 @@
 								</div>
 							</div>
 							<div class="four wide field">
-								<label class="plain-text">Certification Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png">
+								<label class="plain-text">Certification Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png" title="click or drop image file">
+								<input type="hidden" name="photoId">
 							</div>
 						</div>
 						<div class="field"><input type='hidden' name='taskType'></div>
@@ -175,7 +180,8 @@
 								</div>
 							</div>
 							<div class="four wide field">
-								<label class="plain-text">Tax Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png">
+								<label class="plain-text">Tax Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png" title="click or drop image file">
+								<input type="hidden" name="photoId">
 							</div>
 						</div>
 						<div class="field"><input type='hidden' name='taskType'></div>
@@ -194,7 +200,8 @@
 								</div>
 							</div>
 							<div class="four wide field">
-								<label class="plain-text">KIR No. Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png">
+								<label class="plain-text">KIR No. Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png" title="click or drop image file">
+								<input type="hidden" name="photoId">
 							</div>
 						</div>
 						<div class="field"><input type='hidden' name='taskType'></div>
@@ -224,6 +231,14 @@
 		</div>
 	</div>
 </div>
+<div class="ui small segment modal" id="photoPopupModal">
+	<div style="text-align: center; overflow: auto;">
+		<img style="max-width: 700px;">
+	</div>
+	<div class="ui divider"></div>
+	<div><div class="ui small compact right floated close button">Close</div></div>
+</div>
+<input type="file" hidden="hidden" id="photoUploadFile">
 <script src="/js/nprogress.js"></script>
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/jquery-ui.min.js"></script>
@@ -232,110 +247,6 @@
 <script src="/js/common.api.js"></script>
 <script src="/js/common.js?v=1.2"></script>
 <script src="/js/tax.api.js"></script>
-<script src="/js/vhctax.js"></script>
-<script>
-/*
- * fileElement:native Object
- * $uploadButton: jquery object used to initial file upload dialog
- * uploadURI: api uri
- * dndOptions: {$dropZone: jqueryObject }
- */
-function TaxPhotoUploader (fileElement, $uploadButton, uploadURI, dndOptions) {
-	var uploader = this;
-	if(!TaxPhotoUploader.init) {
-		window.addEventListener("dragover",function(e){	e = e || event; e.preventDefault(); },false);
-		window.addEventListener("drop",function(e){ e = e || event; e.preventDefault();},false);
-		TaxPhotoUploader.init = true;
-	}
-	this.fileElement = fileElement;
-	this.uploadURI = uploadURI;
-
-	$uploadButton.click(function() {
-		uploader.initUpload(); 
-		uploader.fileElement.click();
-	});
-	this.fileElement.addEventListener('change', function() {
-		var files = TaxPhotoUploader.filterImages(this.files);
-		if(files.length > 0) {
-			uploader.filesToUpload = files;
-		} else {
-			return false;
-		}
-	});
-	if(dndOptions) {
-		this.$dropZone = dndOptions.$dropZone;
-		dndOptions.$dropZone.on("dragenter", function() {dndOptions.$dropZone.addClass("raised";)});
-		dndOptions.$dropZone.on("dragleave", function() {dndOptions.$dropZone.removeClass("raised";)});
-		dndOptions.$dropZone.on("dragover", function() {return false;});
-	}
-}
-TaxPhotoUploader.prototype.initUpload = function() {
-	this.fileElement.value = "";
-	this.filesToUpload = null;
-};
-TaxPhotoUploader.prototype.dndAction = function (e) {
-	e.preventDefault();
-	if(this.$dropZone) this.$dropZone.removeClass("raised");
-	TaxPhotoUploader.filterImages(e.dataTransfer.files);
-};
-
-TaxPhotoUploader.filterImages = function(files) {
-	var validFiles = [];
-	if(files) {
-		for(var i = 0; i < files.length; i++) {
-			if((/\.(gif|jpe?g|tiff|png)$/i).test(files[i].name)) validFiles.push(files[i]);
-		}
-	}
-	return validFiles;
-};
-TaxPhotoUploader.prototype.uploadTaxPhoto = function() {
-	var file;
-	var formData = new FormData();
-	formData.append("rsvn.id", rsvn.id);
-	formData.append("result.memo", rsvn.result.memo);
-	formData.append("result.location", rsvn.result.location);
-	formData.append("result.fuelRemaining", rsvn.result.fuelRemaining);
-	formData.append("result.mileage", rsvn.result.mileage);
-	var total = 0;
-	var files = this.filesToUpload;
-	for(var i = 0; i < files.length; i++) {
-		file = files[i];
-		total +=  file.size;
-		formData.append("files", file);
-	}
-	if(total >= 20 * 1024 * 1024) {
-		alert('선택한 파일의 크기가 20MB를 초과하였습니다.');
-		return;
-	}
-	var completeHandler, errorHandler;
-	if(callback) {
-		completeHandler = function(event) {
-			callback(event.target.response);
-		};
-		errorHandler = function(event) {
-			console.log(event);
-			callback({success: false, status:{description: 'Error or abort occurred while uploading file'}});	
-		};
-	} else {
-		completeHandler = this.completeHandler;
-		errorHandler = this.errorHandler;
-	}
-	var ajax = new XMLHttpRequest();
-	ajax.responseType = 'json';
-	ajax.upload.addEventListener("progress", this.progressHandler, false);
-	ajax.addEventListener("load", completeHandler, false);
-	ajax.addEventListener("error", errorHandler, false);
-	ajax.addEventListener("abort", errorHandler, false);
-	ajax.open("POST", this.uploadURI);
-	ajax.send(formData);
-};
-TaxPhotoUploader.prototype.completeHandler = function(event) {
-	console.log('Upload complete', event.target.reponse);		
-};
-TaxPhotoUploader.prototype.errorHandler = function(event) {
-	console.log('Error or Abort during upload', event);		
-};
-</script>
-<input type="file" hidden="hidden" id="photoUploadFile">
+<script src="/js/vhctaxtask.js"></script>
 </body>
 </html>
