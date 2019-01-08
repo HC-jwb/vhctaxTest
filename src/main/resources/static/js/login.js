@@ -4,9 +4,7 @@ $(function() {
 			login: {
 				identifier  : 'login',
 				rules: [
-					{
-					type   : 'empty',
-					prompt : '유효하지 않은 아이디입니다.'
+					{type   : 'empty',prompt : 'Empty ID.'
 					}
 				]
 			},
@@ -15,7 +13,7 @@ $(function() {
 				rules: [
 					{
 						type   : 'empty',
-						prompt : '패스워드가 공란입니다'
+						prompt : 'Password Empty.'
 					}
 				]
 			}
@@ -59,7 +57,7 @@ function tryLogin (event, fields) {
 	/*userAuth({login: fields.login, password: fields.password}, procRedirect);*/
 	AuthApi.authenticate({login: fields.login, password: fields.password}, function(response){
 		if(response.success) {
-			window.location.replace('/fuel.html');
+			window.location.replace('/fms.html');
 		} else {
 			alert(response.status.description);
 			window.location.replace("/login.html");

@@ -313,7 +313,21 @@ function buildTaskTable(taskList) {
 		$clonedTR.append("<td class='collapsing'>" +taskList[i].registrationNo+ "</td>");
 		$clonedTR.append("<td class='right aligned collapsing'>" + addCommas(taskList[i].cost == null ? '': taskList[i].cost) + "</td>");
 		$clonedTR.append("<td class='collapsing'>" + taskList[i].dateValidTill + "</td>");
-		$clonedTR.append("<td>" + (taskList[i].paid ? 'Paid': 'Unpaid') + "</td>");
+		if(taskList[i].paid) {
+			$clonedTR.append("<td>Paid</td>");
+		} else {
+			if(taskList[i].daysLeft > 0) {
+				if(taskList[i].remindBeforeDays >= taskList[i].daysLeft) {
+					$clonedTR.append("<td>Unpaid (<strong style='color: #ee2222;'>"+ taskList[i].daysLeft+"</strong> day(s) left)</td>");
+				} else {
+					$clonedTR.append("<td>Unpaid ("+ taskList[i].daysLeft+" days left)</td>");
+				}
+			} else {
+				$clonedTR.addClass("warning");
+				$clonedTR.append("<td>Unpaid (<strong style='color: #ee2222;'>"+ Math.abs(taskList[i].daysLeft)+"</strong> days past due date)</td>");
+			}
+				
+		}
 		$clonedTR.append("<td class='collapsing'>"+ (taskList[i].smsNotification? taskList[i].smsNotification: 'None,')+ (taskList[i].emailNotification? taskList[i].emailNotification: 'None')+"</td>")
 		if(taskList[i].photoId) {
 			$clonedTR.append("<td class='center aligned collapsing popup'><i class='eye grey icon photo-link'></i></td>");
@@ -483,6 +497,6 @@ $(function() {
 		document.getElementById("photoUploadFile"),	
 		$(".tax-reg-photo"), 
 		"/addon/upload/photo", 
-		{$dropZone:$('.tax-reg-photo'), multipleUpload:true, fileSizeMax: 10}
+		{$dropZone:$('.tax-reg-photo'), multipleUpload:false, fileSizeMax: 10}
 	);
 });

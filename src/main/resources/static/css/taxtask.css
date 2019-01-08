@@ -1,0 +1,10 @@
+.ui.tax.segment {padding-bottom: 0;}
+.right-column-content-container {min-width: 1000px;}
+.ui.form .field input {padding: 0.5em;}
+.plain-text {font-weight: normal !important; font-size: 0.9em !important;}
+.ui.checkbox.no-label {font-size: 0;}
+.ui.small.tax.form .fields {margin-bottom: 0.35em;}
+.tax-reg-photo {width: 100px; height: 80px;}
+.ui.table > tbody > tr.selected {background-color: #4085e5; color: white;}
+img.tax-reg-photo:hover, i.photo-link.icon {cursor: pointer;}
+img.tax-reg-photo.dragover {border: 1px dashed red;}

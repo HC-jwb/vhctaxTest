@@ -1,11 +1,17 @@
 package hc.fms.api.addon.vhctax.entity;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -52,7 +58,15 @@ public class VehicleTaxTask {
 	@Column(name="photo_id")
 	private Long photoId;
 	
+	@Transient
+	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	public String getImageURL() {
 		return String.format("/addon/vhctax/photoimg/%d", this.photoId);
+	}
+	public Long getDaysLeft() throws ParseException {
+		Date today = dateFormat.parse(dateFormat.format(new Date()));
+		Date dueDate = dateFormat.parse(this.dateValidTill);
+		long diffInMillies = dueDate.getTime() - today.getTime();
+	    return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 	}
 }

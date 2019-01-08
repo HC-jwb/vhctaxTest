@@ -21,5 +21,7 @@ public interface VehicleTaxPaymentTaskRepository extends JpaRepository<VehicleTa
 	@Modifying
 	@Query(value="update VehicleTaxTask t set t.paid=TRUE where t.id=:taskId")
 	public void updatePaymentTaskPaid(@Param("taskId") Long taskId);
-
+	
+	@Query(value="select * from vhc_tax_task where paid != 1 and date_add(valid_till_dt,interval -remind DAY) <= now() order by valid_till_dt asc", nativeQuery=true)
+	public List<VehicleTaxTask> findAllTaskForNotification();
 }
