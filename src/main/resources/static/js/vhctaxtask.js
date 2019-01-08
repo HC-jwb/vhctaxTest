@@ -74,7 +74,7 @@ TaxPhotoUploader.prototype.filterImages = function(files) {
 	if(validFiles.length > 0) {
 		this.filesToUpload = files;
 	} else {
-		alert("Invalid image file!");
+		/*alert("Invalid image file!");*/
 		this.filesToUpload = null;
 	}
 };
@@ -112,6 +112,7 @@ TaxPhotoUploader.prototype.uploadTaxPhoto = function(callback, paramMap) {
 		completeHandler = this.completeHandler;
 		errorHandler = this.errorHandler;
 	}
+/*	
 	var ajax = new XMLHttpRequest();
 	ajax.responseType = 'json';
 	ajax.upload.addEventListener("progress", this.progressHandler, false);
@@ -120,6 +121,21 @@ TaxPhotoUploader.prototype.uploadTaxPhoto = function(callback, paramMap) {
 	ajax.addEventListener("abort", errorHandler, false);
 	ajax.open("POST", this.uploadURI);
 	ajax.send(formData);
+*/
+	$.ajax({
+		url: this.uploadURI,
+		type: 'POST',
+		data: formData,
+		contentType: false,
+		processData: false,
+		success: function(response) {
+			if(callback) callback(response);
+			else console.log(response);
+		},
+		error: function() {
+			if(callback) callback({success: false, status:{description: 'Error or abort occurred while uploading file'}});
+		}
+	});
 };
 TaxPhotoUploader.prototype.completeHandler = function(event) {
 	console.log('Upload complete', event.target.reponse);		
