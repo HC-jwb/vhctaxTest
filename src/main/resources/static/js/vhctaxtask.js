@@ -163,19 +163,20 @@ function applyTemplate(text, value, $item) {
 	var tmpl = $item.data("tmpl");
 	tmpl.certificationCost = addCommas(tmpl.certificationCost);
 	tmpl.taxCost = addCommas(tmpl.taxCost);
-	var certMap = {}, taxMap = {};
+	var certMap = {}, taxMap = {}, kirMap= {};
 	certMap.cost = addCommas(tmpl.certificationCost);
 	certMap.remindBeforeDays = tmpl.certificationRemindBeforeDays;
 	taxMap.cost = addCommas(tmpl.taxCost);
 	taxMap.remindBeforeDays = tmpl.taxRemindBeforeDays;
+	kirMap.remindBeforeDays = tmpl.kirRemindBeforeDays;
 	
 	$registFrm.form("set values", tmpl);
 	$certRegistFrm.form('set values', certMap);
 	$taxRegistFrm.form('set values', taxMap);
-	
+	$kirRegistFrm.form("set values", kirMap);
 	certValidTill.datepicker("option", "defaultDate", "+" + tmpl.certificationInterval + "y");
 	taxValidTill.datepicker("option", "defaultDate", "+" + tmpl.taxInterval + "y");
-	kirValidTill.datepicker("option", "defaultDate", "+6M");
+	kirValidTill.datepicker("option", "defaultDate", "+" + tmpl.kirInterval + "M");
 }
 function applyVehicle(vhc) {
 	$registFrm.form('set value', 'vehicleId', vhc.id);
