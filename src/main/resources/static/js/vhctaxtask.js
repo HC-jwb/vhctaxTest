@@ -337,7 +337,11 @@ function buildTaskTable(taskList) {
 				if(taskList[i].remindBeforeDays >= taskList[i].daysLeft) {
 					$clonedTR.append("<td>Unpaid (<strong style='color: #ee2222;'>"+ taskList[i].daysLeft+"</strong> day(s) left)</td>");
 				} else {
-					$clonedTR.append("<td>Unpaid ("+ taskList[i].daysLeft+" days left)</td>");
+					if(taskList[i].daysLeft > 50) {
+						$clonedTR.append("<td>Unpaid (50+ days left)</td>");
+					} else {
+						$clonedTR.append("<td>Unpaid ("+ taskList[i].daysLeft+" days left)</td>");
+					}
 				}
 			} else {
 				$clonedTR.addClass("warning");
