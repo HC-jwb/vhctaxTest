@@ -10,9 +10,9 @@ function saveTemplate() {
 	}
 	svcTmpl.certificationCost = svcTmpl.certificationCost.replace(/\,/g,"");
 	svcTmpl.taxCost = svcTmpl.taxCost.replace(/\,/g,"");
+	svcTmpl.kirCost = svcTmpl.kirCost.replace(/\,/g,"");
 	TaxServiceApi.savePaymentTemplate(svcTmpl, function(response) {
 		if(response.success) {
-			console.log(response.payload);
 			listServiceTemplate();
 		} else {
 			FormUI.displayMsgIn($form, response.status.description);
@@ -82,6 +82,7 @@ function showModal(tmpl) {
 		$form.data('id', tmpl.id);
 		tmpl.certificationCost = addCommas(tmpl.certificationCost);
 		tmpl.taxCost = addCommas(tmpl.taxCost);
+		tmpl.kirCost = addCommas(tmpl.kirCost);
 		$form.form('set values', tmpl);
 	}
 	$templateModal.modal("show");
@@ -98,7 +99,7 @@ $(function() {
 	$tableLoader = $("#tableLoader");
 	$templateModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
 	$form = $templateModal.find(".ui.form");
-	$form.form({fields: {title:'empty', description:'empty', certificationCost:'number', certificationCost:'empty', taxCost:'empty'}});
+	$form.form({fields: {title:'empty', description:'empty', certificationCost:'number', certificationCost:'empty', taxCost:'empty', kirCost:'empty'}});
 	
 	$tmplListTable.on("click", "tbody > tr > td > .ui.button", function() {
 		var $this = $(this);
@@ -123,6 +124,10 @@ $(function() {
 	    numeralThousandsGroupStyle: 'thousand'
 	});
 	cleave = new Cleave('.certcost-input', {
+	    numeral: true,
+	    numeralThousandsGroupStyle: 'thousand'
+	});
+	cleave = new Cleave('.kircost-input', {
 	    numeral: true,
 	    numeralThousandsGroupStyle: 'thousand'
 	});

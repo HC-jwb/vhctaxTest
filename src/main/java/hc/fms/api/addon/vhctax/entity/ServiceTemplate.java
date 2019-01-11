@@ -41,6 +41,8 @@ public class ServiceTemplate {
 	private Integer taxRemindBeforeDays;
 
 	private Integer kirInterval;
+	@Column(name="kir_cost")
+	private Double kirCost;
 	@Column(name="kir_remind")
 	private Integer kirRemindBeforeDays;
 	

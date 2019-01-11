@@ -177,13 +177,15 @@ function buildTmplDropdown(tmplList) {
 function applyTemplate(text, value, $item) {
  	if(!$item) {return;}
 	var tmpl = $item.data("tmpl");
-	tmpl.certificationCost = addCommas(tmpl.certificationCost);
+	/*tmpl.certificationCost = addCommas(tmpl.certificationCost);
 	tmpl.taxCost = addCommas(tmpl.taxCost);
+	tmpl.kirCost = addCommas(tmpl.kirCost);*/
 	var certMap = {}, taxMap = {}, kirMap= {};
 	certMap.cost = addCommas(tmpl.certificationCost);
 	certMap.remindBeforeDays = tmpl.certificationRemindBeforeDays;
 	taxMap.cost = addCommas(tmpl.taxCost);
 	taxMap.remindBeforeDays = tmpl.taxRemindBeforeDays;
+	kirMap.cost = addCommas(tmpl.kirCost);
 	kirMap.remindBeforeDays = tmpl.kirRemindBeforeDays;
 	
 	$registFrm.form("set values", tmpl);
@@ -480,7 +482,7 @@ $(function() {
 	$templateDropdown.dropdown({onChange: applyTemplate});
 	$certRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
 	$taxRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
-	$kirRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', remindBeforeDays: 'empty'}});
+	$kirRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
 	$registFrm.find(".ui.checkbox.radio.applyTo").click(function() {
 		var $this = $(this);
 		var $fields = $registModal.find("#certRegistFrm  .field, #taxRegistFrm .field, #kirRegistFrm .field");
@@ -507,6 +509,7 @@ $(function() {
 	});
 	var cleave = new Cleave('.taxcost-input', {numeral: true,numeralThousandsGroupStyle: 'thousand'});
 	cleave = new Cleave('.certcost-input', {numeral: true,numeralThousandsGroupStyle: 'thousand'});
+	cleave = new Cleave('.kircost-input', {numeral: true,numeralThousandsGroupStyle: 'thousand'});
 	listTaxPaymentTask();
 	
 	$actionFrm.find(".ui.search.button:first").click(listTaxPaymentTask);
