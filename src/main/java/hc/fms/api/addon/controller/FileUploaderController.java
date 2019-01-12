@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import hc.fms.api.addon.model.ResponseContainer;
 import hc.fms.api.addon.model.ResponseStatus;
-import hc.fms.api.addon.vhctax.entity.TaxRegistrationPhoto;
+import hc.fms.api.addon.vhctax.entity.TaxPhoto;
 import hc.fms.api.addon.vhctax.service.UploadStorageService;
 
 @RestController
@@ -18,10 +18,10 @@ public class FileUploaderController {
 	@Autowired
 	private UploadStorageService uploadStorageService;
 	@PostMapping("photo")
-	public ResponseContainer<TaxRegistrationPhoto> uploadFile(@RequestParam("file") MultipartFile file) {
-		ResponseContainer<TaxRegistrationPhoto> response = new ResponseContainer<>();
+	public ResponseContainer<TaxPhoto> uploadFile(@RequestParam("file") MultipartFile file) {
+		ResponseContainer<TaxPhoto> response = new ResponseContainer<>();
 		try {
-			TaxRegistrationPhoto taxPhoto = new TaxRegistrationPhoto();
+			TaxPhoto taxPhoto = new TaxPhoto();
 			String fileName = file.getOriginalFilename();
 			byte [] data = file.getBytes();
 			taxPhoto.setImage(data);

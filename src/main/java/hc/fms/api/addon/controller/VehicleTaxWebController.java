@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import hc.fms.api.addon.vhctax.entity.TaxRegistrationPhoto;
+import hc.fms.api.addon.vhctax.entity.TaxPhoto;
 import hc.fms.api.addon.vhctax.repository.TaxPhotoRepository;
 
 @Controller
@@ -21,7 +21,7 @@ public class VehicleTaxWebController {
 	private TaxPhotoRepository taxPhotoRepository;
 	@GetMapping("/vhctax/photoimg/{photoId}")
 	public void sendBinaryAsImageContent(@PathVariable("photoId") Long photoId, HttpServletResponse response) throws IOException {
-		TaxRegistrationPhoto registrationPhoto = taxPhotoRepository.findById(photoId).get();
+		TaxPhoto registrationPhoto = taxPhotoRepository.findById(photoId).get();
 		response.setContentType(String.format("image/%s", registrationPhoto.getType()));
 		OutputStream os = response.getOutputStream();
 		os.write(registrationPhoto.getImage());

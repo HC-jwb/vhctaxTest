@@ -305,59 +305,58 @@ function listTaxPaymentTask() {
 	});
 }
 function buildTaskTable(taskList) {
-	var $TBODY = $taskListTable.find(">tbody");
-	$TBODY.empty();
+	var $TBODY = $taskListTable.find(">tbody").empty();
 	var $TR = $("<tr></tr>"), $clonedTR;
 	if(taskList.length == 0) {
 		$clonedTR = $TR.clone(false);
-		$clonedTR.append("<td class='center aligned' colspan='11'>No matched data found.</td>");
+		$clonedTR.append("<td class='center aligned' colspan='13'>No matched data found.</td>");
 		$TBODY.append($clonedTR);
 		return;
 	}
+	var task;
 	for(var i = 0; i < taskList.length; i++) {
+		task = taskList[i];
 		$clonedTR = $TR.clone(false);
 		$clonedTR.append("<td class='collapsing'><div class='ui task checkbox no-label'><input type='checkbox'></div></td>");
-		$clonedTR.append("<td class='collapsing'>" + taskList[i].label + "</td>");
-		$clonedTR.append("<td class='collapsing'>" + taskList[i].model + "</td>");
-		$clonedTR.append("<td class='collapsing'>" + taskList[i].plateNo + "</td>");
-		if(taskList[i].taskType == 'C') {
+		$clonedTR.append("<td class='collapsing'>" + task.label + "</td>");
+		$clonedTR.append("<td class='collapsing'>" + task.model + "</td>");
+		$clonedTR.append("<td class='collapsing'>" + task.plateNo + "</td>");
+		if(task.taskType == 'C') {
 			$clonedTR.append("<td class='collapsing'>Certification</td>");
-		} else if(taskList[i].taskType == 'T') {
+		} else if(task.taskType == 'T') {
 			$clonedTR.append("<td class='collapsing'>Tax</td>");
-		} else if(taskList[i].taskType == 'K') {
+		} else if(task.taskType == 'K') {
 			$clonedTR.append("<td class='collapsing'>KIR</td>");
 		} else {
 			$clonedTR.append("<td class='collapsing'>Unknown Type</td>");
 		}
-		$clonedTR.append("<td class='collapsing'>" +taskList[i].registrationNo+ "</td>");
-		$clonedTR.append("<td class='right aligned collapsing'>" + addCommas(taskList[i].cost == null ? '': taskList[i].cost) + "</td>");
-		$clonedTR.append("<td class='collapsing'>" + taskList[i].dateValidTill + "</td>");
-		if(taskList[i].paid) {
+		$clonedTR.append("<td class='collapsing'>" +task.registrationNo+ "</td>");
+		$clonedTR.append("<td class='right aligned collapsing'>" + addCommas(task.cost == null ? '': task.cost) + "</td>");
+		$clonedTR.append("<td class='collapsing'>" + task.dateValidTill + "</td>");
+		if(task.paid) {
 			$clonedTR.append("<td>Paid</td>");
 		} else {
-			if(taskList[i].daysLeft > 0) {
-				if(taskList[i].remindBeforeDays >= taskList[i].daysLeft) {
-					$clonedTR.append("<td>Unpaid (<strong style='color: #ee2222;'>"+ taskList[i].daysLeft+"</strong> day(s) left)</td>");
+			var daysLeft = task.daysLeft;
+			if(daysLeft > 0) {
+				if(task.remindBeforeDays >= daysLeft) {
+					$clonedTR.append("<td>Unpaid (<strong style='color: #ee2222;'>"+ daysLeft+"</strong> day(s) left)</td>");
 				} else {
-					if(taskList[i].daysLeft > 50) {
-						$clonedTR.append("<td>Unpaid (50+ days left)</td>");
-					} else {
-						$clonedTR.append("<td>Unpaid ("+ taskList[i].daysLeft+" days left)</td>");
-					}
+					$clonedTR.append("<td>Unpaid (" + (daysLeft > 50 ? '50+': daysLeft ) + " days left)</td>");
 				}
 			} else {
 				$clonedTR.addClass("warning");
-				$clonedTR.append("<td>Unpaid (<strong style='color: #ee2222;'>"+ Math.abs(taskList[i].daysLeft)+"</strong> days past due date)</td>");
+				$clonedTR.append("<td>Unpaid (<strong style='color: #ee2222;'>"+ Math.abs(daysLeft)+"</strong> days past due date)</td>");
 			}
-				
 		}
-		$clonedTR.append("<td class='collapsing'>"+ (taskList[i].smsNotification? taskList[i].smsNotification: 'None,')+ (taskList[i].emailNotification? taskList[i].emailNotification: 'None')+"</td>")
-		if(taskList[i].photoId) {
+		$clonedTR.append("<td class='collapsing'>"+ (task.smsNotification? task.smsNotification: 'None,')+ (task.emailNotification? task.emailNotification: 'None')+"</td>")
+		if(task.photoId) {
 			$clonedTR.append("<td class='center aligned collapsing popup'><i class='eye grey icon photo-link'></i></td>");
 		} else {
 			$clonedTR.append("<td class='center aligned collapsing'></td>");
 		}
-		$clonedTR.data('task', taskList[i]);
+		$clonedTR.append("<td class='center aligned'><div class='ui mini compact icon grey basic paid-receipt-upload button'><i class='cloud upload icon'><i></div></td>");
+		$clonedTR.append("<td class='center aligned'><div class='ui mini compact icon blue edit basic button' title='view and edit template'><i class='edit icon'></i></div><div class='ui mini compact icon red basic delete button' title='remove template'><i class='trash alternate icon'></i></div></td>");
+		$clonedTR.data('task', task);
 		$TBODY.append($clonedTR);
 	}
 	$TBODY.find(".ui.checkbox.no-label").checkbox({onChange: function() {
