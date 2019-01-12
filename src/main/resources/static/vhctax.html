@@ -150,7 +150,7 @@
 								</div>
 							</div>
 							<div class="four wide field">
-								<label class="plain-text">Certification Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png" title="click or drop image file">
+								<label class="plain-text">Certification Photo</label><img class="tax-reg-photo" title="click or drop image file">
 								<input type="hidden" name="photoId">
 							</div>
 						</div>
@@ -172,7 +172,7 @@
 								</div>
 							</div>
 							<div class="four wide field">
-								<label class="plain-text">Tax Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png" title="click or drop image file">
+								<label class="plain-text">Tax Photo</label><img class="tax-reg-photo" title="click or drop image file">
 								<input type="hidden" name="photoId">
 							</div>
 						</div>
@@ -192,7 +192,7 @@
 								</div>
 							</div>
 							<div class="four wide field">
-								<label class="plain-text">KIR No. Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png" title="click or drop image file">
+								<label class="plain-text">KIR No. Photo</label><img class="tax-reg-photo" title="click or drop image file">
 								<input type="hidden" name="photoId">
 							</div>
 						</div>
@@ -220,6 +220,53 @@
 				<div class="ui blue right labeled icon small basic save compact button">Save<i class="save icon"></i></div>
 				<div class="ui right labeled icon small basic close compact button">Close <i class="x icon"></i></div>
 			</div>	
+		</div>
+	</div>
+</div>
+<div class="ui modal" id="editModal">
+	<div class="ui basic segment">
+		<div class="ui top attached blue label"><i class="car icon"></i><span class="taxTypeDescription"></span></div>
+		<div class="ui small form">
+			<div class="fields">
+				<div class="fourteen wide field">		
+					<div class="four fields">
+						<div class="field"><label class="plain-text">Label</label><div class="ui small input"><input type="text" readonly="readonly" name="label"></div></div>
+						<div class="field"><label class="plain-text">Model</label><div class="ui small input"><input type="text" readonly="readonly" name="model"></div></div>
+						<div class="field"><label class="plain-text">Plate No.</label><div class="ui small input"><input type="text" readonly="readonly" name="plateNo"></div></div>
+						<div class="field"><label class="plain-text">VIN</label><div class="ui small input"><input type="text" name="vin" readonly="readonly"></div></div>						
+					</div>
+					<div class="four fields">
+						<div class="field"><label class="plain-text">Registration No.</label><div class="ui small input"><input type="text" readonly="readonly" name="registrationNo"></div></div>
+						<div class="field"><label class="plain-text">Due Date</label><div class="ui small input"><input type="text" readonly="readonly" name="dateValidTill"></div></div>
+						<div class="field"><label class="plain-text">Cost</label><div class="ui small right icon input"><input type="text" readonly="readonly" class="cost-input" name="cost" style="text-align: right;"><i class="rupee icon"></i></div></div>
+						<div class="field"><label class="plain-text">Remind Before</label><div class="ui small input"><input type="number" readonly="readonly" name="remindBeforeDays" min="0" style="text-align: right;"></div></div>
+					</div>
+				</div>
+				<div class="two wide field">
+					<label class="plain-text">Photo</label><img class="tax-reg-photo" src="/images/dummy_photo.png" title="click or drop image file">
+					<input type="hidden" name="photoId">
+				</div>
+			</div>
+			<div class="fields">
+				<div class="four wide field">
+					<div class="ui right pointing fluid green label">Payment Status</div>
+				</div>
+				<div class="four wide field">
+					<div class="ui toggle small tax-payment checkbox">
+						<label>Tax Paid</label>
+						<input type="checkbox" name="paid">
+				 	</div>
+				</div>
+				
+			</div>
+			<div class="error-description field"></div>
+			<div class="ui divider"></div>
+			<div class="field">
+				<div style="text-align: center;">
+					<div class="ui blue right labeled icon small basic save compact button">Save<i class="save icon"></i></div>
+					<div class="ui right labeled icon small basic close compact button">Close <i class="x icon"></i></div>
+				</div>	
+			</div>
 		</div>
 	</div>
 </div>

@@ -57,6 +57,8 @@ public class VehicleTaxTask {
 	
 	@Column(name="photo_id")
 	private Long photoId;
+	@Column(name="rcpt_photo_id")
+	private Long receiptPhotoId;
 	
 	@Transient
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

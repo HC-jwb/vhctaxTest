@@ -230,6 +230,13 @@ function showRegistModal(addButton) {
 		$addButton.removeClass("loading");
 	});
 }
+function showEditModal(taskObj) {
+	var $form = $editModal.find(".ui.form:first");
+	$form.form("set values", taskObj);
+	$form.find(".toggle.tax-payment.checkbox").checkbox("set " + (taskObj.paid? 'checked': 'unchecked'));
+	$editModal.modal('show');
+	
+}
 function saveRegistration() {
 	var vehicleId = $registFrm.form('get value', 'vehicleId');
 	if(!vehicleId) {
@@ -401,7 +408,6 @@ function removeCheckedTask(actionButton) {
 			});
 		}
 	});
-	
 }
 function updateTaskCompletePaid(actionButton) {
 	var chkIdList = getAllCheckTaskIds();
@@ -423,7 +429,27 @@ function showTaxPhoto(taskObj) {
 	$photoPopupModal.find("img").attr("src", taskObj.imageURL);
 	$photoPopupModal.modal('show');
 }
-var $registModal, $photoPopupModal, $actionFrm, $taskListTable, $tableLoader, $actionButtons, $registFrm, 
+function editTaxTask(taskObj) {
+	console.log("edit task", taskObj);
+	showEditModal(taskObj);
+}
+function removeTaxTask(taskObj, $TR) {
+	$TR.addClass("active");
+	DialogUI.confirmOk("Delete this task?", function(result) {
+		if(result) {
+			TaxServiceApi.removePaymentTask([taskObj.id], function(response) {
+				if(response.success) {
+					listTaxPaymentTask();
+				} else {
+					alert(response.status.description);
+				}
+			});
+		} else {
+			$TR.removeClass("active");
+		}
+	});
+}
+var $registModal, $editModal, $photoPopupModal, $actionFrm, $taskListTable, $tableLoader, $actionButtons, $registFrm, 
 $certRegistFrm, $taxRegistFrm, $kirRegistFrm, $templateDropdown, certValidTill, taxValidTill, kirValidTill;
 $(function() {
 	$actionFrm = $("#actionFrm");
@@ -431,6 +457,7 @@ $(function() {
 	$taskListTable = $("#taskListTable");
 	$tableLoader = $("#taskTableLoader");
 	$registModal = $("#registModal");
+	$editModal = $("#editModal");
 	$photoPopupModal = $("#photoPopupModal");
 	$registFrm = $registModal.find(">.form");
 	$certRegistFrm = $registFrm.find("#certRegistFrm");
@@ -441,9 +468,8 @@ $(function() {
 	$photoPopupModal.modal({dimmerSettings:{opacity: 0.1}, autofocus:false, closable:true});
 	$photoPopupModal.find(".close.button").click(function() {$photoPopupModal.modal('hide');});
 	$registModal.find(".ui.radio.checkbox").checkbox();
-	$taskListTable.find(".ui.checkbox.chkAll:first").checkbox();
+	$editModal.find(".ui.toggle.tax-payment.checkbox").checkbox();
 	$(".ui.dropdown").dropdown();
-	
 	function getDate(element) {
 		var date;
 		try {date = $.datepicker.parseDate("yy-mm-dd", element.value );} catch(error) { date = null; }
@@ -468,6 +494,7 @@ $(function() {
 		$this.addClass("selected");
 		applyVehicle($this.data("vhc"));
 	});
+	$taskListTable.find(".ui.checkbox.chkAll:first").checkbox();
 	$taskListTable.find(">thead>tr>th>.ui.chkAll.checkbox:first").click(function() {
 		var allChk = $(this).checkbox('is checked');
 		$taskListTable.find(">tbody > tr> td> .ui.task.checkbox").each(function() {
@@ -475,8 +502,17 @@ $(function() {
 			$this.checkbox(allChk? 'check': 'uncheck');/*set checked or set unchecked won't fire onChange event callback*/
 		});
 	});	
-	$taskListTable.on("click", ">tbody>tr>td>.photo-link", function() {
-		showTaxPhoto($(this).closest('tr').data('task'));
+	$taskListTable.on("click", ">tbody>tr>td>.photo-link, >tbody>tr>td>.edit.button, >tbody>tr>td>.delete.button", function() {
+		var $this = $(this);
+		var $TR = $this.closest('tr');
+		if($this.hasClass("photo-link")) {
+			showTaxPhoto($TR.data('task'));
+		} else if($this.hasClass("edit")) {
+			editTaxTask($TR.data('task'));
+		} else if($this.hasClass("delete")) {
+			removeTaxTask($TR.data('task'), $TR);
+		}
+		
 	});
 	$templateDropdown.dropdown({onChange: applyTemplate});
 	$certRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
@@ -509,6 +545,7 @@ $(function() {
 	var cleave = new Cleave('.taxcost-input', {numeral: true,numeralThousandsGroupStyle: 'thousand'});
 	cleave = new Cleave('.certcost-input', {numeral: true,numeralThousandsGroupStyle: 'thousand'});
 	cleave = new Cleave('.kircost-input', {numeral: true,numeralThousandsGroupStyle: 'thousand'});
+	cleave = new Cleave('.cost-input', {numeral: true,numeralThousandsGroupStyle: 'thousand'});
 	listTaxPaymentTask();
 	
 	$actionFrm.find(".ui.search.button:first").click(listTaxPaymentTask);
