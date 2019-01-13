@@ -1,4 +1,4 @@
-function TaxPhotoUploader (fileElement, $uploadButton, uploadURI, options) {
+function TaxPhotoUploader (fileElement, uploadButton, uploadURI, options) {
 	var uploader = this;
 	if(!TaxPhotoUploader.init) {
 		window.addEventListener("dragover",function(e){	e = e || event; e.preventDefault(); },false);
@@ -8,11 +8,21 @@ function TaxPhotoUploader (fileElement, $uploadButton, uploadURI, options) {
 	this.fileElement = fileElement;
 	this.uploadURI = uploadURI;
 	this.filesToUpload = null;
-	$uploadButton.click(function() {
-		uploader.initUpload(); 
-		uploader.fileElement.click();
-		uploader.$clickedSource = $(this);
-	});
+	
+	if(typeof(uploadButton) === 'object') {
+		uploadButton.click(function() {
+			uploader.initUpload(); 
+			uploader.fileElement.click();
+			uploader.$clickedSource = $(this);
+		});
+	} else if(typeof(uploadButton) === 'string') {
+		$("body").on("click", uploadButton, function() {
+			uploader.initUpload(); 
+			uploader.fileElement.click();
+			uploader.$clickedSource = $(this);
+		});
+	}
+	
 	this.fileElement.addEventListener('change', function() {
 		uploader.filterImages(this.files);
 		if(!uploader.filesToUpload) {
@@ -552,8 +562,8 @@ $(function() {
 		} else if($this.hasClass("delete")) {
 			removeTaxTask($TR.data('task'), $TR);
 		}
-		
 	});
+	
 	$templateDropdown.dropdown({onChange: applyTemplate});
 	$certRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
 	$taxRegistFrm.form({fields: {registrationNo: 'empty', dateValidTill: 'empty', cost:'empty', remindBeforeDays: 'empty'}});
@@ -593,10 +603,13 @@ $(function() {
 	$actionButtons.find(".remove.button").click(function() {removeCheckedTask(this); });
 	$actionButtons.find(".complete.button").click(function() {updateTaskCompletePaid(this);});
 	DialogUI.init();/*call only when I want to use dialog ui*/
+	var photoUploadFileElement = document.getElementById("photoUploadFile");
 	uploader = new TaxPhotoUploader(
-		document.getElementById("photoUploadFile"),	
-		$(".tax-reg-photo"), 
-		"/addon/upload/photo", 
+		photoUploadFileElement,$(".tax-reg-photo"),"/addon/upload/photo", 
 		{$dropZone:$('.tax-reg-photo'), multipleUpload:false, fileSizeMax: 10}
+	);
+	rcptUploader = new TaxPhotoUploader(
+		photoUploadFileElement,"#taskListTable>tbody>tr>td .paid-receipt-upload","/addon/upload/photo", 
+		{multipleUpload:false, fileSizeMax: 10}
 	);
 });
