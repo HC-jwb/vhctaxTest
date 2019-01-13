@@ -23,6 +23,7 @@ import hc.fms.api.addon.vhctax.entity.ServiceTemplate;
 import hc.fms.api.addon.vhctax.entity.VehicleTaxTask;
 import hc.fms.api.addon.vhctax.model.VehicleListResponse;
 import hc.fms.api.addon.vhctax.repository.ServiceTemplateRepository;
+import hc.fms.api.addon.vhctax.repository.TaxPhotoRepository;
 import hc.fms.api.addon.vhctax.repository.VehicleTaxPaymentTaskRepository;
 
 @Service
@@ -32,6 +33,8 @@ public class VehicleTaxManagementService {
 	private ServiceTemplateRepository serviceTemplateRepository;
 	@Autowired
 	private VehicleTaxPaymentTaskRepository taxPaymentTaskRepository; 
+	@Autowired
+	private TaxPhotoRepository photoRepository;
 	
 	@Autowired
 	private FmsProperties fmsProps;
@@ -92,7 +95,17 @@ public class VehicleTaxManagementService {
 	}
 	@Transactional
 	public void removePaymentTaskListByIdList(List<Long> taskIdList) {
-		for(Long id : taskIdList) taxPaymentTaskRepository.deleteById(id);
+		VehicleTaxTask task;
+		for(Long id : taskIdList) {
+			task = taxPaymentTaskRepository.findById(id).get();
+			if(task.getPhotoId()!= null) {
+				photoRepository.deleteById(task.getPhotoId());
+			}
+			if(task.getReceiptPhotoId()!= null) {
+				photoRepository.deleteById(task.getReceiptPhotoId());
+			}
+			taxPaymentTaskRepository.deleteById(id);
+		}
 	}
 	@Transactional
 	public void makePaymentTaskListPaid(List<Long> taskIdList) {

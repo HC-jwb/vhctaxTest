@@ -63,7 +63,11 @@ public class VehicleTaxTask {
 	@Transient
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	public String getImageURL() {
-		return String.format("/addon/vhctax/photoimg/%d", this.photoId);
+		return this.photoId == null? "" : String.format("/addon/vhctax/photoimg/%d", this.photoId);
+	}
+	@Transient
+	public String getReceiptImageURL() {
+		return this.receiptPhotoId == null? "" : String.format("/addon/vhctax/photoimg/%d", this.receiptPhotoId);
 	}
 	public Long getDaysLeft() throws ParseException {
 		Date today = dateFormat.parse(dateFormat.format(new Date()));

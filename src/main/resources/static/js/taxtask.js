@@ -48,7 +48,7 @@ function TaxPhotoUploader (fileElement, $uploadButton, uploadURI, options) {
 			uploader.filterImages(e.originalEvent.dataTransfer.files);
 			uploader.uploadTaxPhoto(function(response) {
 				if(response.success) {
-					console.log(response.payload);
+					/*console.log(response.payload);*/
 					var photoObj = response.payload;
 					$this.closest(".field").find("input[name='photoId']").val(photoObj.id);
 					$this.attr("src", photoObj.imageURL);
@@ -74,7 +74,6 @@ TaxPhotoUploader.prototype.filterImages = function(files) {
 	if(validFiles.length > 0) {
 		this.filesToUpload = files;
 	} else {
-		/*alert("Invalid image file!");*/
 		this.filesToUpload = null;
 	}
 };
@@ -177,9 +176,6 @@ function buildTmplDropdown(tmplList) {
 function applyTemplate(text, value, $item) {
  	if(!$item) {return;}
 	var tmpl = $item.data("tmpl");
-	/*tmpl.certificationCost = addCommas(tmpl.certificationCost);
-	tmpl.taxCost = addCommas(tmpl.taxCost);
-	tmpl.kirCost = addCommas(tmpl.kirCost);*/
 	var certMap = {}, taxMap = {}, kirMap= {};
 	certMap.cost = addCommas(tmpl.certificationCost);
 	certMap.remindBeforeDays = tmpl.certificationRemindBeforeDays;
@@ -214,7 +210,7 @@ function showRegistModal(addButton) {
 					buildTmplDropdown(tmplResponse.payload);
 					$registFrm.form('clear');
 					$registFrm.find(".tax-reg-photo").attr("src", "/images/dummy_photo.png");
-									/*$registFrm.find(".ui.radio.checkbox:first").checkbox("set checked");*//*When rquired to reset to all mode*/
+					/*$registFrm.find(".ui.radio.checkbox:first").checkbox("set checked");*//*When rquired to reset to all mode*/
 					$registFrm.find(".ui.checked.radio.checkbox:first").checkbox("set checked");
 					$certRegistFrm.form('set value', 'taskType', 'C');
 					$taxRegistFrm.form('set value', 'taskType', 'T');
@@ -233,10 +229,48 @@ function showRegistModal(addButton) {
 function showEditModal(taskObj) {
 	var $form = $editModal.find(".ui.form:first");
 	$form.form("set values", taskObj);
+	if(taskObj.photoId) {
+		$form.find("img.tax-reg-photo:first").attr("src", taskObj.imageURL);
+	} else {
+		$form.find("img.tax-reg-photo:first").attr("src", "/images/dummy_photo.png");
+	}
 	$form.find(".toggle.tax-payment.checkbox").checkbox("set " + (taskObj.paid? 'checked': 'unchecked'));
+	var typeDesc = 'Unknown';
+	if(taskObj.taskType == 'K') {
+		typeDesc = 'KIR No.';
+	} else if(taskObj.taskType == 'T') {
+		typeDesc = 'Tax No.';
+	} else if(taskObj.taskType == 'C') {
+		typeDesc = 'Certification No.';
+	}
+	$editModal.find("span.taxTypeDescription").text(typeDesc);
+	$editModal.data("taxtask", taskObj);
+
 	$editModal.modal('show');
-	
 }
+function hideEditModal() {
+	$editModal.modal('hide');
+	$editModal.data("taxtask");
+}
+function saveTaxTask() {
+	var taskObj = $editModal.data("taxtask");
+	taskObj.paid = $editModal.find(".ui.toggle.checkbox:first").checkbox("is checked");
+	var valueMap = $editModal.find(".ui.form:first").form("get values");
+	taskObj.registrationNo = valueMap.registrationNo;
+	taskObj.cost = valueMap.cost;
+	taskObj.dateValidTill = valueMap.dateValidTill;
+	taskObj.photoId = valueMap.photoId;
+	taskObj.remindBeforeDays = valueMap.remindBeforeDays;
+	/*console.log("taskObj to save", taskObj);*/
+	TaxServiceApi.saveTaxPaymentTask([taskObj], function(response) {
+		if(response.success) {
+			hideEditModal();
+			listTaxPaymentTask();
+		} else {
+			alert(response.status.description);
+		}
+	});
+} 
 function saveRegistration() {
 	var vehicleId = $registFrm.form('get value', 'vehicleId');
 	if(!vehicleId) {
@@ -367,7 +401,7 @@ function buildTaskTable(taskList) {
 		$TBODY.append($clonedTR);
 	}
 	$TBODY.find(".ui.checkbox.no-label").checkbox({onChange: function() {
-		var $chk = $(this).parent();/*find the actual checkbox class this represens input box*/
+		var $chk = $(this).parent();/*find the actual checkbox class this represents input box*/
 		if($chk.checkbox('is checked')) {
 			$chk.closest('tr').addClass('error');
 		} else {
@@ -429,10 +463,6 @@ function showTaxPhoto(taskObj) {
 	$photoPopupModal.find("img").attr("src", taskObj.imageURL);
 	$photoPopupModal.modal('show');
 }
-function editTaxTask(taskObj) {
-	console.log("edit task", taskObj);
-	showEditModal(taskObj);
-}
 function removeTaxTask(taskObj, $TR) {
 	$TR.addClass("active");
 	DialogUI.confirmOk("Delete this task?", function(result) {
@@ -465,10 +495,20 @@ $(function() {
 	$kirRegistFrm = $registFrm.find("#kirRegistFrm");
 	$templateDropdown = $("#templateDropdown");
 	$registModal.modal({dimmerSettings:{opacity: 0.3}, autofocus:false, closable:false});
+	$editModal.modal({dimmerSettings:{opacity: 0.1}, autofocus:false, closable:false});
+
 	$photoPopupModal.modal({dimmerSettings:{opacity: 0.1}, autofocus:false, closable:true});
 	$photoPopupModal.find(".close.button").click(function() {$photoPopupModal.modal('hide');});
 	$registModal.find(".ui.radio.checkbox").checkbox();
 	$editModal.find(".ui.toggle.tax-payment.checkbox").checkbox();
+	$editModal.find(".ui.button").click(function(){
+		var $this = $(this);
+		if($this.hasClass("close")) {
+			hideEditModal();			
+		} else if($this.hasClass("save")) {
+			saveTaxTask();
+		}
+	});
 	$(".ui.dropdown").dropdown();
 	function getDate(element) {
 		var date;
@@ -508,7 +548,7 @@ $(function() {
 		if($this.hasClass("photo-link")) {
 			showTaxPhoto($TR.data('task'));
 		} else if($this.hasClass("edit")) {
-			editTaxTask($TR.data('task'));
+			showEditModal($TR.data('task'));
 		} else if($this.hasClass("delete")) {
 			removeTaxTask($TR.data('task'), $TR);
 		}
