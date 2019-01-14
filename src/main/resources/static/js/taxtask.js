@@ -276,7 +276,6 @@ function saveRegistration() {
 		taskObj.model = vhcMap.model;
 		taskObj.plateNo = vhcMap.plateNo;
 		taskObj.vin = vhcMap.vin;
-		console.log(taskObj);
 	}
 	TaxServiceApi.saveTaxPaymentTask(taskList, function(response) {
 		if(response.success) {
