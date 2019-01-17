@@ -45,6 +45,7 @@ function TaxPhotoUploader (fileElement, uploadButton, uploadURI, completeCallbac
 		this.options.$dropZone.on("drop", function(e) {
 			e.preventDefault();
 			var $this = $(this);
+			uploader.$clickedSource = $this;
 			$this.removeClass("dragover");
 			uploader.filterImages(e.originalEvent.dataTransfer.files);
 			uploader.uploadTaxPhoto();
@@ -433,7 +434,6 @@ function showTaxPhoto(taskObj, isReceiptPhoto) {
 	} else {
 		$photoPopupModal.find("img").attr("src", taskObj.imageURL);
 	}
-	
 	$photoPopupModal.modal('show');
 }
 function removeTaxTask(taskObj, $TR) {
@@ -593,7 +593,7 @@ $(function() {
 	$actionButtons.find(".complete.button").click(function() {updateTaskCompletePaid(this);});
 	DialogUI.init();/*call only when I want to use dialog ui*/
 	photoUploader = new TaxPhotoUploader(
-			document.getElementById("photoUploadFile"),$(".tax-reg-photo"),"/addon/upload/photo", onPhotoUploadCompleted,
+		document.getElementById("photoUploadFile"),$(".tax-reg-photo"),"/addon/upload/photo", onPhotoUploadCompleted,
 		{$dropZone:$('.tax-reg-photo'), multipleUpload:false, fileSizeMax: 10}
 	);
 	rcptUploader = new TaxPhotoUploader(
