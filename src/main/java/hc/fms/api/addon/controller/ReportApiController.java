@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import hc.fms.api.addon.model.ResponseContainer;
 import hc.fms.api.addon.model.ResponseStatus;
+import hc.fms.api.addon.properties.FmsProperties;
 import hc.fms.api.addon.report.entity.FillDrainStatistics;
 import hc.fms.api.addon.report.entity.FuelStatResult;
 import hc.fms.api.addon.report.entity.GenSection;
@@ -51,6 +52,8 @@ public class ReportApiController {
 	private TrackerService trackerService;
 	@Autowired
 	private FileExportService exportService;
+	@Autowired
+	private FmsProperties fmsProps;
 	private Logger logger = LoggerFactory.getLogger(ReportApiController.class);
 
 	@RequestMapping("/tracker/list")
@@ -307,7 +310,7 @@ public class ReportApiController {
 		ResponseContainer <String> response = new ResponseContainer<>();
 		String hashKey = HttpUtil.hashKey(session);
 		if(hashKey != null) {
-			response.setPayload(String.format("http://new.black-box.id/pro/demo/?session_key=%s", hashKey));
+			response.setPayload(String.format("http://%s/pro/demo/?session_key=%s", fmsProps.getSiteAddress(),hashKey));
 			response.setSuccess(true);
 		} else {
 			ResponseStatus status = new ResponseStatus();
