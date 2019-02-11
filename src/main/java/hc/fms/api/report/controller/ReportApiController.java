@@ -41,6 +41,7 @@ import hc.fms.api.report.model.fuel.FuelEffRateStatSection;
 import hc.fms.api.report.model.fuel.filldrain.FillDrainStatSection;
 import hc.fms.api.report.model.tracker.Tracker;
 import hc.fms.api.report.model.tracker.TrackerSensor;
+import hc.fms.api.report.properties.FmsProperties;
 import hc.fms.api.report.service.AuthService;
 import hc.fms.api.report.service.FileExportService;
 import hc.fms.api.report.service.TrackerService;
@@ -54,6 +55,8 @@ public class ReportApiController {
 	private TrackerService trackerService;
 	@Autowired
 	private FileExportService exportService;
+	@Autowired
+	private FmsProperties fmsProps;
 	private Logger logger = LoggerFactory.getLogger(ReportApiController.class);
 	@RequestMapping("/validate")
 	public ResponseContainer<Boolean> validateSession(HttpSession session) {
@@ -121,9 +124,16 @@ public class ReportApiController {
 				String sensorName;
 				for(TrackerSensor sensor : sensorList) {
 					sensorName = sensor.getName().replaceAll(" ", "");
+/*					
 					if(sensorName.equals("누적연료소모량")) {
 						info.setFuelConsumptionSensorId(sensor.getId());
 					} else if(sensorName.equals("누적운행거리")) {
+						info.setHardwareMileageSensorId(sensor.getId());
+					}
+*/
+					if(sensorName.equals(fmsProps.getApi().getAccumulatedFuelConsumptionLabel().trim())) {
+						info.setFuelConsumptionSensorId(sensor.getId());
+					} else if(sensorName.equals(fmsProps.getApi().getAccumulatedHardwareMileageLabel().trim())) {
 						info.setHardwareMileageSensorId(sensor.getId());
 					}
 				}
