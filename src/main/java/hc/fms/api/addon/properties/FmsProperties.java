@@ -20,5 +20,7 @@ public class FmsProperties {
 		private String reportGen;
 		private String reportRetrieve;
 		private String vehicleList;
+		private String accumulatedFuelConsumptionLabel;
+		private String accumulatedHardwareMileageLabel;
 	}
 }

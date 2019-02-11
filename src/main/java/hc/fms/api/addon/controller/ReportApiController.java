@@ -87,6 +87,7 @@ public class ReportApiController {
 			"label": "01-레이벤-45하8608(2017) & 02-모닝-45하9940(2016) 누적운행거리"
 		}
 		*/
+
 		req.setHash(HttpUtil.hashKey(session));
 		req.setClientId(clientId(session));
 		logger.info(String.format("requestFuelEffRateReportGen:: session Key %s, clientId: %s",req.getHash(), req.getClientId()));
@@ -99,9 +100,16 @@ public class ReportApiController {
 				String sensorName;
 				for(TrackerSensor sensor : sensorList) {
 					sensorName = sensor.getName().replaceAll(" ", "");
+/*					
 					if(sensorName.equalsIgnoreCase("fuel_consumption")) {
 						info.setFuelConsumptionSensorId(sensor.getId());
 					} else if(sensorName.equalsIgnoreCase("hardware_mileage")) {
+						info.setHardwareMileageSensorId(sensor.getId());
+					}
+*/
+					if(sensorName.equalsIgnoreCase(fmsProps.getApi().getAccumulatedFuelConsumptionLabel().trim())) {
+						info.setFuelConsumptionSensorId(sensor.getId());
+					} else if(sensorName.equalsIgnoreCase(fmsProps.getApi().getAccumulatedHardwareMileageLabel().trim())) {
 						info.setHardwareMileageSensorId(sensor.getId());
 					}
 				}
