@@ -2,6 +2,8 @@ package hc.fms.api.addon.report.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import hc.fms.api.addon.model.ResponseStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,4 +19,6 @@ public class ReportGenResponse {
 	private long id;
 	private ResponseStatus status;
 	private List<ResponseError> errors;
+	@JsonProperty("max_time_span")
+	private String  maxTimeSpan;
 }
