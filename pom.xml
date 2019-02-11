@@ -5,7 +5,7 @@
 
 	<groupId>hc.fms.api</groupId>
 	<artifactId>handycar-fms-api-report</artifactId>
-	<version>0.1</version>
+	<version>1.0</version>
 	<packaging>war</packaging>
 
 	<name>handycar-fms-api-report</name>
