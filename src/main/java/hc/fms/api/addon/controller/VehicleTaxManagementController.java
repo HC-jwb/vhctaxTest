@@ -5,8 +5,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +27,7 @@ import hc.fms.api.addon.vhctax.service.VehicleTaxManagementService;
 @CrossOrigin("*")
 @RequestMapping("/addon/vhctax/api/*")
 public class VehicleTaxManagementController {
-	private Logger logger = LoggerFactory.getLogger(VehicleTaxManagementController.class);
+	//private Logger logger = LoggerFactory.getLogger(VehicleTaxManagementController.class);
 	@Autowired
 	private VehicleTaxManagementService vhcTaxManagementService;
 	@RequestMapping("vehicle/list")

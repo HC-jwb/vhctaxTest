@@ -226,6 +226,7 @@ function saveTaxTask() {
 	taskObj.dateValidTill = valueMap.dateValidTill;
 	taskObj.photoId = valueMap.photoId;
 	taskObj.remindBeforeDays = valueMap.remindBeforeDays;
+	taskObj.vin = valueMap.vin;
 	/*console.log("taskObj to save", taskObj);*/
 	TaxServiceApi.saveTaxPaymentTask([taskObj], function(response) {
 		if(response.success) {
@@ -362,7 +363,7 @@ function buildTaskTable(taskList) {
 		if(task.receiptPhotoId) {
 			$clonedTR.append("<td class='center aligned'><i class='eye grey icon tax-receipt photo-link'></i><div class='ui mini compact icon grey basic paid-receipt-upload button'><i class='cloud upload blue icon'><i></div></td>");
 		} else {
-			$clonedTR.append("<td class='center aligned'><div class='ui mini compact icon grey basic paid-receipt-upload button'><i class='cloud upload icon'><i></div></td>");
+			$clonedTR.append("<td class='right aligned'><div class='ui mini compact icon grey basic paid-receipt-upload button'><i class='cloud upload icon'><i></div></td>");
 		}
 		
 		$clonedTR.append("<td class='center aligned'><div class='ui mini compact icon blue edit basic button' title='view and edit template'><i class='edit icon'></i></div><div class='ui mini compact icon red basic delete button' title='remove template'><i class='trash alternate icon'></i></div></td>");
@@ -479,7 +480,7 @@ function onTaxReceiptUploadCompleted(response) {
 	}
 }
 var $registModal, $editModal, $photoPopupModal, $actionFrm, $taskListTable, $tableLoader, $actionButtons, $registFrm, 
-$certRegistFrm, $taxRegistFrm, $kirRegistFrm, $templateDropdown, certValidTill, taxValidTill, kirValidTill;
+$certRegistFrm, $taxRegistFrm, $kirRegistFrm, $templateDropdown, certValidTill, taxValidTill, kirValidTill, editValidTill;
 $(function() {
 	$actionFrm = $("#actionFrm");
 	$actionButtons = $("#actionButtons");
@@ -527,6 +528,7 @@ $(function() {
 	certValidTill = $("#certValidTill").datepicker({dateFormat: 'yy-mm-dd', numberOfMonths: 1, changeMonth: true, changeYear: true});
 	taxValidTill = $("#taxValidTill").datepicker({dateFormat: 'yy-mm-dd', numberOfMonths: 1, changeMonth: true, changeYear: true});
 	kirValidTill = $("#kirValidTill").datepicker({dateFormat: 'yy-mm-dd', numberOfMonths: 1, changeMonth: true, changeYear: true});
+	editValidTill = $("#editValidTill").datepicker({dateFormat: 'yy-mm-dd', numberOfMonths: 1, changeMonth: true, changeYear: true});
 	$registModal.find(".ui.table:first > tbody").on("click", "> tr", function() {
 		var $this = $(this);
 		$this.parent().find("tr").removeClass("selected");
