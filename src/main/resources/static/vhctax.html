@@ -42,8 +42,8 @@
 		<div class="right-column-content-container">
 			<div class="ui small unstackable form" id="actionFrm" style="padding-top: 0.5em;">
 				<div class="inline fields">
-					<div class="four wide field">
-						<label>Payment type:</label>
+					<div class="three wide field">
+						<label>Type:</label>
 						<div class="ui selection dropdown" style="min-width: 11em;">
 							<i class="dropdown icon"></i>
 							<input type='hidden' name="taskType">
@@ -56,7 +56,20 @@
 							</div>
 						</div>
 					</div>
-					<div class="seven wide inline field">
+					<div class="three wide inline field">
+						<label>Status:</label>
+						<div class="ui selection dropdown" style="min-width: 7em;">
+							<i class="dropdown icon"></i>
+							<input type="hidden" name="statType">
+							<div class="default text">All</div>
+							<div class="ui menu">
+								<div class="item" data-value="">All</div>
+								<div class="item" data-value="1">Paid</div>
+								<div class="item" data-value="0">Unpaid</div>
+							</div>
+						</div>
+					</div>
+					<div class="five wide inline field">
 						<label>Period:</label>
 						<div class="ui small left icon input">
 							<input type="text" placeholder="Date from" id="fromDate" name="fromDate"><i class="calendar alternate outline icon"></i>
@@ -66,7 +79,7 @@
 							<input type="text" placeholder="Date to" id="toDate" name="toDate"><i class="calendar alternate outline icon"></i>
 						</div>
 					</div>
-					<div class="four wide field" id="actionButtons">
+					<div class="three wide field" id="actionButtons">
 						<div class="ui orange tiny compact icon basic add button" title="add new tax payment task"><i class="plus icon"></i></div>
 						<div class="ui tiny compact icon basic button complete" title="set status of checked items as paid"><i class="check icon"></i></div>
 						<div class="ui tiny compact icon basic button print"><i class="print icon"></i></div>

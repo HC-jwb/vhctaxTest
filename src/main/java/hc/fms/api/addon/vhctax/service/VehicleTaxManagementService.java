@@ -84,14 +84,20 @@ public class VehicleTaxManagementService {
 		return taxPaymentTaskRepository.saveAll(taskList);
 	}
 
-	public List<VehicleTaxTask> listTaxTaskList(String taskType, String fromDate, String toDate) {
+	public List<VehicleTaxTask> listTaxTaskList(String taskType, String paymentStatus, String fromDate, String toDate) {
 		List<String> typeList = null;
+		List<Boolean>statList = null;
 		if("".equals(taskType)) {
 			typeList = Arrays.asList("T", "C", "K");
 		} else {
 			typeList = Arrays.asList(taskType);
 		}
-		return taxPaymentTaskRepository.listTaxTaskList(typeList, fromDate, toDate);
+		if("".equals(paymentStatus)) {
+			statList = Arrays.asList(Boolean.TRUE, Boolean.FALSE);
+		} else {
+			statList = Arrays.asList("1".equals(paymentStatus));
+		}
+		return taxPaymentTaskRepository.listTaxTaskList(typeList, statList, fromDate, toDate);
 	}
 	@Transactional
 	public void removePaymentTaskListByIdList(List<Long> taskIdList) {

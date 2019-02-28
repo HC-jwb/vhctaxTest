@@ -15,8 +15,12 @@ public interface VehicleTaxPaymentTaskRepository extends JpaRepository<VehicleTa
  * @Query(value="select r from Reservation r join r.user u join  u.group ug join ug.company c where c.id=:compId and r.vehicleId=:vhcId and (r.startDate between :startDate and :endDate or r.endDate between :startDate and :endDate) and r.status IN :statList")
 	List<Reservation> findAllByStartDateBetweenOrEndDateBetweenInCompanyAndVehicleIdAndStatCodeList(@Param("startDate") String startDate, @Param("endDate") String endDate, @Param("compId") Long compId, @Param("vhcId") Long vhcId, @Param("statList") List<String> statList);
  */
+/*	
 	@Query(value="select t from VehicleTaxTask t where t.taskType IN :typeList and t.dateValidTill between :fromDate and :toDate order by t.dateValidTill ASC")
 	public List<VehicleTaxTask> listTaxTaskList(@Param("typeList") List<String> typeList, @Param("fromDate") String fromDate, @Param("toDate") String toDate);
+*/	
+	@Query(value="select t from VehicleTaxTask t where t.taskType IN :typeList and t.paid IN :statList and t.dateValidTill between :fromDate and :toDate order by t.dateValidTill ASC")
+	public List<VehicleTaxTask> listTaxTaskList(@Param("typeList") List<String> typeList, @Param("statList") List<Boolean> statList, @Param("fromDate") String fromDate, @Param("toDate") String toDate);
 	
 	@Modifying
 	@Query(value="update VehicleTaxTask t set t.paid=TRUE where t.id=:taskId")

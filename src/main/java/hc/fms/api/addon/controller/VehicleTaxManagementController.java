@@ -119,10 +119,13 @@ public class VehicleTaxManagementController {
 		ResponseContainer<List<VehicleTaxTask>> response = new ResponseContainer<>();
 		//logger.info(searchCond.toString());
 		String taskType = searchCond.get("taskType");
+		String paymentStatus = searchCond.get("statType");
 		String fromDate = searchCond.get("fromDate");
 		String toDate = searchCond.get("toDate");
+		
 		try {
-			response.setPayload(vhcTaxManagementService.listTaxTaskList(taskType, fromDate, toDate));
+			//response.setPayload(vhcTaxManagementService.listTaxTaskList(taskType, fromDate, toDate));
+			response.setPayload(vhcTaxManagementService.listTaxTaskList(taskType, paymentStatus, fromDate, toDate));
 			response.setSuccess(true);
 		} catch(Exception e) {
 			response.setStatus(new ResponseStatus(e.getMessage()));
