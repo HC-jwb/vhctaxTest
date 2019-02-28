@@ -345,9 +345,9 @@ function buildTaskTable(taskList) {
 			var daysLeft = task.daysLeft;
 			if(daysLeft > 0) {
 				if(task.remindBeforeDays >= daysLeft) {
-					$clonedTR.append("<td>Unpaid (<strong style='color: #ee2222;'>"+ daysLeft+"</strong> day(s) left)</td>");
+					$clonedTR.append("<td class='collapsing'>Unpaid (<strong style='color: #ee2222;'>"+ daysLeft+"</strong> day(s) left)</td>");
 				} else {
-					$clonedTR.append("<td>Unpaid (" + (daysLeft > 50 ? '50+': daysLeft ) + " days left)</td>");
+					$clonedTR.append("<td class='collapsing'>Unpaid (" + (daysLeft > 50 ? '50+': daysLeft ) + " days left)</td>");
 				}
 			} else {
 				$clonedTR.addClass("warning");
