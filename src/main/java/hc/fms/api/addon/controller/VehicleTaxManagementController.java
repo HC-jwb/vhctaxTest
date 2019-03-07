@@ -1,11 +1,16 @@
 package hc.fms.api.addon.controller;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -131,6 +136,15 @@ public class VehicleTaxManagementController {
 			response.setStatus(new ResponseStatus(e.getMessage()));
 		}
 		return response;
+	}
+	@RequestMapping("task/list/download")
+	public ResponseEntity<InputStreamResource> downloadVehicleTaxTaskListReport(@RequestBody Map<String, String> cond) {
+		HttpHeaders headers = new HttpHeaders();
+		InputStream in = null;
+		return ResponseEntity
+				.ok()
+				.contentType(MediaType.parseMediaType("application/octet-stream"))
+				.headers(headers).body(new InputStreamResource(in));
 	}
 	@PostMapping("task/remove")
 	public ResponseContainer<Void> removePaymentTaskList(@RequestBody List<Long> taskIdList) {
