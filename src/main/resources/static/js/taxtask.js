@@ -429,6 +429,17 @@ function updateTaskCompletePaid(actionButton) {
 		});
 	});
 }
+function printReport() {
+    var actionParam = $actionFrm.form('get values');
+    actionParam.reportFileFormat = "pdf";
+    TaxServiceApi.printPaymentTaskListReport(actionParam);
+}
+function downloadReport(itemButton) {
+    var $btn = $(itemButton);
+    var actionParam = $actionFrm.form('get values');
+    actionParam.reportFileFormat = $btn.hasClass("pdf") ? "pdf": "xls";
+    TaxServiceApi.downloadPaymentTaskListReport(actionParam);
+}
 function showTaxPhoto(taskObj, isReceiptPhoto) {
 	if(isReceiptPhoto) {
 		$photoPopupModal.find("img").attr("src", taskObj.receiptImageURL);
@@ -592,7 +603,9 @@ $(function() {
 	$actionFrm.find(".ui.search.button:first").click(listTaxPaymentTask);
 	$actionButtons.find(".ui.add.button:first").click(function() {showRegistModal(this);});
 	$actionButtons.find(".remove.button").click(function() {removeCheckedTask(this); });
-	$actionButtons.find(".complete.button").click(function() {updateTaskCompletePaid(this);});
+    $actionButtons.find(".complete.button").click(function() {updateTaskCompletePaid(this);});
+    $actionButtons.find(".print.button:first").click(printReport);
+    $actionButtons.find(".download.button .menu .item").click(function() {downloadReport(this);});
 	DialogUI.init();/*call only when I want to use dialog ui*/
 	photoUploader = new TaxPhotoUploader(
 		document.getElementById("photoUploadFile"),$(".tax-reg-photo"),"/addon/upload/photo", onPhotoUploadCompleted,
