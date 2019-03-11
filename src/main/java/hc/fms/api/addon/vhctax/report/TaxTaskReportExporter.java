@@ -237,7 +237,7 @@ public class TaxTaskReportExporter {
 		
 		
 		Paragraph nearestTask = new Paragraph()
-		.add(new Paragraph("The nearest payment task: ").setFont(tableHeaderFont).setMargin(0))
+		.add(new Paragraph("The nearest payment task to come: ").setFont(tableHeaderFont).setMargin(0))
 		.add(
 			new Paragraph(genData.getNearestPaymentTaskToCome())
 			.setMargin(0)
@@ -483,7 +483,7 @@ public class TaxTaskReportExporter {
 			cell = row.createCell(colOffset);
 			style = workbook.createCellStyle();
 			style.setFont(font);
-			cell.setCellValue("The nearest payment task: " + genData.getNearestPaymentTaskToCome());
+			cell.setCellValue("The nearest payment task to come: " + genData.getNearestPaymentTaskToCome());
 			cell.setCellStyle(style); 
 			
 			rangeAddress = new CellRangeAddress(rowNum,rowNum, colOffset, 4);

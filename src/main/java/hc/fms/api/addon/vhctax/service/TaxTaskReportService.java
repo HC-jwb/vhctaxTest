@@ -27,7 +27,7 @@ public class TaxTaskReportService {
 		List<String> row;
 		int paid = 0, unpaid = 0;
 		Double paidCost = 0d, unpaidCost = 0d;
-		VehicleTaxTask nearestUnpaidTask = null, farthestUnpaidTask = null;
+		VehicleTaxTask nearestUnpaidTask = null, latestPaymentTask = null;
 		long daysLeft;
 		for(VehicleTaxTask task: vhcTaxTaskList) {
 			row = new ArrayList<String>();
@@ -38,22 +38,26 @@ public class TaxTaskReportService {
 			row.add(task.getRegistrationNo());
 			row.add(numberFormat.format(task.getCost()));
 			row.add(task.getDateValidTill());
+			daysLeft = task.getDaysLeft();
+			
 			if(task.isPaid()) {
 				row.add("Paid");
+				
+				if(latestPaymentTask == null) {
+					latestPaymentTask = task;
+				} else {
+					if(daysLeft > latestPaymentTask.getDaysLeft()) latestPaymentTask = task;
+				}
+				
 				paid++;
 				paidCost += task.getCost();
 			} else {
-				daysLeft = task.getDaysLeft();
 				if(nearestUnpaidTask == null) {
 					nearestUnpaidTask = task;
 				} else {
 					if(daysLeft < nearestUnpaidTask.getDaysLeft()) nearestUnpaidTask = task;
 				}
-				if(farthestUnpaidTask == null) {
-					farthestUnpaidTask = task;
-				} else {
-					if(daysLeft > farthestUnpaidTask.getDaysLeft()) farthestUnpaidTask = task;
-				}
+				
 				row.add(String.format("%s day(s) left", numberFormat.format(daysLeft)));
 				unpaid++;
 				unpaidCost += task.getCost();
@@ -81,14 +85,14 @@ public class TaxTaskReportService {
 			)
 		);
 		genData.setFarthestPaymentTaskToCome(
-				farthestUnpaidTask == null ? "" : 
+				latestPaymentTask == null ? "" : 
 			String.format(
 				"%s - %s(%s) %s (%s days left)", 
-				farthestUnpaidTask.getLabel(), 
-				ReportGenData.getTaskTypeDescription(farthestUnpaidTask.getTaskType()),
-				farthestUnpaidTask.getPlateNo(),
-				farthestUnpaidTask.getDateValidTill(),
-				numberFormat.format(farthestUnpaidTask.getDaysLeft())
+				latestPaymentTask.getLabel(), 
+				ReportGenData.getTaskTypeDescription(latestPaymentTask.getTaskType()),
+				latestPaymentTask.getPlateNo(),
+				latestPaymentTask.getDateValidTill(),
+				numberFormat.format(latestPaymentTask.getDaysLeft())
 			)
 		);
 		
