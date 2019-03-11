@@ -10,21 +10,12 @@ import org.springframework.stereotype.Service;
 import hc.fms.api.addon.vhctax.entity.VehicleTaxTask;
 import hc.fms.api.addon.vhctax.model.TaxTaskListRequest;
 import hc.fms.api.addon.vhctax.report.ReportGenData;
-import hc.fms.api.addon.vhctax.report.TaxTaskReportPdfExporter;
+import hc.fms.api.addon.vhctax.report.TaxTaskReportExporter;
 
 @Service
 public class TaxTaskReportService {
 	private NumberFormat numberFormat = NumberFormat.getInstance();
 	
-	public InputStream exportAsPdf(ReportGenData genData) throws Exception {
-		
-		TaxTaskReportPdfExporter exporter = new TaxTaskReportPdfExporter(genData);
-		return exporter.exportAsInputStream();
-	}
-	
-	public InputStream exportAsXls(ReportGenData data) {
-		return null;
-	}
 	public InputStream exportEntity(List<VehicleTaxTask> vhcTaxTaskList, TaxTaskListRequest reportReq) throws Exception {
 		ReportGenData genData = new ReportGenData();
 		genData.setPeriodFrom(reportReq.getFromDate());
@@ -103,13 +94,12 @@ public class TaxTaskReportService {
 		
 		genData.setRowData(rows);
 		
-		
-		
+		TaxTaskReportExporter exporter = new TaxTaskReportExporter(genData);
 		switch(reportReq.getReportFileFormat()) {
 		case "pdf":
-			return exportAsPdf(genData);
-		case "xls":
-			return exportAsXls(genData);
+			return exporter.exportPdfAsInputStream();
+		case "xlsx":
+			return exporter.exportXlsAsInputStream();
 		default:
 			throw new RuntimeException("Unknown export Type " + reportReq.getReportFileFormat());
 		}

@@ -1,17 +1,14 @@
 package hc.fms.api.addon.vhctax.service;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,15 +99,7 @@ public class VehicleTaxManagementService {
 		}
 		return taxPaymentTaskRepository.listTaxTaskList(typeList, statList, fromDate, toDate);
 	}
-	//////////////This is for xls, pdf report for taxtask list////////////////////
-	public ResponseEntity<InputStreamResource> downloadTaxTaskListReport() {
-		InputStream in = null;
-		HttpHeaders headers = new HttpHeaders();
-		return ResponseEntity
-				.ok()
-				.contentType(MediaType.parseMediaType("application/octet-stream"))
-				.headers(headers).body(new InputStreamResource(in));
-	}
+
 	@Transactional
 	public void removePaymentTaskListByIdList(List<Long> taskIdList) {
 		VehicleTaxTask task;

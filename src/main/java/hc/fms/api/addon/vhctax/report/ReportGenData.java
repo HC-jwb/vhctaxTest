@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +34,7 @@ public class ReportGenData {
 	public static final float[] LIST_TABLE_COL_WIDTHS = new float[] {1, 1, 1, 1, 1, 1, 1, 250, 1};
 	public static final String [] TABLE_COLS = {"Label", "Model", "Plate No.", "Type", "Payment No.", "Cost", "Due Date", "Status", "Payment Receipt"};
 	
-	private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMM. dd , yyyy");
+	private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMM. dd , yyyy", Locale.US);
 	private static SimpleDateFormat parseFormat = new SimpleDateFormat("yyyy-MM-dd");
 	public ReportGenData() {
 		reportGenDate = dateFormat.format(new Date());
@@ -73,7 +74,6 @@ public class ReportGenData {
 		}
 	}
 	public static String convertDateFormat(String yyyyMMdd) throws ParseException {
-		
 		return dateFormat.format(parseFormat.parse(yyyyMMdd));
 	}
 }

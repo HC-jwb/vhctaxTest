@@ -13,4 +13,7 @@ public class TaxTaskListRequest {
 	private String fromDate;
 	private String toDate;
 	private String reportFileFormat;
+	public String getReportFileFormat() {
+		return this.reportFileFormat.equals("xls")? "xlsx" : this.reportFileFormat;
+	}
 }
