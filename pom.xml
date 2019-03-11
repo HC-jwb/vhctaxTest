@@ -5,7 +5,7 @@
 
 	<groupId>hc.fms.addon.vhctax</groupId>
 	<artifactId>handycar-fms-addon-vhctax</artifactId>
-	<version>0.1</version>
+	<version>0.91</version>
 	<packaging>war</packaging>
 
 	<name>handycar-fms-api-report</name>
@@ -77,16 +77,16 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
- 	
+ <!-- 	
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
-
+ -->
  		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itext7-core</artifactId>
-			<version>RELEASE</version>
+			<version>7.1.5</version>
 			<type>pom</type>
 		</dependency>
    </dependencies>

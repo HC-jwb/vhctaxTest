@@ -6,7 +6,6 @@ function getGroupList() {
             for(var i = 0; i < list.length; i++) {
 				$menu.append("<div class='tracker item' data-value='" + list[i].id + "'>" + list[i].title + "</div>");
             }
-            $trackerListDropdown.dropdown('restore defaults');
 		} else {
 			FormUI.displayMsgIn($reportGenFrm, response.status.description);
 		}
@@ -23,7 +22,8 @@ function getTrackerList(groupId) {
 			}
 			for(var i = 0; i < list.length; i++) {
 				$menu.append("<div class='tracker item' data-value='" + list[i].id + "'>" + list[i].label + "</div>");
-			}
+            }
+            $trackerListDropdown.dropdown('restore defaults');
 		} else {
 			FormUI.displayMsgIn($reportGenFrm, response.status.description);;
 		}
