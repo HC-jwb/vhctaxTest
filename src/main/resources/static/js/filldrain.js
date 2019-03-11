@@ -1,7 +1,11 @@
 function getGroupList() {
 	ReportApi.getGroupList(function(response) {
 		if(response.success) {
-			console.log(response);
+           var list = response.list;
+            var $menu = $trackerGroupListDropdown.find(".menu");
+            for(var i = 0; i < list.length; i++) {
+				$menu.append("<div class='tracker item' data-value='" + list[i].id + "'>" + list[i].title + "</div>");
+			}
 		} else {
 			FormUI.displayMsgIn($reportGenFrm, response.status.description);
 		}
@@ -18,7 +22,8 @@ function getTrackerList(groupId) {
 			}
 			for(var i = 0; i < list.length; i++) {
 				$menu.append("<div class='tracker item' data-value='" + list[i].id + "'>" + list[i].label + "</div>");
-			}
+            }
+            $trackerListDropdown.dropdown('restore defaults');
 		} else {
 			FormUI.displayMsgIn($reportGenFrm, response.status.description);;
 		}
@@ -219,7 +224,7 @@ function rebuildTableByVolumeDiff(pcnt) {
 		buildStatTable(cached);
 	}
 } 
-var $reportGenFrm, $trackerListDropdown, $genReportList, $reportGenItem, $reportGenAccordion, scrollTabs, $scrollTabs, $statTableContainer, $scrolltabsContainer;
+var $reportGenFrm, $trackerGroupListDropdown,$trackerListDropdown, $genReportList, $reportGenItem, $reportGenAccordion, scrollTabs, $scrollTabs, $statTableContainer, $scrolltabsContainer;
 $(function() {
 	$scrollTabs = $("#scrollTabs");
 	$scrolltabsContainer = $("#scrolltabsContainer");
@@ -230,8 +235,9 @@ $(function() {
 	$genReportList = $("#genReportList");
 	$statTableContainer = $("#statTableContainer");
 	$reportGenItem = $("<div class='item'><div class='content'><div class='description'></div></div>");
-	$reportGenAccordion.accordion();
-	$("#trackerGroupListDropdown").dropdown({onChange: getTrackerList});
+    $reportGenAccordion.accordion();
+    $trackerGroupListDropdown = $("#trackerGroupListDropdown");
+	$trackerGroupListDropdown.dropdown({onChange: getTrackerList});
 	$trackerListDropdown.dropdown({fullTextSearch: true, clearable: true});
 	
 	$reportGenFrm.find(".close.button").click(closeAccordion);
@@ -275,5 +281,5 @@ $(function() {
 	$(".ui.radio.checkbox").click(function() { 
 		rebuildTableByVolumeDiff($(this).find("input[type='radio']").val()); 
 	});
-/*getGroupList();*/
+    getGroupList();
 });

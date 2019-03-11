@@ -53,7 +53,7 @@ public class VehicleTaxManagementService {
 					new HttpEntity<>(map, basicUrlEncodedContentTypeHeaders), 
 					vehicleListResponseTypeRef
 			);
-			response= responseEntity.getBody();
+			response = responseEntity.getBody();
 		} catch(HttpStatusCodeException  e) {
 			try {response = HttpUtil.getObjectMapper().readValue(e.getResponseBodyAsString(), VehicleListResponse.class);} catch(Exception ex) { ex.printStackTrace();}
 		}
