@@ -23,6 +23,11 @@ html,body, .main-container, .left-column, .left-column > .ui.segment, .right-col
 #reportGenFrm {min-width: 850px;}
 #scrollTabs{margin-top: 0.5em;}
 
+.main-container-test {padding: 44px 0.3em 0.2em 0.3em ;}
+.main-container-test div.left-column {width: 320px; padding:0; float:left; overflow-x: auto;}
+.main-container-test div.right-column {width: calc(100% - 330px); padding: 0 0.5em; float:right; overflow-y: auto;}
+
+
 @media (min-width:2401px) {#scrolltabsContainer {width: 100%;}}
 @media (min-width: 2301px) and (max-width: 2400px) {#scrolltabsContainer {width: 1845px;}}
 @media (min-width: 2101px) and (max-width: 2200px) {#scrolltabsContainer {width: 1745px;}}

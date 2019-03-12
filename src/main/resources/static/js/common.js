@@ -45,6 +45,8 @@ $(function () {
 			window.location.replace("/filling.html")
 		} else if($this.hasClass("vehicle tax")) {
 			window.location.replace("/vhctax.html");
+		} else if($this.hasClass("test")) {			
+			window.location.replace("/test.html");
 		}
 	});
 	$("#taxSubMenu .item").click(function() {
